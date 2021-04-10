@@ -13,35 +13,35 @@
 $gameinfos = array( 
 
 // Name of the game in English (will serve as the basis for translation) 
-'game_name' => "My Great Game",
+'game_name' => "Spot it",
 
 // Game designer (or game designers, separated by commas)
-'designer' => 'John Doe',       
+'designer' => 'Denis Blanchot', 'Jacques Cottereau', 'Guillaume Gille-Naves', 'Igor Polouchine',       
 
 // Game artist (or game artists, separated by commas)
-'artist' => 'Jane Doe',         
+'artist' => 'Denis Blanchot', 'Ingrid Vang Nyman', 'Peyo', 'Igor Polouchine',         
 
 // Year of FIRST publication of this game. Can be negative.
-'year' => 2000,                 
+'year' => 2009,                 
 
 // Game publisher (use empty string if there is no publisher)
-'publisher' => 'My Publishing Company',                     
+'publisher' => 'Asmodee',                     
 
 // Url of game publisher website
-'publisher_website' => 'http://www.mypublishingcompany.com/',   
+'publisher_website' => 'http://www.asmodee.com',   
 
 // Board Game Geek ID of the publisher
-'publisher_bgg_id' => 1234,
+'publisher_bgg_id' => 157,
 
 // Board game geek ID of the game
 'bgg_id' => 63268,
 
 
 // Players configuration that can be played (ex: 2 to 4 players)
-'players' => array( 2,3,4 ),    
+'players' => array( 2,3,4,5,6,7,8 ),    
 
 // Suggest players to play with this number of players. Must be null if there is no such advice, or if there is only one possible player configuration.
-'suggest_player_number' => null,
+'suggest_player_number' => 4,
 
 // Discourage players to play with these numbers of players. Must be null if there is no such advice.
 'not_recommend_player_number' => null,
@@ -49,7 +49,7 @@ $gameinfos = array(
 
 
 // Estimated game duration, in minutes (used only for the launch, afterward the real duration is computed)
-'estimated_duration' => 30,           
+'estimated_duration' => 15,           
 
 // Time in second add to a player when "giveExtraTime" is called (speed profile = fast)
 'fast_additional_time' => 30,           
@@ -87,16 +87,16 @@ $gameinfos = array(
 'language_dependency' => false,
 
 // Complexity of the game, from 0 (extremely simple) to 5 (extremely complex)
-'complexity' => 3,    
+'complexity' => 1,    
 
 // Luck of the game, from 0 (absolutely no luck in this game) to 5 (totally luck driven)
-'luck' => 3,    
+'luck' => 0,    
 
 // Strategy of the game, from 0 (no strategy can be setup) to 5 (totally based on strategy)
-'strategy' => 3,    
+'strategy' => 1,    
 
 // Diplomacy of the game, from 0 (no interaction in this game) to 5 (totally based on interaction and discussion between players)
-'diplomacy' => 3,    
+'diplomacy' => 5,    
 
 // Colors attributed to players
 'player_colors' => array( "ff0000", "008000", "0000ff", "ffa500", "773300" ),
@@ -131,9 +131,9 @@ $gameinfos = array(
 // Each paragraph must be wrapped with totranslate() for translation and should not contain html (plain text without formatting).
 // A good length for this text is between 100 and 150 words (about 6 to 9 lines on a standard display)
 'presentation' => array(
-//    totranslate("This wonderful game is about geometric shapes!"),
-//    totranslate("It was awarded best triangle game of the year in 2005 and nominated for the Spiel des Jahres."),
-//    ...
+    totranslate("Spot it!, a.k.a. Dobble, is a simple pattern recognition game in which players try to find an image shown on two cards."),
+    totranslate("Each card in original Spot it! features eight different symbols, with the symbols varying in size from one card to the next. Any two cards have exactly one symbol in common. For the basic Spot it! game, reveal one card, then another. Whoever spots the symbol in common on both cards claims the first card, then another card is revealed for players to search, and so on. Whoever has collected the most cards when the 55-card deck runs out wins!"),
+    totranslate("Rules for different games – each an observation game with a speed element – are included with Spot it!, with the first player to find a match either gaining or getting rid of a card."),
 ),
 
 // Games categories
@@ -143,7 +143,7 @@ $gameinfos = array(
 //  http://en.doc.boardgamearena.com/Game_meta-information:_gameinfos.inc.php
 //  IMPORTANT: this list should be ORDERED, with the most important tag first.
 //  IMPORTANT: it is mandatory that the FIRST tag is 1, 2, 3 and 4 (= game category)
-'tags' => array( 2 ),
+'tags' => array( 2,10,20 ,200,207),
 
 
 //////// BGA SANDBOX ONLY PARAMETERS (DO NOT MODIFY)

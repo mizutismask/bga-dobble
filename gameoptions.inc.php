@@ -23,35 +23,21 @@
  * !! It is not a good idea to modify this file when a game is running !!
  *
  */
+require_once("modules/php/constants.inc.php");
 
 $game_options = array(
-
-    /*
-    
-    // note: game variant ID should start at 100 (ie: 100, 101, 102, ...). The maximum is 199.
-    100 => array(
-                'name' => totranslate('my game option'),    
-                'values' => array(
-
-                            // A simple value for this option:
-                            1 => array( 'name' => totranslate('option 1') )
-
-                            // A simple value for this option.
-                            // If this value is chosen, the value of "tmdisplay" is displayed in the game lobby
-                            2 => array( 'name' => totranslate('option 2'), 'tmdisplay' => totranslate('option 2') ),
-
-                            // Another value, with other options:
-                            //  description => this text will be displayed underneath the option when this value is selected to explain what it does
-                            //  beta=true => this option is in beta version right now (there will be a warning)
-                            //  alpha=true => this option is in alpha version right now (there will be a warning, and starting the game will be allowed only in training mode except for the developer)
-                            //  nobeginner=true  =>  this option is not recommended for beginners
-                            3 => array( 'name' => totranslate('option 3'), 'description' => totranslate('this option does X'), 'beta' => true, 'nobeginner' => true )
-                        ),
-                'default' => 1
-            ),
-
-    */
-
+    TYPE_OF_RULES => array(
+        'name' => totranslate('Mini-games'),
+        'values' => array(
+            TOWERING_INFERNO => array('name' => totranslate('Towering inferno'), 'tmdisplay' => totranslate('Towering inferno'), 'description' => totranslate('Get the most cards')),
+            WELL => array('name' => totranslate('Well'), 'tmdisplay' => totranslate('Well'), 'description' => totranslate('Be the first to get rid of all yours cards')),
+            HOT_POTATO => array('name' => totranslate('Hot potato'), 'tmdisplay' => totranslate('Hot potato'), 'description' => totranslate('Get rid of your cards giving your entire deck to your opponents (several rounds)')),
+            POISONED_GIFT => array('name' => totranslate('Poisoned gift'), 'tmdisplay' => totranslate('Poisoned gift'), 'description' => totranslate('Get rid of your cards giving them to your opponents')),
+            TRIPLET => array('name' => totranslate('Triplet'), 'tmdisplay' => totranslate('Triplet'), 'description' => totranslate('Find the common symbol on 3 cards (several rounds)')),
+            
+        ),
+        'default' => TOWERING_INFERNO
+    ),
 );
 
 
