@@ -25,8 +25,18 @@
     Please REMOVE this comment before publishing your game on BGA
 -->
 
-
-This is your game interface. You can edit this HTML in your ".tpl" file.
+<div id="mainLine">
+    <div id="pattern_pile_wrap" class="whiteblock">
+        <h3 class="dbl_block_title">{PLAYING_ZONE}</h3>
+        <div id="pattern_pile">
+        </div>
+    </div>
+    <div id="myhand_wrap" class="whiteblock">
+        <h3 class="dbl_block_title">{MY_HAND}</h3>
+        <div id="myhand">
+        </div>
+    </div>
+</div>
 
 
 <script type="text/javascript">
