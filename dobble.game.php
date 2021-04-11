@@ -185,13 +185,31 @@ class Dobble extends Table
     {
         $players = self::loadPlayersBasicInfos();
 
-        if ($this->getMiniGame() === TRIPLET) {
-        } else if ($this->getMiniGame() === WELL) {
-        } else {
-            $number = 1;
-            foreach ($players as $player_id => $player) {
-                $this->pickCardsAndNotifyPlayer($number, $player_id);
-            }
+        switch ($this->getMiniGame()) {
+
+            case TRIPLET:
+
+                break;
+            case WELL:
+
+                break;
+            case HOT_POTATO:
+
+                break;
+            case POISONED_GIFT:
+
+                break;
+            case TOWERING_INFERNO:
+                $this->dealCardsToAllPlayers($players, 1);
+                $this->pickModelAndNotifyPlayers();
+                break;
+            default:
+        }
+    }
+    function dealCardsToAllPlayers($players, $number)
+    {
+        foreach ($players as $player_id => $player) {
+            $this->pickCardsAndNotifyPlayer($number, $player_id);
         }
     }
 
@@ -201,6 +219,13 @@ class Dobble extends Table
         // Notify player about his cards
         self::notifyPlayer($player_id, NOTIF_HAND_CHANGE, '', array('added' => $cards));
     }
+
+    function pickModelAndNotifyPlayers()
+    {
+        $card = $this->deck->getCardOnTop(DECK_LOC_DECK);
+        self::notifyAllPlayers(NOTIF_HAND_CHANGE, '', array('added' => [$card])); //todo
+    }
+
 
     function getMiniGame()
     {
