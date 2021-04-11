@@ -132,7 +132,7 @@ class Dobble extends Table
         $sql = "SELECT player_id id, player_score score FROM player ";
         $result['players'] = self::getCollectionFromDb($sql);
         $result['hand'] = $this->deck->getCardsInLocation(DECK_LOC_HAND, $current_player_id);
-        $result['pattern'] = [$this->deck->getCardOnTop(DECK_LOC_DECK)];
+        $result['pattern'] = $this->enhanceCards([$this->deck->getCardOnTop(DECK_LOC_DECK)]);
 
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
 
@@ -234,6 +234,24 @@ class Dobble extends Table
         return self::getGameStateValue('type_of_rules');
     }
 
+    function enhanceCards($cards)
+    {
+        $enhanced = $cards;
+        foreach ($enhanced as $cardId => &$card) { //by reference in order to add the symbols property
+            $type = $this->cards_description[$card["type"]]["type"];
+
+            $symbols = str_split($type, 2);
+            self::dump("**************************symbols", $symbols);
+            foreach ($symbols as $i => $s) {
+                $name = array_search($s, $this->symbols);
+                self::dump("**************************name", $name);
+                $card["symbols"][] = $name;
+                //self::dump("**************************card", $card);
+            }
+        }
+        self::dump("**************************cards", $enhanced);
+        return $enhanced;
+    }
     //////////////////////////////////////////////////////////////////////////////
     //////////// Player actions
     //////////// 
@@ -296,6 +314,16 @@ class Dobble extends Table
         );
     }    
     */
+    public function argPossibleSymbols()
+    {
+        $player_id = self::getActivePlayerId();
+        $possibleSymbols =        $this->enhanceCards([$this->deck->getCardOnTop(DECK_LOC_DECK)]);
+        return array(
+            'possibleSymbols' => $possibleSymbols[0]["symbols"],
+
+        );
+    }
+
 
     //////////////////////////////////////////////////////////////////////////////
     //////////// Game state actions

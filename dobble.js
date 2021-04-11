@@ -135,12 +135,20 @@ function (dojo, declare) {
         //        
         onUpdateActionButtons: function( stateName, args )
         {
-            console.log( 'onUpdateActionButtons: '+stateName );
+            console.log( 'onUpdateActionButtons: '+stateName ,args);
                       
             if( this.isCurrentPlayerActive() )
             {            
                 switch( stateName )
                 {
+                    case "playerTurn":
+                        var symbols = args.possibleSymbols;
+                        for(const s of symbols) {
+                            console.log(s);
+                            this.addActionButton('button_symbol_'+s, s, 'onChooseSymbol');//_('s')
+                            
+                        }
+                        break;
 /*               
                  Example:
  
@@ -241,7 +249,28 @@ function (dojo, declare) {
         },        
         
         */
+onChooseSymbol: function (evt) {
+                console.log('onChooseSymbol');
 
+                // Preventing default browser reaction
+                dojo.stopEvent(evt);
+
+                //this.checkAction('swapObjects');
+                if (this.isCurrentPlayerActive()) {
+                    
+                   /*
+                        this.ajaxcall('/getthemacguffin/getthemacguffin/swapObjectsAction.html',
+                            {
+                                lock: true,
+                                object_id_1: card1.id,
+                                object_id_2: card2.id,
+                            },
+                            this,
+                            function (result) { });
+*/
+                  
+                }
+            },
         
         ///////////////////////////////////////////////////
         //// Reaction to cometD notifications
