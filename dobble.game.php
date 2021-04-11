@@ -131,6 +131,8 @@ class Dobble extends Table
         // Note: you can retrieve some extra field you added for "player" table in "dbmodel.sql" if you need it.
         $sql = "SELECT player_id id, player_score score FROM player ";
         $result['players'] = self::getCollectionFromDb($sql);
+        $result['hand'] = $this->deck->getCardsInLocation(DECK_LOC_HAND, $current_player_id);
+        $result['pattern'] = [$this->deck->getCardOnTop(DECK_LOC_DECK)];
 
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
 

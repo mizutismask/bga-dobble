@@ -59,28 +59,15 @@ function (dojo, declare) {
             
             // TODO: Set up your game interface here, according to "gamedatas"
             //---------- Player hand setup
-                this.playerHand = new ebg.stock(); // new stock object for hand
-                this.playerHand.create(this, $('myhand'), this.cardwidth, this.cardheight);//myhand is the div where the card is going
-                this.playerHand.image_items_per_row = this.image_items_per_row;
-                this.playerHand.item_margin = 6;
-                this.playerHand.apparenceBorderWidth = '2px';
-                this.playerHand.setSelectionAppearance('class');
-                this.playerHand.setSelectionMode(1);
-                
-
-                // Create cards types:
+                this.playerHand=this.createStock('myhand');
+            this.createCardTypes(this.playerHand);
+            this.addCardsToStock(gamedatas.hand, this.playerHand);
+ 
+                this.patternPile = this.createStock('pattern_pile');
+                this.createCardTypes(this.patternPile);
+            this.addCardsToStock(gamedatas.pattern, this.patternPile);
             
-                for (let i = 0; i < 55; i++) {
-                    var formattedNumber = this.getFormatedType(i);
-                    console.log("formattedNumber", formattedNumber);
-                    this.playerHand.addItemType(formattedNumber, 0, g_gamethemeurl + this.cards_img, i);
-                } 
- 
-                for (var card_id in gamedatas.hand) {
-                    var card = gamedatas.hand[card_id];
-                    this.playerHand.addToStockWithId(card.type, card.id);
-                }
- 
+              
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
 
@@ -179,8 +166,32 @@ function (dojo, declare) {
             script.
         
         */
+         createStock:function(divName) {
+    var stock = new ebg.stock(); // new stock object for hand
+    stock.create(this, $(divName), this.cardwidth, this.cardheight); //myhand is the div where the card is going
+    stock.image_items_per_row = this.image_items_per_row;
+    stock.item_margin = 6;
+    stock.apparenceBorderWidth = '2px';
+    stock.setSelectionAppearance('class');
+    stock.setSelectionMode(0);
+    return stock;
+        },
+         
+        addCardsToStock:function(cards, stock){
+        for (var card_id in cards) {
+                    var card = cards[card_id];
+                    stock.addToStockWithId(card.type, card.id);
+                }
+         },
         getFormatedType:function(typeNumber) {
             return typeNumber < 10 ? "0" + typeNumber : typeNumber;
+        },
+        
+         createCardTypes:function(stock) {
+            for (let i = 0; i < 55; i++) {
+                    var formattedNumber = this.getFormatedType(i);
+                    stock.addItemType(formattedNumber, 0, g_gamethemeurl + this.cards_img, i);
+                } 
 },
 
         ///////////////////////////////////////////////////
@@ -279,3 +290,5 @@ function (dojo, declare) {
         */
    });             
 });
+
+
