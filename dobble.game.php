@@ -131,7 +131,7 @@ class Dobble extends Table
         // Note: you can retrieve some extra field you added for "player" table in "dbmodel.sql" if you need it.
         $sql = "SELECT player_id id, player_score score FROM player ";
         $result['players'] = self::getCollectionFromDb($sql);
-        $result['hand'] = $this->deck->getCardsInLocation(DECK_LOC_HAND, $current_player_id);
+        $result['hand'] = [$this->deck->getCardOnTop(DECK_LOC_HAND, $current_player_id)];
         $result['pattern'] = $this->enhanceCards([$this->deck->getCardOnTop(DECK_LOC_DECK)]);
 
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
@@ -252,6 +252,18 @@ class Dobble extends Table
         self::dump("**************************cards", $enhanced);
         return $enhanced;
     }
+
+    function isSymboleCommon($symbol, $template, $mine)
+    {
+        $templateSymbols = $this->cards_description[$template["type"]]["type"];
+        $mySymbols = $this->cards_description[$mine["type"]]["type"];
+
+        $templateSymbolsArr = str_split($templateSymbols, 2);
+        $mySymbolsArr = str_split($mySymbols, 2);
+
+        $intersection = array_intersect($templateSymbolsArr, $mySymbolsArr);
+        return $intersection[0] === $this->symbols[$symbol];
+    }
     //////////////////////////////////////////////////////////////////////////////
     //////////// Player actions
     //////////// 
@@ -261,31 +273,48 @@ class Dobble extends Table
         (note: each method below must match an input method in dobble.action.php)
     */
 
-    /*
-    
-    Example:
 
-    function playCard( $card_id )
+    function chooseSymbol($symbol)
     {
         // Check that this is the player's turn and that it is a "possible action" at this game state (see states.inc.php)
-        self::checkAction( 'playCard' ); 
-        
+        self::checkAction('playCard');
+
         $player_id = self::getActivePlayerId();
-        
-        // Add your game logic to play a card there 
-        ...
-        
+        switch ($this->getMiniGame()) {
+
+            case TRIPLET:
+
+                break;
+            case WELL:
+
+                break;
+            case HOT_POTATO:
+
+                break;
+            case POISONED_GIFT:
+
+                break;
+            case TOWERING_INFERNO:
+                $template = $this->deck->getCardOnTop(DECK_LOC_DECK);
+                $mine = $this->deck->getCardOnTop(DECK_LOC_HAND, $player_id);
+                if ($this->isSymboleCommon($symbol, $template, $mine)) {
+                    self::trace("gagné");
+                } else {
+                    self::trace("perdu");
+                }
+                break;
+            default:
+        }
+
         // Notify all players about the card played
-        self::notifyAllPlayers( "cardPlayed", clienttranslate( '${player_name} plays ${card_name}' ), array(
+        /*  self::notifyAllPlayers("cardPlayed", clienttranslate('${player_name} plays ${card_name}'), array(
             'player_id' => $player_id,
             'player_name' => self::getActivePlayerName(),
             'card_name' => $card_name,
             'card_id' => $card_id
-        ) );
-          
+        ));*/
     }
-    
-    */
+
 
 
     //////////////////////////////////////////////////////////////////////////////

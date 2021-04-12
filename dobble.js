@@ -145,7 +145,7 @@ function (dojo, declare) {
                         var symbols = args.possibleSymbols;
                         for(const s of symbols) {
                             console.log(s);
-                            this.addActionButton('button_symbol_'+s, s, 'onChooseSymbol');//_('s')
+                            this.addActionButton('button_symbol_'+s, _(s), 'onChooseSymbol');//_('s')
                             
                         }
                         break;
@@ -200,8 +200,19 @@ function (dojo, declare) {
                     var formattedNumber = this.getFormatedType(i);
                     stock.addItemType(formattedNumber, 0, g_gamethemeurl + this.cards_img, i);
                 } 
-},
+        },
+         
+ajaxcallwrapper: function(action, args, handler) {
+			if (!args) {
+				args = [];
+			}
+			args.lock = true;
 
+			//if (this.checkAction(action)) {
+				this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + action + ".html", args,// 
+					this, (result) => { }, handler);
+			//}
+		},
         ///////////////////////////////////////////////////
         //// Player's action
         
@@ -249,26 +260,17 @@ function (dojo, declare) {
         },        
         
         */
-onChooseSymbol: function (evt) {
-                console.log('onChooseSymbol');
+        onChooseSymbol: function (evt) {
+            var symbol = evt.currentTarget.id;
+            symbol=symbol.replace("button_symbol_","");
+                console.log('onChooseSymbol ', symbol);
 
                 // Preventing default browser reaction
                 dojo.stopEvent(evt);
 
                 //this.checkAction('swapObjects');
                 if (this.isCurrentPlayerActive()) {
-                    
-                   /*
-                        this.ajaxcall('/getthemacguffin/getthemacguffin/swapObjectsAction.html',
-                            {
-                                lock: true,
-                                object_id_1: card1.id,
-                                object_id_2: card2.id,
-                            },
-                            this,
-                            function (result) { });
-*/
-                  
+                   this.ajaxcallwrapper('chooseSymbol', {symbol: symbol});      
                 }
             },
         
