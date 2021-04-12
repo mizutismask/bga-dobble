@@ -10,28 +10,28 @@
  * dobble.js
  *
  * Dobble user interface script
- * 
+ *
  * In this file, you are describing the logic of your user interface, in Javascript language.
  *
  */
 
 define([
-    "dojo","dojo/_base/declare",
+    "dojo",
+    "dojo/_base/declare",
     "ebg/core/gamegui",
     "ebg/counter",
-    "ebg/stock"
-],
-function (dojo, declare) {
+    "ebg/stock",
+], function (dojo, declare) {
     return declare("bgagame.dobble", ebg.core.gamegui, {
-        constructor: function(){
-            console.log('dobble constructor');
-              
-           this.cardwidth = 200;
+        constructor: function () {
+            console.log("dobble constructor");
+
+            this.cardwidth = 200;
             this.cardheight = 200;
             this.image_items_per_row = 10;
-            this.cards_img = 'img/cards/cards200x200.png';
+            this.cards_img = "img/cards/cards200x200.png";
         },
-        
+
         /*
             setup:
             
@@ -44,56 +44,49 @@ function (dojo, declare) {
             
             "gamedatas" argument contains all datas retrieved by your "getAllDatas" PHP method.
         */
-        
-        setup: function( gamedatas )
-        {
+
+        setup: function (gamedatas) {
             console.log("gamedatas ", gamedatas);
-            
+
             // Setting up player boards
-            for( var player_id in gamedatas.players )
-            {
+            for (var player_id in gamedatas.players) {
                 var player = gamedatas.players[player_id];
-                         
+
                 // TODO: Setting up players boards if needed
             }
-            
+
             // TODO: Set up your game interface here, according to "gamedatas"
             //---------- Player hand setup
-                this.playerHand=this.createStock('myhand');
+            this.playerHand = this.createStock("myhand");
             this.createCardTypes(this.playerHand);
             this.addCardsToStock(gamedatas.hand, this.playerHand);
- 
-                this.patternPile = this.createStock('pattern_pile');
-                this.createCardTypes(this.patternPile);
+
+            this.patternPile = this.createStock("pattern_pile");
+            this.createCardTypes(this.patternPile);
             this.addCardsToStock(gamedatas.pattern, this.patternPile);
-            
-              
+
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
 
-            console.log( "Ending game setup" );
+            console.log("Ending game setup");
         },
-       
 
         ///////////////////////////////////////////////////
         //// Game & client states
-        
+
         // onEnteringState: this method is called each time we are entering into a new game state.
         //                  You can use this method to perform some user interface changes at this moment.
         //
-        onEnteringState: function( stateName, args )
-        {
-            console.log( 'Entering state: '+stateName, args );
-            
-            switch( stateName )
-            {
-            
+        onEnteringState: function (stateName, args) {
+            console.log("Entering state: " + stateName, args);
+
+            switch (stateName) {
                 case "playerTurn":
                     var patterns = args.args.pattern;
                     this.patternPile.removeAll();
                     this.addCardsToStock(patterns, this.patternPile);
-                        break;
-            /* Example:
+                    break;
+                /* Example:
             
             case 'myGameState':
             
@@ -102,24 +95,20 @@ function (dojo, declare) {
                 
                 break;
            */
-           
-           
-            case 'dummmy':
-                break;
+
+                case "dummmy":
+                    break;
             }
         },
 
         // onLeavingState: this method is called each time we are leaving a game state.
         //                 You can use this method to perform some user interface changes at this moment.
         //
-        onLeavingState: function( stateName )
-        {
-            console.log( 'Leaving state: '+stateName );
-            
-            switch( stateName )
-            {
-            
-            /* Example:
+        onLeavingState: function (stateName) {
+            console.log("Leaving state: " + stateName);
+
+            switch (stateName) {
+                /* Example:
             
             case 'myGameState':
             
@@ -128,33 +117,32 @@ function (dojo, declare) {
                 
                 break;
            */
-           
-           
-            case 'dummmy':
-                break;
-            }               
-        }, 
+
+                case "dummmy":
+                    break;
+            }
+        },
 
         // onUpdateActionButtons: in this method you can manage "action buttons" that are displayed in the
         //                        action status bar (ie: the HTML links in the status bar).
-        //        
-        onUpdateActionButtons: function( stateName, args )
-        {
-            console.log( 'onUpdateActionButtons: '+stateName ,args);
-                      
-            if( this.isCurrentPlayerActive() )
-            {            
-                switch( stateName )
-                {
+        //
+        onUpdateActionButtons: function (stateName, args) {
+            console.log("onUpdateActionButtons: " + stateName, args);
+
+            if (this.isCurrentPlayerActive()) {
+                switch (stateName) {
                     case "playerTurn":
                         var symbols = args.possibleSymbols;
-                        for(const s of symbols) {
+                        for (const s of symbols) {
                             console.log(s);
-                            this.addActionButton('button_symbol_'+s, _(s), 'onChooseSymbol');//_('s')
-                            
+                            this.addActionButton(
+                                "button_symbol_" + s,
+                                _(s),
+                                "onChooseSymbol"
+                            ); //_('s')
                         }
                         break;
-/*               
+                    /*               
                  Example:
  
                  case 'myGameState':
@@ -168,59 +156,75 @@ function (dojo, declare) {
 */
                 }
             }
-        },        
+        },
 
         ///////////////////////////////////////////////////
         //// Utility methods
-        
+
         /*
         
             Here, you can defines some utility methods that you can use everywhere in your javascript
             script.
         
         */
-         createStock:function(divName) {
-    var stock = new ebg.stock(); // new stock object for hand
-    stock.create(this, $(divName), this.cardwidth, this.cardheight); //myhand is the div where the card is going
-    stock.image_items_per_row = this.image_items_per_row;
-    stock.item_margin = 6;
-    stock.apparenceBorderWidth = '2px';
-    stock.setSelectionAppearance('class');
-    stock.setSelectionMode(0);
-    return stock;
+        createStock: function (divName) {
+            var stock = new ebg.stock(); // new stock object for hand
+            stock.create(this, $(divName), this.cardwidth, this.cardheight); //myhand is the div where the card is going
+            stock.image_items_per_row = this.image_items_per_row;
+            stock.item_margin = 6;
+            stock.apparenceBorderWidth = "2px";
+            stock.setSelectionAppearance("class");
+            stock.setSelectionMode(0);
+            return stock;
         },
-         
-        addCardsToStock:function(cards, stock){
-        for (var card_id in cards) {
-                    var card = cards[card_id];
-                    stock.addToStockWithId(card.type, card.id);
-                }
-         },
-        getFormatedType:function(typeNumber) {
+
+        addCardsToStock: function (cards, stock) {
+            for (var card_id in cards) {
+                var card = cards[card_id];
+                stock.addToStockWithId(card.type, card.id);
+            }
+        },
+        getFormatedType: function (typeNumber) {
             return typeNumber < 10 ? "0" + typeNumber : typeNumber;
         },
-        
-         createCardTypes:function(stock) {
-            for (let i = 0; i < 55; i++) {
-                    var formattedNumber = this.getFormatedType(i);
-                    stock.addItemType(formattedNumber, 0, g_gamethemeurl + this.cards_img, i);
-                } 
-        },
-         
-ajaxcallwrapper: function(action, args, handler) {
-			if (!args) {
-				args = [];
-			}
-			args.lock = true;
 
-			//if (this.checkAction(action)) {
-				this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + action + ".html", args,// 
-					this, (result) => { }, handler);
-			//}
-		},
+        createCardTypes: function (stock) {
+            for (let i = 0; i < 55; i++) {
+                var formattedNumber = this.getFormatedType(i);
+                stock.addItemType(
+                    formattedNumber,
+                    0,
+                    g_gamethemeurl + this.cards_img,
+                    i
+                );
+            }
+        },
+
+        ajaxcallwrapper: function (action, args, handler) {
+            if (!args) {
+                args = [];
+            }
+            args.lock = true;
+
+            //if (this.checkAction(action)) {
+            this.ajaxcall(
+                "/" +
+                    this.game_name +
+                    "/" +
+                    this.game_name +
+                    "/" +
+                    action +
+                    ".html",
+                args, //
+                this,
+                (result) => {},
+                handler
+            );
+            //}
+        },
         ///////////////////////////////////////////////////
         //// Player's action
-        
+
         /*
         
             Here, you are defining methods to handle player's action (ex: results of mouse click on 
@@ -231,7 +235,7 @@ ajaxcallwrapper: function(action, args, handler) {
             _ make a call to the game server
         
         */
-        
+
         /* Example:
         
         onMyMethodToCall1: function( evt )
@@ -267,18 +271,18 @@ ajaxcallwrapper: function(action, args, handler) {
         */
         onChooseSymbol: function (evt) {
             var symbol = evt.currentTarget.id;
-            symbol=symbol.replace("button_symbol_","");
-                console.log('onChooseSymbol ', symbol);
+            symbol = symbol.replace("button_symbol_", "");
+            console.log("onChooseSymbol ", symbol);
 
-                // Preventing default browser reaction
-                dojo.stopEvent(evt);
+            // Preventing default browser reaction
+            dojo.stopEvent(evt);
 
-                //this.checkAction('swapObjects');
-                if (this.isCurrentPlayerActive()) {
-                   this.ajaxcallwrapper('chooseSymbol', {symbol: symbol});      
-                }
-            },
-        
+            //this.checkAction('swapObjects');
+            if (this.isCurrentPlayerActive()) {
+                this.ajaxcallwrapper("chooseSymbol", { symbol: symbol });
+            }
+        },
+
         ///////////////////////////////////////////////////
         //// Reaction to cometD notifications
 
@@ -291,52 +295,46 @@ ajaxcallwrapper: function(action, args, handler) {
                   your dobble.game.php file.
         
         */
-        setupNotifications: function()
-        {
-            console.log( 'notifications subscriptions setup' );
-            
+        setupNotifications: function () {
+            console.log("notifications subscriptions setup");
+
             // TODO: here, associate your game notifications with local methods
-            
+
             // Example 1: standard notification handling
             // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
-            
+
             // Example 2: standard notification handling + tell the user interface to wait
             //            during 3 seconds after calling the method in order to let the players
             //            see what is happening in the game.
             // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
             // this.notifqueue.setSynchronous( 'cardPlayed', 3000 );
-            // 
-           dojo.subscribe( 'cardsMove', this, "notifCardsMove" );
-        },  
-        
+            //
+            dojo.subscribe("cardsMove", this, "notifCardsMove");
+        },
+
         // TODO: from this point and below, you can write your game notifications handling methods
-        
-       
-        
-        notifCardsMove: function( notif )
-        {
-            console.log( 'notifCardsMove' ,notif);
+
+        notifCardsMove: function (notif) {
+            console.log("notifCardsMove", notif);
             //$player_id = notif.args.player_id;
-            
+
             var from = notif.args.from;
-             var to = notif.args.to;
-            
-            
-               
-                    for (var i in notif.args.cards) {
-                        var card = notif.args.cards[i];
-                        
-                        if (from == "pattern") {
-                from = "pattern_pile_item_"+card.id;
-                        } if (to == this.player_id) {
-                this.playerHand.removeAll();
-                            this.playerHand.addToStockWithId(card.type, card.id, from);
+            var to = notif.args.to;
+            if (to) {
+                this.scoreCtrl[to].incValue(1);
             }
-                    }
-               
-        },    
-      
-   });             
+
+            for (var i in notif.args.cards) {
+                var card = notif.args.cards[i];
+
+                if (from == "pattern") {
+                    from = "pattern_pile_item_" + card.id;
+                }
+                if (to == this.player_id) {
+                    this.playerHand.removeAll();
+                    this.playerHand.addToStockWithId(card.type, card.id, from);
+                }
+            }
+        },
+    });
 });
-
-
