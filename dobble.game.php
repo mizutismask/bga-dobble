@@ -27,10 +27,11 @@ if (!defined('DECK_LOC_DECK')) {
     // constants for deck locations
     define("DECK_LOC_DECK", "deck");
     define("DECK_LOC_HAND", "hand");
+    define("DECK_LOC_WON", "won");
     define("DECK_LOC_DISCARD", "discard");
 
     // constants for notifications
-    define("NOTIF_CARD_PLAYED", "cardPlayed");
+    define("NOTIF_CARDS_MOVE", "cardsMove");
     define("NOTIF_PLAYER_TURN", "playerTurn");
     define("NOTIF_UPDATE_SCORE", "updateScore");
     define("NOTIF_HAND_CHANGE", "handChange");
@@ -132,7 +133,7 @@ class Dobble extends Table
         $sql = "SELECT player_id id, player_score score FROM player ";
         $result['players'] = self::getCollectionFromDb($sql);
         $result['hand'] = [$this->deck->getCardOnTop(DECK_LOC_HAND, $current_player_id)];
-        $result['pattern'] = $this->enhanceCards([$this->deck->getCardOnTop(DECK_LOC_DECK)]);
+        $result['pattern'] = $this->getPatternCards();
 
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
 
@@ -203,7 +204,7 @@ class Dobble extends Table
                 break;
             case TOWERING_INFERNO:
                 $this->dealCardsToAllPlayers($players, 1);
-                $this->pickModelAndNotifyPlayers();
+                $this->pickPatternAndNotifyPlayers();
                 break;
             default:
         }
@@ -222,10 +223,14 @@ class Dobble extends Table
         self::notifyPlayer($player_id, NOTIF_HAND_CHANGE, '', array('added' => $cards));
     }
 
-    function pickModelAndNotifyPlayers()
+    function pickPatternAndNotifyPlayers()
     {
-        $card = $this->deck->getCardOnTop(DECK_LOC_DECK);
-        self::notifyAllPlayers(NOTIF_HAND_CHANGE, '', array('added' => [$card])); //todo
+        $card = $this->getPatternCards();
+        self::notifyAllPlayers(NOTIF_CARDS_MOVE, '', array(
+            'added' => [$card],
+
+            //'player_id' => $player_id
+        ));
     }
 
 
@@ -258,11 +263,58 @@ class Dobble extends Table
         $templateSymbols = $this->cards_description[$template["type"]]["type"];
         $mySymbols = $this->cards_description[$mine["type"]]["type"];
 
+        self::dump("**************************template", $template);
+        self::dump("**************************mine", $mine);
+
         $templateSymbolsArr = str_split($templateSymbols, 2);
         $mySymbolsArr = str_split($mySymbols, 2);
 
-        $intersection = array_intersect($templateSymbolsArr, $mySymbolsArr);
+        $intersection = array_values(array_intersect($templateSymbolsArr, $mySymbolsArr));
+        self::dump("**************************intersection", $intersection);
         return $intersection[0] === $this->symbols[$symbol];
+    }
+
+    function winCard($player_id, $template)
+    {
+        $this->deck->moveCard($template["id"], DECK_LOC_HAND, $player_id);
+        $this->deck->insertCardOnExtremePosition($template["id"], DECK_LOC_HAND, true);
+
+        $this->incScore($player_id, 1);
+        self::notifyAllPlayers(NOTIF_CARDS_MOVE, clienttranslate('${player_name} spotted the common symbol'), array(
+            'player_name' => self::getActivePlayerName(),
+            'cards' => [$template],
+            'from' => 'pattern',
+            'to' => $player_id,
+        ));
+    }
+
+    function incScore($player_id, $incValue)
+    {
+        $sql = "UPDATE player set player_score=player_score+" . $incValue . " where player_id=" . $player_id;
+        self::DbQuery($sql);
+    }
+
+    function getPatternCards()
+    {
+        switch ($this->getMiniGame()) {
+
+            case TRIPLET:
+
+                break;
+            case WELL:
+
+                break;
+            case HOT_POTATO:
+
+                break;
+            case POISONED_GIFT:
+
+                break;
+            case TOWERING_INFERNO:
+                return $this->enhanceCards([$this->deck->getCardOnTop(DECK_LOC_DECK)]);
+                break;
+            default:
+        }
     }
     //////////////////////////////////////////////////////////////////////////////
     //////////// Player actions
@@ -295,24 +347,23 @@ class Dobble extends Table
 
                 break;
             case TOWERING_INFERNO:
-                $template = $this->deck->getCardOnTop(DECK_LOC_DECK);
+                $template = $this->getPatternCards()[0];
                 $mine = $this->deck->getCardOnTop(DECK_LOC_HAND, $player_id);
                 if ($this->isSymboleCommon($symbol, $template, $mine)) {
-                    self::trace("gagné");
+                    $this->winCard($player_id, $template);
+
+                    $this->gamestate->nextState(TRANSITION_NEXT_TURN);
                 } else {
-                    self::trace("perdu");
+                    self::notifyAllPlayers("msg", clienttranslate('${player_name} failed to spot the common symbol'), array(
+                        'player_name' => self::getActivePlayerName(),
+                    ));
                 }
                 break;
             default:
         }
 
         // Notify all players about the card played
-        /*  self::notifyAllPlayers("cardPlayed", clienttranslate('${player_name} plays ${card_name}'), array(
-            'player_id' => $player_id,
-            'player_name' => self::getActivePlayerName(),
-            'card_name' => $card_name,
-            'card_id' => $card_id
-        ));*/
+
     }
 
 
@@ -343,13 +394,13 @@ class Dobble extends Table
         );
     }    
     */
-    public function argPossibleSymbols()
+    public function argPlayerTurn()
     {
         $player_id = self::getActivePlayerId();
         $possibleSymbols =        $this->enhanceCards([$this->deck->getCardOnTop(DECK_LOC_DECK)]);
         return array(
             'possibleSymbols' => $possibleSymbols[0]["symbols"],
-
+            'pattern' => $this->getPatternCards(),
         );
     }
 
@@ -363,18 +414,38 @@ class Dobble extends Table
         The action method of state X is called everytime the current game state is set to X.
     */
 
-    /*
-    
-    Example for game state "MyGameState":
 
-    function stMyGameState()
+
+    function stNextTurn()
     {
-        // Do some stuff ...
-        
+        switch ($this->getMiniGame()) {
+
+            case TRIPLET:
+
+                break;
+            case WELL:
+
+                break;
+            case HOT_POTATO:
+
+                break;
+            case POISONED_GIFT:
+
+                break;
+            case TOWERING_INFERNO:
+                if ($this->deck->countCardInLocation(DECK_LOC_DECK) == 0) {
+                    $this->gamestate->nextState(TRANSITION_END_GAME);
+                } else {
+                    $this->pickPatternAndNotifyPlayers();
+                    $this->gamestate->nextState(TRANSITION_PLAYER_TURN);
+                }
+                break;
+            default:
+        }
         // (very often) go to another gamestate
-        $this->gamestate->nextState( 'some_gamestate_transition' );
-    }    
-    */
+
+    }
+
 
     //////////////////////////////////////////////////////////////////////////////
     //////////// Zombie

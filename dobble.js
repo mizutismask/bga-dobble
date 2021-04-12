@@ -83,11 +83,16 @@ function (dojo, declare) {
         //
         onEnteringState: function( stateName, args )
         {
-            console.log( 'Entering state: '+stateName );
+            console.log( 'Entering state: '+stateName, args );
             
             switch( stateName )
             {
             
+                case "playerTurn":
+                    var patterns = args.args.pattern;
+                    this.patternPile.removeAll();
+                    this.addCardsToStock(patterns, this.patternPile);
+                        break;
             /* Example:
             
             case 'myGameState':
@@ -301,24 +306,33 @@ ajaxcallwrapper: function(action, args, handler) {
             // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
             // this.notifqueue.setSynchronous( 'cardPlayed', 3000 );
             // 
+           dojo.subscribe( 'cardsMove', this, "notifCardsMove" );
         },  
         
         // TODO: from this point and below, you can write your game notifications handling methods
         
-        /*
-        Example:
+       
         
-        notif_cardPlayed: function( notif )
+        notifCardsMove: function( notif )
         {
-            console.log( 'notif_cardPlayed' );
-            console.log( notif );
+            console.log( 'notifCardsMove' ,notif);
+            //$player_id = notif.args.player_id;
             
-            // Note: notif.args contains the arguments specified during you "notifyAllPlayers" / "notifyPlayer" PHP call
+            var from = notif.args.from;
             
-            // TODO: play the card in the user interface.
+            
+               
+                    for (var i in notif.args.cards) {
+                        var card = notif.args.cards[i];
+                        this.playerHand.removeAll();
+                        if (from == "pattern") {
+                from = "pattern_pile_item_"+card.id;
+            }
+                        this.playerHand.addToStockWithId(card.type, card.id, from);
+                    }
+               
         },    
-        
-        */
+      
    });             
 });
 

@@ -50,6 +50,14 @@
 
 //    !! It is not a good idea to modify this file when a game is running !!
 
+if (!defined('STATE_PLAYER_TURN')) { // ensure this block is only invoked once, since it is included multiple times
+    define("STATE_PLAYER_TURN", 2);
+    define("STATE_NEXT_TURN", 3);
+
+    //define("TRANSITION_PLAYER_TURN", "playerTurn");
+    define("TRANSITION_NEXT_TURN", "nextTurn");
+    define("TRANSITION_END_GAME", "endGame");
+}
 
 $machinestates = array(
 
@@ -64,14 +72,24 @@ $machinestates = array(
 
     // Note: ID=2 => your first state
 
-    2 => array(
+    STATE_PLAYER_TURN => array(
         "name" => "playerTurn",
         "description" => clienttranslate('${actplayer} must play a card or pass'),
         "descriptionmyturn" => clienttranslate('${you} must find the common symbol'),
         "type" => "activeplayer",
         "possibleactions" => array("playCard", "pass"),
-        "args" => "argPossibleSymbols",
-        "transitions" => array("playCard" => 2, "pass" => 2)
+        "args" => "argPlayerTurn",
+        "transitions" => array(TRANSITION_NEXT_TURN => STATE_NEXT_TURN)
+    ),
+
+    STATE_NEXT_TURN => array(
+        "name" => "nextTurn",
+        "description" => '',
+        "type" => "game",
+        // "args" => "argCardsCounters",
+        "action" => "stNextTurn",
+        "updateGameProgression" => true,
+        "transitions" => array(TRANSITION_PLAYER_TURN => STATE_PLAYER_TURN, TRANSITION_END_GAME => 99)
     ),
 
     /*
