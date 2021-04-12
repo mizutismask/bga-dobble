@@ -150,7 +150,27 @@ class Dobble extends Table
     */
     function getGameProgression()
     {
-        // TODO: compute and return the game progression
+        switch ($this->getMiniGame()) {
+
+            case TRIPLET:
+
+                break;
+            case WELL:
+
+                break;
+            case HOT_POTATO:
+
+                break;
+            case POISONED_GIFT:
+
+                break;
+            case TOWERING_INFERNO:
+                $remaining  = $this->deck->countCardInLocation(DECK_LOC_DECK);
+                $players = self::loadPlayersBasicInfos();
+                $total = count($this->cards_description) - count($players);
+                $done = $total - $remaining;
+                return $done *  100 / $total;
+        }
 
         return 0;
     }
