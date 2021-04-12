@@ -130,7 +130,7 @@ class Dobble extends Table
         // Note: you can retrieve some extra field you added for "player" table in "dbmodel.sql" if you need it.
         $sql = "SELECT player_id id, player_score score FROM player ";
         $result['players'] = self::getCollectionFromDb($sql);
-        $result['hand'] = [$this->deck->getCardOnTop(DECK_LOC_HAND, $current_player_id)];
+        $result['hand'] = [$this->getMyCard($current_player_id)];
         $result['pattern'] = $this->getPatternCards();
 
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
@@ -244,15 +244,15 @@ class Dobble extends Table
             $type = $this->cards_description[$card["type"]]["type"];
 
             $symbols = str_split($type, 2);
-            self::dump("**************************symbols", $symbols);
+            //self::dump("**************************symbols", $symbols);
             foreach ($symbols as $i => $s) {
                 $name = array_search($s, $this->symbols);
-                self::dump("**************************name", $name);
+                //self::dump("**************************name", $name);
                 $card["symbols"][] = $name;
                 //self::dump("**************************card", $card);
             }
         }
-        self::dump("**************************cards", $enhanced);
+        //self::dump("**************************cards", $enhanced);
         return $enhanced;
     }
 
@@ -268,15 +268,17 @@ class Dobble extends Table
         $mySymbolsArr = str_split($mySymbols, 2);
 
         $intersection = array_values(array_intersect($templateSymbolsArr, $mySymbolsArr));
-        self::dump("**************************intersection", $intersection);
-        self::dump("**************************guess", $symbol);
+        self::dump("**************************intersection", $intersection[0]);
+        self::dump("**************************guess", $symbol, $this->symbols[$symbol]);
+        self::dump("**************************guess number", $this->symbols[$symbol]);
         return $intersection[0] === $this->symbols[$symbol];
     }
 
     function winCard($player_id, $template)
     {
+        $this->deck->moveAllCardsInLocation(DECK_LOC_HAND, DECK_LOC_WON, $player_id, $player_id);
         $this->deck->moveCard($template["id"], DECK_LOC_HAND, $player_id);
-        $this->deck->insertCardOnExtremePosition($template["id"], DECK_LOC_HAND, true);
+        //$this->deck->insertCardOnExtremePosition($template["id"], DECK_LOC_HAND, true);
 
         $this->incScore($player_id, 1);
         self::notifyAllPlayers(NOTIF_CARDS_MOVE, clienttranslate('${player_name} spotted the common symbol'), array(
@@ -329,6 +331,12 @@ class Dobble extends Table
             self::giveExtraTime($player["player_id"]);
         }
     }
+
+    function getMyCard($player_id)
+    {
+        $cards = $this->deck->getCardsInLocation(DECK_LOC_HAND, $player_id);
+        return array_pop($cards);
+    }
     //////////////////////////////////////////////////////////////////////////////
     //////////// Player actions
     //////////// 
@@ -361,7 +369,7 @@ class Dobble extends Table
                 break;
             case TOWERING_INFERNO:
                 $template = $this->getPatternCards()[0];
-                $mine = $this->deck->getCardOnTop(DECK_LOC_HAND, $player_id);
+                $mine = $this->getMyCard($player_id);
                 if ($this->isSymboleCommon($symbol, $template, $mine)) {
                     $this->winCard($player_id, $template);
 
@@ -458,8 +466,6 @@ class Dobble extends Table
                 break;
             default:
         }
-        // (very often) go to another gamestate
-
     }
 
     // this will make all players multiactive just before entering the state
