@@ -319,16 +319,19 @@ ajaxcallwrapper: function(action, args, handler) {
             //$player_id = notif.args.player_id;
             
             var from = notif.args.from;
+             var to = notif.args.to;
             
             
                
                     for (var i in notif.args.cards) {
                         var card = notif.args.cards[i];
-                        this.playerHand.removeAll();
+                        
                         if (from == "pattern") {
                 from = "pattern_pile_item_"+card.id;
+                        } if (to == this.player_id) {
+                this.playerHand.removeAll();
+                            this.playerHand.addToStockWithId(card.type, card.id, from);
             }
-                        this.playerHand.addToStockWithId(card.type, card.id, from);
                     }
                
         },    

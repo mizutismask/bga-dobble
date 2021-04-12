@@ -74,12 +74,17 @@ $machinestates = array(
 
     STATE_PLAYER_TURN => array(
         "name" => "playerTurn",
-        "description" => clienttranslate('${actplayer} must play a card or pass'),
-        "descriptionmyturn" => clienttranslate('${you} must find the common symbol'),
-        "type" => "activeplayer",
+        "description" => clienttranslate('Other players try to find their common symbol'),
+        "descriptionmyturn" => clienttranslate('Be the fist to find the common symbol'),
+        "type" => "multipleactiveplayer",
         "possibleactions" => array("playCard", "pass"),
         "args" => "argPlayerTurn",
-        "transitions" => array(TRANSITION_NEXT_TURN => STATE_NEXT_TURN)
+        "action" => 'st_multiPlayerInit',
+        "transitions" => array(
+            TRANSITION_NEXT_TURN => STATE_NEXT_TURN,
+            TRANSITION_PLAYER_TURN => STATE_PLAYER_TURN //when everyone failed
+            ,
+        )
     ),
 
     STATE_NEXT_TURN => array(

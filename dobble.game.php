@@ -107,8 +107,6 @@ class Dobble extends Table
         $this->deck->shuffle(DECK_LOC_DECK);
         $this->dealCards();
 
-        // Activate first player (which is in general a good idea :) )
-        $this->activeNextPlayer();
 
         /************ End of the game initialization *****/
     }
@@ -271,6 +269,7 @@ class Dobble extends Table
 
         $intersection = array_values(array_intersect($templateSymbolsArr, $mySymbolsArr));
         self::dump("**************************intersection", $intersection);
+        self::dump("**************************guess", $symbol);
         return $intersection[0] === $this->symbols[$symbol];
     }
 
@@ -281,7 +280,7 @@ class Dobble extends Table
 
         $this->incScore($player_id, 1);
         self::notifyAllPlayers(NOTIF_CARDS_MOVE, clienttranslate('${player_name} spotted the common symbol'), array(
-            'player_name' => self::getActivePlayerName(),
+            'player_name' => $this->getPlayerName($player_id),
             'cards' => [$template],
             'from' => 'pattern',
             'to' => $player_id,
@@ -316,6 +315,20 @@ class Dobble extends Table
             default:
         }
     }
+
+    function getPlayerName($player_id)
+    {
+        $sql = "select player_name from player where player_id=" . $player_id;
+        return self::getUniqueValueFromDB($sql);
+    }
+
+    function giveExtraTimeToEveryone()
+    {
+        $players = self::loadPlayersBasicInfos();
+        foreach ($players as $player) {
+            self::giveExtraTime($player["player_id"]);
+        }
+    }
     //////////////////////////////////////////////////////////////////////////////
     //////////// Player actions
     //////////// 
@@ -331,7 +344,7 @@ class Dobble extends Table
         // Check that this is the player's turn and that it is a "possible action" at this game state (see states.inc.php)
         self::checkAction('playCard');
 
-        $player_id = self::getActivePlayerId();
+        $player_id = self::getCurrentPlayerId();
         switch ($this->getMiniGame()) {
 
             case TRIPLET:
@@ -354,8 +367,9 @@ class Dobble extends Table
 
                     $this->gamestate->nextState(TRANSITION_NEXT_TURN);
                 } else {
+                    $this->gamestate->setPlayerNonMultiactive($player_id, TRANSITION_PLAYER_TURN); // deactivate player; if none left, reactivates everyone
                     self::notifyAllPlayers("msg", clienttranslate('${player_name} failed to spot the common symbol'), array(
-                        'player_name' => self::getActivePlayerName(),
+                        'player_name' => $this->getPlayerName($player_id),
                     ));
                 }
                 break;
@@ -396,7 +410,7 @@ class Dobble extends Table
     */
     public function argPlayerTurn()
     {
-        $player_id = self::getActivePlayerId();
+
         $possibleSymbols =        $this->enhanceCards([$this->deck->getCardOnTop(DECK_LOC_DECK)]);
         return array(
             'possibleSymbols' => $possibleSymbols[0]["symbols"],
@@ -418,6 +432,7 @@ class Dobble extends Table
 
     function stNextTurn()
     {
+        $this->giveExtraTimeToEveryone();
         switch ($this->getMiniGame()) {
 
             case TRIPLET:
@@ -437,6 +452,7 @@ class Dobble extends Table
                     $this->gamestate->nextState(TRANSITION_END_GAME);
                 } else {
                     $this->pickPatternAndNotifyPlayers();
+
                     $this->gamestate->nextState(TRANSITION_PLAYER_TURN);
                 }
                 break;
@@ -444,6 +460,12 @@ class Dobble extends Table
         }
         // (very often) go to another gamestate
 
+    }
+
+    // this will make all players multiactive just before entering the state
+    function st_multiPlayerInit()
+    {
+        $this->gamestate->setAllPlayersMultiactive();
     }
 
 
