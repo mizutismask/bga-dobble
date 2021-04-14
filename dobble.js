@@ -30,6 +30,12 @@ define([
             this.cardheight = 200;
             this.image_items_per_row = 10;
             this.cards_img = "img/cards/cards200x200.png";
+
+            this.TOWERING_INFERNO = 1;
+            this.WELL = 2;
+            this.HOT_POTATO = 3;
+            this.POISONED_GIFT = 4;
+            this.TRIPLET = 5;
         },
 
         /*
@@ -48,6 +54,7 @@ define([
         setup: function (gamedatas) {
             console.log("gamedatas ", gamedatas);
 
+            this.minigame = gamedatas.minigame;
             // Setting up player boards
             for (var player_id in gamedatas.players) {
                 var player = gamedatas.players[player_id];
@@ -317,23 +324,64 @@ define([
         notifCardsMove: function (notif) {
             console.log("notifCardsMove", notif);
             //$player_id = notif.args.player_id;
-
+            var cards = notif.args.cards;
             var from = notif.args.from;
             var to = notif.args.to;
-            if (to) {
-                this.scoreCtrl[to].incValue(1);
-            }
 
-            for (var i in notif.args.cards) {
-                var card = notif.args.cards[i];
+            switch (parseInt(this.minigame)) {
+                case this.TOWERING_INFERNO:
+                    if (to) {
+                        this.scoreCtrl[to].incValue(1);
+                    }
 
-                if (from == "pattern") {
-                    from = "pattern_pile_item_" + card.id;
-                }
-                if (to == this.player_id) {
-                    this.playerHand.removeAll();
-                    this.playerHand.addToStockWithId(card.type, card.id, from);
-                }
+                    for (var i in cards) {
+                        var card = cards[i];
+
+                        if (from == "pattern") {
+                            from = "pattern_pile_item_" + card.id;
+                        }
+                        if (to == this.player_id) {
+                            this.playerHand.removeAll();
+                            this.playerHand.addToStockWithId(
+                                card.type,
+                                card.id,
+                                from
+                            );
+                        }
+                    }
+                    break;
+                case this.WELL:
+                    var newHand = notif.args.newHand;
+                    if (from) {
+                        this.scoreCtrl[from].incValue(1);
+                    }
+
+                    for (var i in cards) {
+                        var card = cards[i];
+
+                        if (from == this.player_id) {
+                            var fromDiv = "myhand_item_" + card.id;
+
+                            this.patternPile.removeAll();
+                            this.patternPile.addToStockWithId(
+                                card.type,
+                                card.id,
+                                fromDiv
+                            );
+                        }
+                    }
+                    if (from == this.player_id && newHand) {
+                        //display the card under my pile
+                        this.playerHand.removeAll();
+                        this.playerHand.addToStockWithId(
+                            newHand.type,
+                            newHand.id
+                        );
+                    }
+                    break;
+
+                default:
+                    break;
             }
         },
     });

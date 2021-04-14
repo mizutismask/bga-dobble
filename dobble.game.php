@@ -27,6 +27,7 @@ if (!defined('DECK_LOC_DECK')) {
     // constants for deck locations
     define("DECK_LOC_DECK", "deck");
     define("DECK_LOC_HAND", "hand");
+    //define("DECK_LOC_TOP_HAND", "topHand");
     define("DECK_LOC_WON", "won");
     define("DECK_LOC_DISCARD", "discard");
 
@@ -132,6 +133,7 @@ class Dobble extends Table
         $result['players'] = self::getCollectionFromDb($sql);
         $result['hand'] = [$this->getMyCard($current_player_id)];
         $result['pattern'] = $this->getPatternCards();
+        $result['minigame'] = $this->getMiniGame();
 
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
 
@@ -150,13 +152,17 @@ class Dobble extends Table
     */
     function getGameProgression()
     {
+        $players = self::loadPlayersBasicInfos();
         switch ($this->getMiniGame()) {
 
             case TRIPLET:
 
                 break;
             case WELL:
-
+                $cardsNbAtTheBeginning = floor((count($this->cards_description) - 1) / count($players));
+                $remaining = min($this->deck->countCardsByLocationArgs(DECK_LOC_HAND));
+                $done = $cardsNbAtTheBeginning - $remaining;
+                return $done *  100 / $cardsNbAtTheBeginning;
                 break;
             case HOT_POTATO:
 
@@ -166,7 +172,6 @@ class Dobble extends Table
                 break;
             case TOWERING_INFERNO:
                 $remaining  = $this->deck->countCardInLocation(DECK_LOC_DECK);
-                $players = self::loadPlayersBasicInfos();
                 $total = count($this->cards_description) - count($players);
                 $done = $total - $remaining;
                 return $done *  100 / $total;
@@ -212,7 +217,9 @@ class Dobble extends Table
 
                 break;
             case WELL:
-
+                $number = floor((count($this->cards_description) - 1) / count($players));
+                $this->dealCardsToAllPlayers($players, $number);
+                $this->discardRemainingCards();
                 break;
             case HOT_POTATO:
 
@@ -251,6 +258,17 @@ class Dobble extends Table
         ));
     }
 
+    function discardRemainingCards()
+    {
+        $remaining = $this->deck->getCardsInLocation(DECK_LOC_DECK);
+        $toDiscardNb = count($remaining) - 1;
+        if ($toDiscardNb > 0) {
+            for ($i = 0; $i < $toDiscardNb; $i++) {
+                $card = array_pop($remaining);
+                $this->deck->playCard($card["id"]);
+            }
+        }
+    }
 
     function getMiniGame()
     {
@@ -264,7 +282,7 @@ class Dobble extends Table
             $type = $this->cards_description[$card["type"]]["type"];
 
             $symbols = str_split($type, 2);
-            //self::dump("**************************symbols", $symbols);
+            self::dump("**************************symbols", $symbols);
             foreach ($symbols as $i => $s) {
                 $name = array_search($s, $this->symbols);
                 //self::dump("**************************name", $name);
@@ -272,7 +290,7 @@ class Dobble extends Table
                 //self::dump("**************************card", $card);
             }
         }
-        //self::dump("**************************cards", $enhanced);
+        self::dump("**************************cards", $enhanced);
         return $enhanced;
     }
 
@@ -294,19 +312,44 @@ class Dobble extends Table
         return $intersection[0] === $this->symbols[$symbol];
     }
 
-    function winCard($player_id, $template)
+    function symbolFoundActions($player_id, $template, $myCard)
     {
-        $this->deck->moveAllCardsInLocation(DECK_LOC_HAND, DECK_LOC_WON, $player_id, $player_id);
-        $this->deck->moveCard($template["id"], DECK_LOC_HAND, $player_id);
-        //$this->deck->insertCardOnExtremePosition($template["id"], DECK_LOC_HAND, true);
+        switch ($this->getMiniGame()) {
 
-        $this->incScore($player_id, 1);
-        self::notifyAllPlayers(NOTIF_CARDS_MOVE, clienttranslate('${player_name} spotted the common symbol'), array(
-            'player_name' => $this->getPlayerName($player_id),
-            'cards' => [$template],
-            'from' => 'pattern',
-            'to' => $player_id,
-        ));
+            case TRIPLET:
+
+                break;
+            case WELL:
+                $this->deck->moveCard($myCard["id"], DECK_LOC_DECK);
+                $this->deck->insertCardOnExtremePosition($myCard["id"], DECK_LOC_DECK, true);
+                $this->incScore($player_id, 1);
+                self::notifyAllPlayers(NOTIF_CARDS_MOVE, clienttranslate('${player_name} spotted the common symbol'), array(
+                    'player_name' => $this->getPlayerName($player_id),
+                    'cards' => [$myCard],
+                    'from' => $player_id,
+                    'to' => 'pattern',
+                    'newHand' => $this->getMyCard($player_id),
+                ));
+                break;
+            case HOT_POTATO:
+
+                break;
+            case POISONED_GIFT:
+
+                break;
+            case TOWERING_INFERNO:
+                $this->deck->moveAllCardsInLocation(DECK_LOC_HAND, DECK_LOC_WON, $player_id, $player_id);
+                $this->deck->moveCard($template["id"], DECK_LOC_HAND, $player_id);
+                $this->incScore($player_id, 1);
+                self::notifyAllPlayers(NOTIF_CARDS_MOVE, clienttranslate('${player_name} spotted the common symbol'), array(
+                    'player_name' => $this->getPlayerName($player_id),
+                    'cards' => [$template],
+                    'from' => 'pattern',
+                    'to' => $player_id,
+                ));
+                break;
+            default:
+        }
     }
 
     function incScore($player_id, $incValue)
@@ -323,7 +366,7 @@ class Dobble extends Table
 
                 break;
             case WELL:
-
+                return $this->enhanceCards([$this->deck->getCardOnTop(DECK_LOC_DECK)]);
                 break;
             case HOT_POTATO:
 
@@ -377,8 +420,6 @@ class Dobble extends Table
 
             case TRIPLET:
 
-                break;
-            case WELL:
 
                 break;
             case HOT_POTATO:
@@ -387,11 +428,12 @@ class Dobble extends Table
             case POISONED_GIFT:
 
                 break;
+            case WELL:
             case TOWERING_INFERNO:
                 $template = $this->getPatternCards()[0];
                 $mine = $this->getMyCard($player_id);
                 if ($this->isSymboleCommon($symbol, $template, $mine)) {
-                    $this->winCard($player_id, $template);
+                    $this->symbolFoundActions($player_id, $template, $mine);
 
                     $this->gamestate->nextState(TRANSITION_NEXT_TURN);
                 } else {
@@ -439,7 +481,8 @@ class Dobble extends Table
     public function argPlayerTurn()
     {
 
-        $possibleSymbols =        $this->enhanceCards([$this->deck->getCardOnTop(DECK_LOC_DECK)]);
+        $possibleSymbols = $this->getPatternCards();
+        self::dump("**************************possibleSymbols", $possibleSymbols);
         return array(
             'possibleSymbols' => $possibleSymbols[0]["symbols"],
             'pattern' => $this->getPatternCards(),
@@ -468,6 +511,16 @@ class Dobble extends Table
                 break;
             case WELL:
 
+                $nbByPlayer = $this->deck->countCardsByLocationArgs(DECK_LOC_HAND);
+                self::dump("**************************nbByPlayer", $nbByPlayer);
+                $withCards = array_keys(array_filter($nbByPlayer, function ($nb) {
+                    return $nb > 0;
+                }));
+                if (count($withCards) == 1) {
+                    $this->gamestate->nextState(TRANSITION_END_GAME); //only one player with cards in hand
+                } else {
+                    $this->gamestate->nextState(TRANSITION_PLAYER_TURN);
+                }
                 break;
             case HOT_POTATO:
 
@@ -477,7 +530,7 @@ class Dobble extends Table
                 break;
             case TOWERING_INFERNO:
                 if ($this->deck->countCardInLocation(DECK_LOC_DECK) == 0) {
-                    $this->gamestate->nextState(TRANSITION_END_GAME);
+                    $this->gamestate->nextState(TRANSITION_END_GAME); //no more cards in the pile
                 } else {
                     $this->pickPatternAndNotifyPlayers();
 
