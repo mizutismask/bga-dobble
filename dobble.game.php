@@ -168,8 +168,6 @@ class Dobble extends Table
 
                 break;
             case POISONED_GIFT:
-
-                break;
             case TOWERING_INFERNO:
                 $remaining  = $this->deck->countCardInLocation(DECK_LOC_DECK);
                 $total = count($this->cards_description) - count($players);
