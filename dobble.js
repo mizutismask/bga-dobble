@@ -15,13 +15,7 @@
  *
  */
 
-define([
-    "dojo",
-    "dojo/_base/declare",
-    "ebg/core/gamegui",
-    "ebg/counter",
-    "ebg/stock",
-], function (dojo, declare) {
+define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/stock"], function (dojo, declare) {
     return declare("bgagame.dobble", ebg.core.gamegui, {
         constructor: function () {
             console.log("dobble constructor");
@@ -54,23 +48,48 @@ define([
         setup: function (gamedatas) {
             console.log("gamedatas ", gamedatas);
 
-            this.minigame = gamedatas.minigame;
+            this.minigame = parseInt(gamedatas.minigame);
             // Setting up player boards
             for (var player_id in gamedatas.players) {
                 var player = gamedatas.players[player_id];
 
                 // TODO: Setting up players boards if needed
             }
+            console.log("minigame ", this.minigame);
 
             // TODO: Set up your game interface here, according to "gamedatas"
-            //---------- Player hand setup
-            this.playerHand = this.createStock("myhand");
-            this.createCardTypes(this.playerHand);
-            this.addCardsToStock(gamedatas.hand, this.playerHand);
+            if (this.minigame == this.WELL || this.minigame == this.TOWERING_INFERNO) {
+                //---------- Player hand setup
+                this.playerHand = this.createStock("myhand");
+                this.createCardTypes(this.playerHand);
+                this.addCardsToStock(gamedatas.hand, this.playerHand);
+            }
 
-            this.patternPile = this.createStock("pattern_pile");
-            this.createCardTypes(this.patternPile);
-            this.addCardsToStock(gamedatas.pattern, this.patternPile);
+            if (
+                this.minigame == this.WELL ||
+                this.minigame == this.TOWERING_INFERNO ||
+                this.minigame == this.POISONED_GIFT
+            ) {
+                this.patternPile = this.createStock("pattern_pile");
+                this.createCardTypes(this.patternPile);
+                this.addCardsToStock(gamedatas.pattern, this.patternPile);
+            }
+
+            if (this.minigame == this.POISONED_GIFT) {
+                this.playerHands = [];
+
+                for (var player_id of gamedatas.playerorder) {
+                    if (player_id != this.player_id) {
+                        playerHand = this.createStock("player_hand_stock_" + player_id);
+                        playerHand.setSelectionMode(1);
+                        this.createCardTypes(playerHand);
+                        this.addCardsToStock(gamedatas.pattern, playerHand);
+
+                        dojo.connect(playerHand, "onChangeSelection", this, "onSelectOpponentHand");
+                        this.playerHands[player_id] = playerHand;
+                    }
+                }
+            }
 
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
@@ -87,24 +106,41 @@ define([
         onEnteringState: function (stateName, args) {
             console.log("Entering state: " + stateName, args);
 
+            //handle pattern
             switch (stateName) {
                 case "playerTurn":
-                    var patterns = args.args.pattern;
-                    this.patternPile.removeAll();
-                    this.addCardsToStock(patterns, this.patternPile);
-                    break;
-                /* Example:
-            
-            case 'myGameState':
-            
-                // Show some HTML block at this game state
-                dojo.style( 'my_html_block_id', 'display', 'block' );
-                
-                break;
-           */
+                    switch (this.minigame) {
+                        case this.TOWERING_INFERNO:
+                        case this.WELL:
+                        case this.POISONED_GIFT:
+                            var patterns = args.args.pattern;
+                            this.patternPile.removeAll();
+                            this.addCardsToStock(patterns, this.patternPile);
+                            break;
+                            break;
 
-                case "dummmy":
-                    break;
+                        default:
+                            break;
+                    }
+            }
+            //handle hands
+            switch (stateName) {
+                case "playerTurn":
+                    switch (this.minigame) {
+                        case this.POISONED_GIFT:
+                            var patterns = args.args.hands;
+                            for (const [player_id, cards] of Object.entries(patterns)) {
+                                if (player_id != this.player_id) {
+                                    this.playerHands[player_id].removeAll();
+                                    this.addCardsToStock(cards, this.playerHands[player_id]);
+                                }
+                            }
+
+                            break;
+
+                        default:
+                            break;
+                    }
             }
         },
 
@@ -142,11 +178,7 @@ define([
                         var symbols = args.possibleSymbols;
                         for (const s of symbols) {
                             console.log(s);
-                            this.addActionButton(
-                                "button_symbol_" + s,
-                                _(s),
-                                "onChooseSymbol"
-                            ); //_('s')
+                            this.addActionButton("button_symbol_" + s, _(s), "onChooseSymbol"); //_('s')
                         }
                         break;
                     /*               
@@ -176,12 +208,14 @@ define([
         */
         createStock: function (divName) {
             var stock = new ebg.stock(); // new stock object for hand
+            console.log("creation stock ", divName);
             stock.create(this, $(divName), this.cardwidth, this.cardheight); //myhand is the div where the card is going
             stock.image_items_per_row = this.image_items_per_row;
             stock.item_margin = 6;
             stock.apparenceBorderWidth = "2px";
             stock.setSelectionAppearance("class");
             stock.setSelectionMode(0);
+            stock.autowidth = true;
             return stock;
         },
 
@@ -198,12 +232,7 @@ define([
         createCardTypes: function (stock) {
             for (let i = 0; i < 55; i++) {
                 var formattedNumber = this.getFormatedType(i);
-                stock.addItemType(
-                    formattedNumber,
-                    0,
-                    g_gamethemeurl + this.cards_img,
-                    i
-                );
+                stock.addItemType(formattedNumber, 0, g_gamethemeurl + this.cards_img, i);
             }
         },
 
@@ -215,19 +244,22 @@ define([
 
             //if (this.checkAction(action)) {
             this.ajaxcall(
-                "/" +
-                    this.game_name +
-                    "/" +
-                    this.game_name +
-                    "/" +
-                    action +
-                    ".html",
+                "/" + this.game_name + "/" + this.game_name + "/" + action + ".html",
                 args, //
                 this,
                 (result) => {},
                 handler
             );
             //}
+        },
+
+        getSelectedPlayer: function () {
+            for (var player_id in this.playerHands) {
+                var stock = this.playerHands[player_id];
+                if (stock.getSelectedItems().length > 0) {
+                    return player_id;
+                }
+            }
         },
         ///////////////////////////////////////////////////
         //// Player's action
@@ -286,7 +318,47 @@ define([
 
             //this.checkAction('swapObjects');
             if (this.isCurrentPlayerActive()) {
-                this.ajaxcallwrapper("chooseSymbol", { symbol: symbol });
+                switch (this.minigame) {
+                    case this.TOWERING_INFERNO:
+                    case this.WELL:
+                        this.ajaxcallwrapper("chooseSymbol", {
+                            symbol: symbol,
+                        });
+                        break;
+                    case this.POISONED_GIFT:
+                        if (!this.getSelectedPlayer()) {
+                            this.showMessage(_("You have to select a player first"), "error");
+                        } else {
+                            this.ajaxcallwrapper("chooseSymbolWithPlayer", {
+                                symbol: symbol,
+                                player_id: this.getSelectedPlayer(),
+                            });
+                        }
+
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+        },
+
+        /**
+         * Unselects other player hands when one is clicked, since hands are not in the same stock.
+         */
+        onSelectOpponentHand: function (control_name, item_id) {
+            var clickedStock = null;
+            for (var player_id in this.playerHands) {
+                var stock = this.playerHands[player_id];
+                if (stock.control_name == control_name) clickedStock = stock;
+            }
+
+            if (clickedStock.getSelectedItems().length == 1) {
+                //Unselects other player hands when one is clicked, since hands are not in the same stock
+                for (var player_id in this.playerHands) {
+                    var stock = this.playerHands[player_id];
+                    if (stock.control_name != clickedStock.control_name) stock.unselectAll();
+                }
             }
         },
 
@@ -328,7 +400,7 @@ define([
             var from = notif.args.from;
             var to = notif.args.to;
 
-            switch (parseInt(this.minigame)) {
+            switch (this.minigame) {
                 case this.TOWERING_INFERNO:
                     if (to) {
                         this.scoreCtrl[to].incValue(1);
@@ -342,11 +414,7 @@ define([
                         }
                         if (to == this.player_id) {
                             this.playerHand.removeAll();
-                            this.playerHand.addToStockWithId(
-                                card.type,
-                                card.id,
-                                from
-                            );
+                            this.playerHand.addToStockWithId(card.type, card.id, from);
                         }
                     }
                     break;
@@ -363,23 +431,31 @@ define([
                             var fromDiv = "myhand_item_" + card.id;
 
                             this.patternPile.removeAll();
-                            this.patternPile.addToStockWithId(
-                                card.type,
-                                card.id,
-                                fromDiv
-                            );
+                            this.patternPile.addToStockWithId(card.type, card.id, fromDiv);
                         }
                     }
                     if (from == this.player_id && newHand) {
                         //display the card under my pile
                         this.playerHand.removeAll();
-                        this.playerHand.addToStockWithId(
-                            newHand.type,
-                            newHand.id
-                        );
+                        this.playerHand.addToStockWithId(newHand.type, newHand.id);
                     }
                     break;
+                case this.POISONED_GIFT:
+                    if (to) {
+                        this.scoreCtrl[to].incValue(-1);
+                    }
 
+                    for (var i in cards) {
+                        var card = cards[i];
+
+                        if (from == "pattern") {
+                            from = "pattern_pile_item_" + card.id;
+                        }
+
+                        this.playerHands[to].removeAll();
+                        this.playerHands[to].addToStockWithId(card.type, card.id, from);
+                    }
+                    break;
                 default:
                     break;
             }

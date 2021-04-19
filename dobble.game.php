@@ -225,7 +225,7 @@ class Dobble extends Table
 
                 break;
             case POISONED_GIFT:
-
+                $this->dealCardsToAllPlayers($players, 1);
                 break;
             case TOWERING_INFERNO:
                 $this->dealCardsToAllPlayers($players, 1);
@@ -312,7 +312,7 @@ class Dobble extends Table
         return $intersection[0] === $this->symbols[$symbol];
     }
 
-    function symbolFoundActions($player_id, $template, $myCard)
+    function symbolFoundActions($player_id, $template, $myCard, $opponent_player_id = null)
     {
         switch ($this->getMiniGame()) {
 
@@ -332,10 +332,30 @@ class Dobble extends Table
                 ));
                 break;
             case HOT_POTATO:
-
+                $this->deck->moveCard($myCard["id"], DECK_LOC_DECK);
+                $this->deck->insertCardOnExtremePosition($myCard["id"], DECK_LOC_DECK, true);
+                $this->incScore($player_id, 1);
+                $this->incScore($opponent_player_id, -1);
+                self::notifyAllPlayers(NOTIF_CARDS_MOVE, clienttranslate('${player_name} spotted the common symbol with ${player_name2}'), array(
+                    'player_name' => $this->getPlayerName($player_id),
+                    'player_name2' => $this->getPlayerName($opponent_player_id),
+                    'cards' => [$myCard],
+                    'from' => 'pattern',
+                    'to' => $opponent_player_id,
+                ));
                 break;
             case POISONED_GIFT:
-
+                //mycard here is the opponent card
+                $this->deck->moveCard($myCard["id"], DECK_LOC_WON, $opponent_player_id);
+                $this->deck->moveCard($template["id"], DECK_LOC_HAND, $opponent_player_id);
+                $this->incScore($opponent_player_id, -1);
+                self::notifyAllPlayers(NOTIF_CARDS_MOVE, clienttranslate('${player_name} spotted the common symbol with ${player_name2}'), array(
+                    'player_name' => $this->getPlayerName($player_id),
+                    'player_name2' => $this->getPlayerName($opponent_player_id),
+                    'cards' => [$template],
+                    'from' => 'pattern',
+                    'to' => $opponent_player_id,
+                ));
                 break;
             case TOWERING_INFERNO:
                 $this->deck->moveAllCardsInLocation(DECK_LOC_HAND, DECK_LOC_WON, $player_id, $player_id);
@@ -365,15 +385,12 @@ class Dobble extends Table
             case TRIPLET:
 
                 break;
-            case WELL:
-                return $this->enhanceCards([$this->deck->getCardOnTop(DECK_LOC_DECK)]);
-                break;
+
             case HOT_POTATO:
 
                 break;
             case POISONED_GIFT:
-
-                break;
+            case WELL:
             case TOWERING_INFERNO:
                 return $this->enhanceCards([$this->deck->getCardOnTop(DECK_LOC_DECK)]);
                 break;
@@ -400,6 +417,56 @@ class Dobble extends Table
         $cards = $this->deck->getCardsInLocation(DECK_LOC_HAND, $player_id);
         return array_pop($cards);
     }
+
+    function getHandForEachPlayer()
+    {
+        $hands = [];
+        $players = self::loadPlayersBasicInfos();
+        foreach ($players as $player_id => $player) {
+            $card = $this->getMyCard($player_id);
+            if ($card) {
+                $hands[$player_id] = $this->enhanceCards(
+                    [$card]
+                );
+            }
+        }
+        return $hands;
+    }
+
+    function getPlayersInOrder($removeEliminated = true)
+    {
+        $result = array();
+
+        $players = self::loadPlayersBasicInfos();
+        $next_player = self::getNextPlayerTable();
+        $player_id = self::getCurrentPlayerId();
+
+        // Check for spectator
+        if (!key_exists($player_id, $players)) {
+            $player_id = $next_player[0];
+        }
+
+        // Build array starting with current player
+        for ($i = 0; $i < count($players); $i++) {
+            $result[] = $player_id;
+            $player_id = $next_player[$player_id];
+        }
+
+        if ($removeEliminated) {
+            //Need to remove eliminated players
+            $eliminated = array_keys(array_filter($players, function ($player) {
+                return $player["player_eliminated"];
+            }));
+            $result = array_diff($result, $eliminated);
+        }
+
+        return $result;
+    }
+
+    function publicGetCurrentPlayerId()
+    {
+        return self::getCurrentPlayerId();
+    }
     //////////////////////////////////////////////////////////////////////////////
     //////////// Player actions
     //////////// 
@@ -420,12 +487,6 @@ class Dobble extends Table
 
             case TRIPLET:
 
-
-                break;
-            case HOT_POTATO:
-
-                break;
-            case POISONED_GIFT:
 
                 break;
             case WELL:
@@ -450,7 +511,39 @@ class Dobble extends Table
 
     }
 
+    function chooseSymbolWithPlayer($symbol, $opponent_player_id)
+    {
+        // Check that this is the player's turn and that it is a "possible action" at this game state (see states.inc.php)
+        self::checkAction('playCard');
 
+        $player_id = self::getCurrentPlayerId();
+        switch ($this->getMiniGame()) {
+
+
+            case HOT_POTATO:
+
+                break;
+            case POISONED_GIFT:
+                $template = $this->getPatternCards()[0];
+                $opponentCard = $this->getMyCard($opponent_player_id);
+                if ($this->isSymboleCommon($symbol, $template, $opponentCard)) {
+                    $this->symbolFoundActions($player_id, $template, $opponentCard, $opponent_player_id);
+
+                    $this->gamestate->nextState(TRANSITION_NEXT_TURN);
+                } else {
+                    $this->gamestate->setPlayerNonMultiactive($player_id, TRANSITION_PLAYER_TURN); // deactivate player; if none left, reactivates everyone
+                    self::notifyAllPlayers("msg", clienttranslate('${player_name} failed to spot the common symbol with ${player_name2}'), array(
+                        'player_name' => $this->getPlayerName($player_id),
+                        'player_name2' => $this->getPlayerName($opponent_player_id),
+                    ));
+                }
+                break;
+            default:
+        }
+
+        // Notify all players about the card played
+
+    }
 
     //////////////////////////////////////////////////////////////////////////////
     //////////// Game state arguments
@@ -480,13 +573,13 @@ class Dobble extends Table
     */
     public function argPlayerTurn()
     {
-
         $possibleSymbols = $this->getPatternCards();
         self::dump("**************************possibleSymbols", $possibleSymbols);
-        return array(
-            'possibleSymbols' => $possibleSymbols[0]["symbols"],
-            'pattern' => $this->getPatternCards(),
-        );
+        $args = [];
+        $args['possibleSymbols'] = $possibleSymbols[0]["symbols"];
+        $args['pattern'] = $this->getPatternCards();
+        $args['hands'] = $this->getHandForEachPlayer();
+        return $args;
     }
 
 
@@ -526,8 +619,6 @@ class Dobble extends Table
 
                 break;
             case POISONED_GIFT:
-
-                break;
             case TOWERING_INFERNO:
                 if ($this->deck->countCardInLocation(DECK_LOC_DECK) == 0) {
                     $this->gamestate->nextState(TRANSITION_END_GAME); //no more cards in the pile

@@ -26,16 +26,34 @@
 -->
 
 <div id="mainLine">
+    <!-- BEGIN pattern -->
     <div id="pattern_pile_wrap" class="whiteblock">
         <h3 class="dbl_block_title">{PLAYING_ZONE}</h3>
         <div id="pattern_pile">
         </div>
     </div>
+    <!-- END pattern -->
+
+    <div id="opponents_wrapper">
+        <!-- BEGIN player -->
+        <div id="player_hand_{PLAYER_ID}" class="whiteblock">
+            <div style="color:#{PLAYER_COLOR}">
+                <h3 class="dbl_block_title">{PLAYER_NAME}</h3>
+            </div>
+            <div class="playerHand" id="player_hand_stock_{PLAYER_ID}">
+            </div>
+            <span id="cards_count_{PLAYER_ID}" class="dbl_cards_counter dbl_cards_count"></span>
+        </div>
+        <!-- END player -->
+    </div>
+
+    <!-- BEGIN myHand -->
     <div id="myhand_wrap" class="whiteblock">
         <h3 class="dbl_block_title">{MY_HAND}</h3>
         <div id="myhand">
         </div>
     </div>
+     <!-- END myHand -->
 </div>
 
 

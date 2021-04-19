@@ -54,4 +54,18 @@ class action_dobble extends APP_GameAction
 
     self::ajaxResponse();
   }
+
+  public function chooseSymbolWithPlayer()
+  {
+    self::setAjaxMode();
+
+    // Retrieve arguments
+    // Note: these arguments correspond to what has been sent through the javascript "ajaxcall" method
+    $symbol = self::getArg("symbol", AT_alphanum, true);
+    $player_id = self::getArg("player_id", AT_posint, true);
+    // Then, call the appropriate method in your game logic, like "playCard" or "myAction"
+    $this->game->chooseSymbolWithPlayer($symbol, $player_id);
+
+    self::ajaxResponse();
+  }
 }

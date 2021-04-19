@@ -66,7 +66,11 @@
         background-repeat: none;
     }
 */
-
+#opponents_wrapper
+{ 
+    display: inline-flex;
+    flex-wrap: wrap;
+}
 
 
 

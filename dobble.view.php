@@ -38,6 +38,10 @@ class view_dobble_dobble extends game_view
     // Get players & players number
     $players = $this->game->loadPlayersBasicInfos();
     $players_nbr = count($players);
+    $players_in_order = $this->game->getPlayersInOrder(false);
+    $active_player_id = $this->game->publicGetCurrentPlayerId();
+    $template = self::getGameName() . "_" . self::getGameName();
+    $miniGame = $this->game->getMiniGame();
 
     /*********** Place your code below:  ************/
     $this->tpl['MY_HAND'] = self::_("My hand");
@@ -57,28 +61,34 @@ class view_dobble_dobble extends game_view
         $this->tpl['MY_VARIABLE_ELEMENT'] = self::raw( $some_html_code );
         
         */
+    self::dump("*****************minigame ", $miniGame);
 
-    /*
-        
-        // Example: display a specific HTML block for each player in this game.
-        // (note: the block is defined in your .tpl file like this:
-        //      <!-- BEGIN myblock --> 
-        //          ... my HTML code ...
-        //      <!-- END myblock --> 
-        
+    //declare blocks
+    $this->page->begin_block($template, "player");
+    $this->page->begin_block($template, "pattern");
+    $this->page->begin_block($template, "myHand");
 
-        $this->page->begin_block( "dobble_dobble", "myblock" );
-        foreach( $players as $player )
-        {
-            $this->page->insert_block( "myblock", array( 
-                                                    "PLAYER_NAME" => $player['player_name'],
-                                                    "SOME_VARIABLE" => $some_value
-                                                    ...
-                                                     ) );
+    if ($miniGame == WELL || $miniGame == TOWERING_INFERNO) {
+      $this->page->insert_block("myHand", array());
+    }
+
+    if ($miniGame == WELL || $miniGame == TOWERING_INFERNO || $miniGame == POISONED_GIFT) {
+      $this->page->insert_block("pattern", array());
+    }
+
+    if ($miniGame == POISONED_GIFT || $miniGame == HOT_POTATO) {
+
+      foreach ($players_in_order  as $player_id) {
+        if (key_exists($active_player_id, $players) && $active_player_id != $player_id) {
+          $this->page->insert_block("player", array(
+            "PLAYER_ID" => $player_id,
+            "PLAYER_NAME" => $players[$player_id]['player_name'],
+            "PLAYER_COLOR" => $players[$player_id]['player_color'],
+            "PLAYER_NAME" => $players[$player_id]['player_name'],
+          ));
         }
-        
-        */
-
+      }
+    }
 
 
     /*********** Do not change anything below this line  ************/
