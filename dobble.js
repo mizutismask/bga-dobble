@@ -58,7 +58,11 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
             console.log("minigame ", this.minigame);
 
             // TODO: Set up your game interface here, according to "gamedatas"
-            if (this.minigame == this.WELL || this.minigame == this.TOWERING_INFERNO) {
+            if (
+                this.minigame == this.WELL ||
+                this.minigame == this.TOWERING_INFERNO ||
+                this.minigame == this.HOT_POTATO
+            ) {
                 //---------- Player hand setup
                 this.playerHand = this.createStock("myhand");
                 this.createCardTypes(this.playerHand);
@@ -75,7 +79,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                 this.addCardsToStock(gamedatas.pattern, this.patternPile);
             }
 
-            if (this.minigame == this.POISONED_GIFT) {
+            if (this.minigame == this.POISONED_GIFT || this.minigame == this.HOT_POTATO) {
                 this.playerHands = [];
 
                 for (var player_id of gamedatas.playerorder) {
@@ -128,6 +132,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                 case "playerTurn":
                     switch (this.minigame) {
                         case this.POISONED_GIFT:
+                        case this.HOT_POTATO:
                             var patterns = args.args.hands;
                             for (const [player_id, cards] of Object.entries(patterns)) {
                                 if (player_id != this.player_id) {
@@ -175,10 +180,32 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
             if (this.isCurrentPlayerActive()) {
                 switch (stateName) {
                     case "playerTurn":
-                        var symbols = args.possibleSymbols;
-                        for (const s of symbols) {
-                            console.log(s);
-                            this.addActionButton("button_symbol_" + s, _(s), "onChooseSymbol"); //_('s')
+                        if (args.possibleSymbols) {
+                            var symbols = args.possibleSymbols;
+                            for (const s of symbols) {
+                                console.log(s);
+                                this.addActionButton("button_symbol_" + s, _(s), "onChooseSymbol"); //_('s')
+                            }
+                        }
+
+                        if (args.hands) {
+                            var hands = args.hands;
+                            for (const [playerId, cards] of Object.entries(hands)) {
+                                // var divId = "actions_" + playerId;
+                                // dojo.place('<div id="' + divId + '"/>', $("generalactions"));
+                                if (playerId != this.player_id) {
+                                    for (const c of cards) {
+                                        for (const s of c.symbols) {
+                                            console.log(s);
+                                            var buttonId = "button_symbol_" + s;
+                                            this.addActionButton(buttonId, _(s), "onChooseSymbol"); //_('s')
+                                            //dojo.byId(divId).appendChild(buttonId);
+                                            dojo.style(buttonId, "display", "none");
+                                            dojo.setAttr(buttonId, "data-player-id", playerId);
+                                        }
+                                    }
+                                }
+                            }
                         }
                         break;
                     /*               
@@ -326,6 +353,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                         });
                         break;
                     case this.POISONED_GIFT:
+                    case this.HOT_POTATO:
                         if (!this.getSelectedPlayer()) {
                             this.showMessage(_("You have to select a player first"), "error");
                         } else {
@@ -348,18 +376,39 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
          */
         onSelectOpponentHand: function (control_name, item_id) {
             var clickedStock = null;
+            var clickedPlayerId = null;
             for (var player_id in this.playerHands) {
                 var stock = this.playerHands[player_id];
-                if (stock.control_name == control_name) clickedStock = stock;
+                if (stock.control_name == control_name) {
+                    clickedStock = stock;
+                    clickedPlayerId = player_id;
+                }
             }
 
             if (clickedStock.getSelectedItems().length == 1) {
                 //Unselects other player hands when one is clicked, since hands are not in the same stock
                 for (var player_id in this.playerHands) {
                     var stock = this.playerHands[player_id];
-                    if (stock.control_name != clickedStock.control_name) stock.unselectAll();
+                    if (stock.control_name != clickedStock.control_name) {
+                        stock.unselectAll();
+                        if (this.minigame == this.HOT_POTATO) {
+                            dojo.query("#generalactions [data-player-id]=" + player_id).style("display", "none");
+                        }
+                    }
                 }
+                if (this.minigame == this.HOT_POTATO) {
+                    this.onSelectOpponentHandDisplayActionButtons(clickedPlayerId);
+                }
+            } else if (this.minigame == this.HOT_POTATO) {
+                dojo.query("#generalactions [data-player-id]").style("display", "none");
             }
+        },
+
+        /**
+         * Displays action buttons on selection for hot potato.
+         */
+        onSelectOpponentHandDisplayActionButtons: function (playerId) {
+            dojo.query("#generalactions [data-player-id]=" + playerId).style("display", "inline");
         },
 
         ///////////////////////////////////////////////////

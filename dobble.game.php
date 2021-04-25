@@ -38,6 +38,7 @@ if (!defined('DECK_LOC_DECK')) {
     define("NOTIF_HAND_CHANGE", "handChange");
 
     // constants for game states
+    define("GS_CURRENT_ROUND", "currentRound");
     define("TRANSITION_PLAYER_TURN", "playerTurn");
 }
 
@@ -54,18 +55,15 @@ class Dobble extends Table
         parent::__construct();
 
         self::initGameStateLabels(array(
-            //    "my_first_global_variable" => 10,
-            //    "my_second_global_variable" => 11,
-            //      ...
-            //    "my_first_game_variant" => 100,
-            //    "my_second_game_variant" => 101,
-            //      ...
             "type_of_rules" => TYPE_OF_RULES,
+            "rounds_number" => ROUNDS_NUMBER,
             "towering_inferno" => TOWERING_INFERNO,
             "well" => WELL,
             "hot_potato" => HOT_POTATO,
             "poisoned_gift" => POISONED_GIFT,
             "triplet" => TRIPLET,
+
+            GS_CURRENT_ROUND => 10,
         ));
 
         $this->deck = self::getNew("module.common.deck");
@@ -92,7 +90,7 @@ class Dobble extends Table
         /************ Start the game initialization *****/
 
         // Init global values with their initial values
-        //self::setGameStateInitialValue( 'my_first_global_variable', 0 );
+        self::setGameStateInitialValue(GS_CURRENT_ROUND, 1);
 
         // Init game statistics
         // (note: statistics used in this file must be defined in your stats.inc.php file)
@@ -131,7 +129,11 @@ class Dobble extends Table
         // Note: you can retrieve some extra field you added for "player" table in "dbmodel.sql" if you need it.
         $sql = "SELECT player_id id, player_score score FROM player ";
         $result['players'] = self::getCollectionFromDb($sql);
-        $result['hand'] = [$this->getMyCard($current_player_id)];
+        $result['hand'] = [];
+        $myCard = $this->getMyCard($current_player_id);
+        if ($myCard) {
+            $result['hand'][] = $myCard;
+        }
         $result['pattern'] = $this->getPatternCards();
         $result['minigame'] = $this->getMiniGame();
 
@@ -220,8 +222,6 @@ class Dobble extends Table
                 $this->discardRemainingCards();
                 break;
             case HOT_POTATO:
-
-                break;
             case POISONED_GIFT:
                 $this->dealCardsToAllPlayers($players, 1);
                 break;
@@ -231,6 +231,7 @@ class Dobble extends Table
                 break;
             default:
         }
+        self::trace("**************************cards dealt");
     }
     function dealCardsToAllPlayers($players, $number)
     {
@@ -271,6 +272,11 @@ class Dobble extends Table
     function getMiniGame()
     {
         return self::getGameStateValue('type_of_rules');
+    }
+
+    function getRoundsNumber()
+    {
+        return self::getGameStateValue('rounds_number');
     }
 
     function enhanceCards($cards)
@@ -330,15 +336,15 @@ class Dobble extends Table
                 ));
                 break;
             case HOT_POTATO:
-                $this->deck->moveCard($myCard["id"], DECK_LOC_DECK);
-                $this->deck->insertCardOnExtremePosition($myCard["id"], DECK_LOC_DECK, true);
-                $this->incScore($player_id, 1);
-                $this->incScore($opponent_player_id, -1);
+                $this->deck->moveAllCardsInLocation(DECK_LOC_WON, DECK_LOC_WON, $player_id, $opponent_player_id);
+                $this->deck->moveCard($template["id"], DECK_LOC_WON, $opponent_player_id);
+                $this->deck->moveCard($myCard["id"], DECK_LOC_HAND, $opponent_player_id);
+
                 self::notifyAllPlayers(NOTIF_CARDS_MOVE, clienttranslate('${player_name} spotted the common symbol with ${player_name2}'), array(
                     'player_name' => $this->getPlayerName($player_id),
                     'player_name2' => $this->getPlayerName($opponent_player_id),
                     'cards' => [$myCard],
-                    'from' => 'pattern',
+                    'from' => $player_id,
                     'to' => $opponent_player_id,
                 ));
                 break;
@@ -385,8 +391,7 @@ class Dobble extends Table
                 break;
 
             case HOT_POTATO:
-
-                break;
+                return [];
             case POISONED_GIFT:
             case WELL:
             case TOWERING_INFERNO:
@@ -465,6 +470,21 @@ class Dobble extends Table
     {
         return self::getCurrentPlayerId();
     }
+
+    function onlyOnePlayerHasAHand()
+    {
+        $withCards = $this->getPlayersWithHand();
+        return count($withCards) == 1;
+    }
+
+    function getPlayersWithHand()
+    {
+        $nbByPlayer = $this->deck->countCardsByLocationArgs(DECK_LOC_HAND);
+        $withCards = array_keys(array_filter($nbByPlayer, function ($nb) {
+            return $nb > 0;
+        }));
+        return $withCards;
+    }
     //////////////////////////////////////////////////////////////////////////////
     //////////// Player actions
     //////////// 
@@ -519,7 +539,24 @@ class Dobble extends Table
 
 
             case HOT_POTATO:
+                $myCard = $this->getMyCard($player_id);
+                $opponentCard = $this->getMyCard($opponent_player_id);
+                if ($this->isSymboleCommon($symbol, $myCard, $opponentCard)) {
+                    $this->symbolFoundActions($player_id, $myCard, $opponentCard, $opponent_player_id);
 
+                    if ($this->onlyOnePlayerHasAHand()) {
+                        $this->gamestate->nextState(TRANSITION_NEXT_ROUND);
+                    } else {
+                        $this->gamestate->nextState(TRANSITION_NEXT_TURN);
+                    }
+                } else {
+                    $this->gamestate->setPlayerNonMultiactive($player_id, TRANSITION_PLAYER_TURN); // deactivate player; if none left, reactivates everyone
+                    self::notifyAllPlayers("msg", clienttranslate('${player_name} failed to spot the common symbol with ${player_name2}'), array(
+                        'player_name' => $this->getPlayerName($player_id),
+                        'player_name2' => $this->getPlayerName($opponent_player_id),
+                    ));
+                }
+                break;
                 break;
             case POISONED_GIFT:
                 $template = $this->getPatternCards()[0];
@@ -571,12 +608,19 @@ class Dobble extends Table
     */
     public function argPlayerTurn()
     {
-        $possibleSymbols = $this->getPatternCards();
-        self::dump("**************************possibleSymbols", $possibleSymbols);
         $args = [];
-        $args['possibleSymbols'] = $possibleSymbols[0]["symbols"];
-        $args['pattern'] = $this->getPatternCards();
         $args['hands'] = $this->getHandForEachPlayer();
+
+        switch ($this->getMiniGame()) {
+            case HOT_POTATO:
+                //no pattern
+                break;
+            default:
+                $possibleSymbols = $this->getPatternCards();
+                $args['pattern'] = $this->getPatternCards();
+                $args['possibleSymbols'] = $possibleSymbols[0]["symbols"];
+                self::dump("**************************possibleSymbols", $possibleSymbols);
+        }
         return $args;
     }
 
@@ -594,6 +638,7 @@ class Dobble extends Table
 
     function stNextTurn()
     {
+        self::trace("*********************stNextTurn");
         $this->giveExtraTimeToEveryone();
         switch ($this->getMiniGame()) {
 
@@ -601,20 +646,14 @@ class Dobble extends Table
 
                 break;
             case WELL:
-
-                $nbByPlayer = $this->deck->countCardsByLocationArgs(DECK_LOC_HAND);
-                self::dump("**************************nbByPlayer", $nbByPlayer);
-                $withCards = array_keys(array_filter($nbByPlayer, function ($nb) {
-                    return $nb > 0;
-                }));
-                if (count($withCards) == 1) {
+                if ($this->onlyOnePlayerHasAHand()) {
                     $this->gamestate->nextState(TRANSITION_END_GAME); //only one player with cards in hand
                 } else {
                     $this->gamestate->nextState(TRANSITION_PLAYER_TURN);
                 }
                 break;
             case HOT_POTATO:
-
+                $this->gamestate->nextState(TRANSITION_PLAYER_TURN);
                 break;
             case POISONED_GIFT:
             case TOWERING_INFERNO:
@@ -630,10 +669,51 @@ class Dobble extends Table
         }
     }
 
+    function stNextRound()
+    {
+        self::trace("**********************stNextRound");
+        $players = self::loadPlayersBasicInfos();
+        switch ($this->getMiniGame()) {
+            case HOT_POTATO:
+                //update scores
+                foreach ($players as $player_id => $player) {
+                    //empty hands before count
+                    $this->deck->moveAllCardsInLocation(DECK_LOC_HAND, DECK_LOC_WON, $player_id, $player_id);
+                }
+                $nbByPlayer = $this->deck->countCardsByLocationArgs(DECK_LOC_WON);
+                foreach ($nbByPlayer as $player_id => $nb) {
+                    $this->incScore($player_id, $nb * -1); //-1 by won card
+                }
+
+                //discard used cards
+                $this->deck->moveAllCardsInLocation(DECK_LOC_WON, DECK_LOC_DISCARD);
+
+                //checks if it's the end of the game
+                $currentRound = self::getGameStateValue(GS_CURRENT_ROUND);
+                if ($currentRound == $this->getRoundsNumber()) {
+                    self::trace("*******************************TRANSITION_END_GAME");
+                    $this->gamestate->nextState(TRANSITION_END_GAME);
+                } else {
+                    //prepare next round
+                    self::setGameStateValue(GS_CURRENT_ROUND, $currentRound + 1);
+                    $this->dealCardsToAllPlayers($players, 1);
+                    self::trace("*******************************TRANSITION_NEXT_TURN");
+                    $this->gamestate->nextState(TRANSITION_NEXT_TURN);
+                }
+                break;
+            default:
+        }
+    }
+
     // this will make all players multiactive just before entering the state
     function st_multiPlayerInit()
     {
-        $this->gamestate->setAllPlayersMultiactive();
+        if ($this->getMiniGame() == HOT_POTATO) {
+            $players = $this->getPlayersWithHand();
+            $this->gamestate->setPlayersMultiactive($players, STATE_PLAYER_TURN, true); // activate players with cards
+        } else {
+            $this->gamestate->setAllPlayersMultiactive();
+        }
     }
 
 

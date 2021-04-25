@@ -38,4 +38,22 @@ $game_options = array(
         ),
         'default' => TOWERING_INFERNO
     ),
+
+    ROUNDS_NUMBER => array(
+        'name' => totranslate('Rounds number'),
+        'values' => array(
+            5 => array('name' => '5', 'tmdisplay' => '5', 'description' => ''),
+            8 => array('name' => '8', 'tmdisplay' => '8', 'description' => ''),
+            10 => array('name' => '10', 'tmdisplay' => '10', 'description' => ''),
+            12 => array('name' => '12', 'tmdisplay' => '12', 'description' => ''),
+            15 => array('name' => '15', 'tmdisplay' => '15', 'description' => ''),
+        ),
+        'displaycondition' => [
+            [
+                'type' => 'otheroption',
+                'id' => TYPE_OF_RULES,
+                'value' => HOT_POTATO,
+            ],
+        ],
+    ),
 );

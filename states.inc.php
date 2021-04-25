@@ -53,9 +53,11 @@
 if (!defined('STATE_PLAYER_TURN')) { // ensure this block is only invoked once, since it is included multiple times
     define("STATE_PLAYER_TURN", 2);
     define("STATE_NEXT_TURN", 3);
+    define("STATE_NEXT_ROUND", 4);
 
     //define("TRANSITION_PLAYER_TURN", "playerTurn");
     define("TRANSITION_NEXT_TURN", "nextTurn");
+    define("TRANSITION_NEXT_ROUND", "nextRound");
     define("TRANSITION_END_GAME", "endGame");
 }
 
@@ -82,8 +84,8 @@ $machinestates = array(
         "action" => 'st_multiPlayerInit',
         "transitions" => array(
             TRANSITION_NEXT_TURN => STATE_NEXT_TURN,
-            TRANSITION_PLAYER_TURN => STATE_PLAYER_TURN //when everyone failed
-            ,
+            TRANSITION_PLAYER_TURN => STATE_PLAYER_TURN, //when everyone failed
+            TRANSITION_NEXT_ROUND => STATE_NEXT_ROUND,
         )
     ),
 
@@ -94,9 +96,18 @@ $machinestates = array(
         // "args" => "argCardsCounters",
         "action" => "stNextTurn",
         "updateGameProgression" => true,
-        "transitions" => array(TRANSITION_PLAYER_TURN => STATE_PLAYER_TURN, TRANSITION_END_GAME => 99)
+        "transitions" => array(TRANSITION_PLAYER_TURN => STATE_PLAYER_TURN, TRANSITION_NEXT_ROUND => STATE_PLAYER_TURN, TRANSITION_END_GAME => 99)
     ),
 
+    STATE_NEXT_ROUND => array(
+        "name" => "nextRound",
+        "description" => '',
+        "type" => "game",
+        // "args" => "argCardsCounters",
+        "action" => "stNextRound",
+        "updateGameProgression" => true,
+        "transitions" => array(TRANSITION_NEXT_TURN => STATE_NEXT_TURN, TRANSITION_END_GAME => 99)
+    ),
     /*
     Examples:
     
