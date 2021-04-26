@@ -152,6 +152,13 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                                 }
                             }
 
+                            var player = this.getUniqueOpponentWithCards();
+                            if (player) {
+                                console.log("1 player");
+                                var playerStock = this.getPlayerStock(player);
+                                playerStock.selectItem(playerStock.getAllItems().pop().id);
+                                this.onSelectOpponentHandDisplayActionButtons(player);
+                            }
                             break;
 
                         default:
@@ -214,6 +221,11 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                                         }
                                     }
                                 }
+                            }
+
+                            var player = this.getUniqueOpponentWithCards();
+                            if (player) {
+                                this.onSelectOpponentHandDisplayActionButtons(player);
                             }
                         }
                         break;
@@ -295,6 +307,25 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                 if (stock.getSelectedItems().length > 0) {
                     return player_id;
                 }
+            }
+            //if there is only one player with cards, he's considered like selected
+            return this.getUniqueOpponentWithCards();
+        },
+
+        /**
+         *
+         * @returns the id of the only player with cards, if there is only one, nothing otherwise.
+         */
+        getUniqueOpponentWithCards: function () {
+            var possiblePlayers = [];
+            for (var player_id in this.playerHands) {
+                var stock = this.playerHands[player_id];
+                if (stock.count() > 0) {
+                    possiblePlayers.push(player_id);
+                }
+            }
+            if (possiblePlayers.length == 1) {
+                return possiblePlayers.pop();
             }
         },
 
@@ -450,6 +481,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
          * Displays action buttons on selection for hot potato.
          */
         onSelectOpponentHandDisplayActionButtons: function (playerId) {
+            console.log("onSelectOpponentHandDisplayActionButtons", playerId);
             dojo.query("#generalactions [data-player-id=" + playerId + "]").style("display", "inline");
         },
 
