@@ -145,8 +145,11 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                         case this.HOT_POTATO:
                             var hands = args.args.hands;
                             for (const [player_id, cards] of Object.entries(hands)) {
-                                this.getPlayerStock(player_id).removeAll();
-                                this.addCardsToStock(cards, this.getPlayerStock(player_id));
+                                var playerStock = this.getPlayerStock(player_id);
+                                if (this.stockContentIsDifferentFromHand(playerStock, cards)) {
+                                    playerStock.removeAll();
+                                    this.addCardsToStock(cards, playerStock);
+                                }
                             }
 
                             break;
@@ -197,19 +200,14 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                         }
 
                         if (args.hands) {
-                            //dojo.query("#generalactions [data-player-id]").remove();
                             var hands = args.hands;
                             for (const [playerId, cards] of Object.entries(hands)) {
-                                // var divId = "actions_" + playerId;
-                                // dojo.place('<div id="' + divId + '"/>', $("generalactions"));
                                 if (playerId != this.player_id) {
                                     for (const c of cards) {
                                         for (const s of c.symbols) {
                                             console.log(s);
                                             var buttonId = "button_" + playerId + "_symbol_" + s;
-
                                             this.addActionButton(buttonId, _(s), "onChooseSymbol"); //_('s')
-                                            //dojo.byId(divId).appendChild(buttonId);
                                             dojo.style(buttonId, "display", "none");
                                             dojo.setAttr(buttonId, "data-player-id", playerId);
                                             dojo.setAttr(buttonId, "data-symbol", s);
@@ -306,6 +304,31 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
             } else {
                 return this.playerHands[playerId];
             }
+        },
+
+        getStockDiv: function (playerId, card = null) {
+            var fromDiv;
+            if (playerId == this.player_id) {
+                fromDiv = "myhand"; //_item_" + card.id;
+            } else {
+                fromDiv = "player_hand_stock_" + playerId;
+            }
+            if (card) {
+                fromDiv += "_item_" + card.id;
+            }
+            console.log("fromDiv ", fromDiv);
+            return fromDiv;
+        },
+
+        stockContentIsDifferentFromHand: function (playerStock, cardsFromHand) {
+            if (playerStock.count() != cardsFromHand.length) return true;
+
+            for (const card of cardsFromHand) {
+                if (!playerStock.getItemById(card.id)) {
+                    return true;
+                }
+            }
+            return false;
         },
 
         ///////////////////////////////////////////////////
@@ -474,9 +497,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                         this.scoreCtrl[to].incValue(1);
                     }
 
-                    for (var i in cards) {
-                        var card = cards[i];
-
+                    for (var card of cards) {
                         if (from == "pattern") {
                             from = "pattern_pile_item_" + card.id;
                         }
@@ -492,9 +513,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                         this.scoreCtrl[from].incValue(1);
                     }
 
-                    for (var i in cards) {
-                        var card = cards[i];
-
+                    for (var card of cards) {
                         if (from == this.player_id) {
                             var fromDiv = "myhand_item_" + card.id;
 
@@ -513,9 +532,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                         this.scoreCtrl[to].incValue(-1);
                     }
 
-                    for (var i in cards) {
-                        var card = cards[i];
-
+                    for (var card of cards) {
                         if (from == "pattern") {
                             from = "pattern_pile_item_" + card.id;
                         }
@@ -525,17 +542,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                     }
                     break;
                 case this.HOT_POTATO:
-                    for (var i in cards) {
-                        var card = cards[i];
-
-                        if (from == this.player_id) {
-                            var fromDiv = "myhand"; //_item_" + card.id;
-                        } else {
-                            var fromDiv = "player_hand_stock_" + from;
-                        }
-                        console.log("fromDiv ", fromDiv);
+                    for (var card of cards) {
                         this.getPlayerStock(to).removeAll();
-                        this.getPlayerStock(to).addToStockWithId(card.type, card.id, fromDiv);
+                        this.getPlayerStock(to).addToStockWithId(card.type, card.id, this.getStockDiv(from, card));
                         this.getPlayerStock(from).removeAll();
                     }
                     break;
