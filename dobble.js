@@ -132,13 +132,21 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                 case "playerTurn":
                     switch (this.minigame) {
                         case this.POISONED_GIFT:
-                        case this.HOT_POTATO:
-                            var patterns = args.args.hands;
-                            for (const [player_id, cards] of Object.entries(patterns)) {
+                            var hands = args.args.hands;
+                            for (const [player_id, cards] of Object.entries(hands)) {
                                 if (player_id != this.player_id) {
                                     this.playerHands[player_id].removeAll();
                                     this.addCardsToStock(cards, this.playerHands[player_id]);
                                 }
+                            }
+
+                            break;
+
+                        case this.HOT_POTATO:
+                            var hands = args.args.hands;
+                            for (const [player_id, cards] of Object.entries(hands)) {
+                                this.getPlayerStock(player_id).removeAll();
+                                this.addCardsToStock(cards, this.getPlayerStock(player_id));
                             }
 
                             break;
@@ -189,6 +197,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                         }
 
                         if (args.hands) {
+                            //dojo.query("#generalactions [data-player-id]").remove();
                             var hands = args.hands;
                             for (const [playerId, cards] of Object.entries(hands)) {
                                 // var divId = "actions_" + playerId;
@@ -197,11 +206,13 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                                     for (const c of cards) {
                                         for (const s of c.symbols) {
                                             console.log(s);
-                                            var buttonId = "button_symbol_" + s;
+                                            var buttonId = "button_" + playerId + "_symbol_" + s;
+
                                             this.addActionButton(buttonId, _(s), "onChooseSymbol"); //_('s')
                                             //dojo.byId(divId).appendChild(buttonId);
                                             dojo.style(buttonId, "display", "none");
                                             dojo.setAttr(buttonId, "data-player-id", playerId);
+                                            dojo.setAttr(buttonId, "data-symbol", s);
                                         }
                                     }
                                 }
@@ -288,6 +299,15 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                 }
             }
         },
+
+        getPlayerStock: function (playerId) {
+            if (playerId == this.player_id) {
+                return this.playerHand;
+            } else {
+                return this.playerHands[playerId];
+            }
+        },
+
         ///////////////////////////////////////////////////
         //// Player's action
 
@@ -336,8 +356,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         
         */
         onChooseSymbol: function (evt) {
-            var symbol = evt.currentTarget.id;
-            symbol = symbol.replace("button_symbol_", "");
+            var symbol = dojo.getAttr(evt.currentTarget.id, "data-symbol");
             console.log("onChooseSymbol ", symbol);
 
             // Preventing default browser reaction
@@ -392,7 +411,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                     if (stock.control_name != clickedStock.control_name) {
                         stock.unselectAll();
                         if (this.minigame == this.HOT_POTATO) {
-                            dojo.query("#generalactions [data-player-id]=" + player_id).style("display", "none");
+                            dojo.query("#generalactions [data-player-id=" + player_id + "]").style("display", "none");
                         }
                     }
                 }
@@ -408,7 +427,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
          * Displays action buttons on selection for hot potato.
          */
         onSelectOpponentHandDisplayActionButtons: function (playerId) {
-            dojo.query("#generalactions [data-player-id]=" + playerId).style("display", "inline");
+            dojo.query("#generalactions [data-player-id=" + playerId + "]").style("display", "inline");
         },
 
         ///////////////////////////////////////////////////
@@ -503,6 +522,21 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 
                         this.playerHands[to].removeAll();
                         this.playerHands[to].addToStockWithId(card.type, card.id, from);
+                    }
+                    break;
+                case this.HOT_POTATO:
+                    for (var i in cards) {
+                        var card = cards[i];
+
+                        if (from == this.player_id) {
+                            var fromDiv = "myhand"; //_item_" + card.id;
+                        } else {
+                            var fromDiv = "player_hand_stock_" + from;
+                        }
+                        console.log("fromDiv ", fromDiv);
+                        this.getPlayerStock(to).removeAll();
+                        this.getPlayerStock(to).addToStockWithId(card.type, card.id, fromDiv);
+                        this.getPlayerStock(from).removeAll();
                     }
                     break;
                 default:

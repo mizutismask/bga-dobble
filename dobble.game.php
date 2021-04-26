@@ -336,6 +336,7 @@ class Dobble extends Table
                 ));
                 break;
             case HOT_POTATO:
+                //template here is the opponent card
                 $this->deck->moveAllCardsInLocation(DECK_LOC_WON, DECK_LOC_WON, $player_id, $opponent_player_id);
                 $this->deck->moveCard($template["id"], DECK_LOC_WON, $opponent_player_id);
                 $this->deck->moveCard($myCard["id"], DECK_LOC_HAND, $opponent_player_id);
@@ -542,7 +543,7 @@ class Dobble extends Table
                 $myCard = $this->getMyCard($player_id);
                 $opponentCard = $this->getMyCard($opponent_player_id);
                 if ($this->isSymboleCommon($symbol, $myCard, $opponentCard)) {
-                    $this->symbolFoundActions($player_id, $myCard, $opponentCard, $opponent_player_id);
+                    $this->symbolFoundActions($player_id, $opponentCard, $myCard, $opponent_player_id);
 
                     if ($this->onlyOnePlayerHasAHand()) {
                         $this->gamestate->nextState(TRANSITION_NEXT_ROUND);
