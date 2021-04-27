@@ -95,7 +95,8 @@ class Dobble extends Table
         // Init game statistics
         // (note: statistics used in this file must be defined in your stats.inc.php file)
         //self::initStat( 'table', 'table_teststat1', 0 );    // Init a table statistics
-        //self::initStat( 'player', 'player_teststat1', 0 );  // Init a player statistics (for all players)
+        self::initStat('player', 'symbols_spotted', 0);  // Init a player statistics (for all players)
+        self::initStat('player', 'symbols_failed', 0);
 
         // setup the deck and deal card
         $cards = array();
@@ -167,6 +168,11 @@ class Dobble extends Table
                 return $done *  100 / $cardsNbAtTheBeginning;
                 break;
             case HOT_POTATO:
+                $currentRound = self::getGameStateValue(GS_CURRENT_ROUND);
+                $total = $this->getRoundsNumber();
+                self::dump("*******currentRound", $currentRound);
+
+                return ($currentRound - 1) *  100 / $total; //the round is started, but not over yet
 
                 break;
             case POISONED_GIFT:
@@ -318,6 +324,8 @@ class Dobble extends Table
 
     function symbolFoundActions($player_id, $template, $myCard, $opponent_player_id = null)
     {
+        self::incStat(1, "symbols_spotted", $player_id);
+
         switch ($this->getMiniGame()) {
 
             case TRIPLET:
@@ -375,6 +383,12 @@ class Dobble extends Table
                 break;
             default:
         }
+    }
+
+    function symbolNotFoundActions($player_id)
+    {
+        self::incStat(1, "symbols_failed", $player_id);
+        $this->gamestate->setPlayerNonMultiactive($player_id, TRANSITION_PLAYER_TURN); // deactivate player; if none left, reactivates everyone
     }
 
     function incScore($player_id, $incValue)
@@ -517,7 +531,7 @@ class Dobble extends Table
 
                     $this->gamestate->nextState(TRANSITION_NEXT_TURN);
                 } else {
-                    $this->gamestate->setPlayerNonMultiactive($player_id, TRANSITION_PLAYER_TURN); // deactivate player; if none left, reactivates everyone
+                    $this->symbolNotFoundActions($player_id);
                     self::notifyAllPlayers("msg", clienttranslate('${player_name} failed to spot the common symbol'), array(
                         'player_name' => $this->getPlayerName($player_id),
                     ));
@@ -551,7 +565,7 @@ class Dobble extends Table
                         $this->gamestate->nextState(TRANSITION_NEXT_TURN);
                     }
                 } else {
-                    $this->gamestate->setPlayerNonMultiactive($player_id, TRANSITION_PLAYER_TURN); // deactivate player; if none left, reactivates everyone
+                    $this->symbolNotFoundActions($player_id);
                     self::notifyAllPlayers("msg", clienttranslate('${player_name} failed to spot the common symbol with ${player_name2}'), array(
                         'player_name' => $this->getPlayerName($player_id),
                         'player_name2' => $this->getPlayerName($opponent_player_id),
@@ -564,10 +578,9 @@ class Dobble extends Table
                 $opponentCard = $this->getMyCard($opponent_player_id);
                 if ($this->isSymboleCommon($symbol, $template, $opponentCard)) {
                     $this->symbolFoundActions($player_id, $template, $opponentCard, $opponent_player_id);
-
                     $this->gamestate->nextState(TRANSITION_NEXT_TURN);
                 } else {
-                    $this->gamestate->setPlayerNonMultiactive($player_id, TRANSITION_PLAYER_TURN); // deactivate player; if none left, reactivates everyone
+                    $this->symbolNotFoundActions($player_id);
                     self::notifyAllPlayers("msg", clienttranslate('${player_name} failed to spot the common symbol with ${player_name2}'), array(
                         'player_name' => $this->getPlayerName($player_id),
                         'player_name2' => $this->getPlayerName($opponent_player_id),
@@ -691,12 +704,12 @@ class Dobble extends Table
 
                 //checks if it's the end of the game
                 $currentRound = self::getGameStateValue(GS_CURRENT_ROUND);
+                self::setGameStateValue(GS_CURRENT_ROUND, $currentRound + 1); //update the round to have a correct progression, means that the previous round is over
                 if ($currentRound == $this->getRoundsNumber()) {
                     self::trace("*******************************TRANSITION_END_GAME");
                     $this->gamestate->nextState(TRANSITION_END_GAME);
                 } else {
                     //prepare next round
-                    self::setGameStateValue(GS_CURRENT_ROUND, $currentRound + 1);
                     $this->dealCardsToAllPlayers($players, 1);
                     self::trace("*******************************TRANSITION_NEXT_TURN");
                     $this->gamestate->nextState(TRANSITION_NEXT_TURN);
