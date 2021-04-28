@@ -72,5 +72,22 @@
     flex-wrap: wrap;
 }
 
+.stockitem_selected {
+	border: 4px solid #876998 ! important;
+    border-radius: 50%;
+}
+
+.stockitem {
+	border: 1px solid black;
+    border-radius: 50%;
+    -moz-box-shadow: 5px 5px 5px 0px rgba(0,0,0,0.4);
+    -webkit-box-shadow: 5px 5px 5px 0px rgba(0,0,0,0.4);
+    -o-box-shadow: 5px 5px 5px 0px rgba(0,0,0,0.4);
+    box-shadow: 5px 5px 5px 0px rgba(0,0,0,0.4);
+    filter:progid:DXImageTransform.Microsoft.Shadow(color=#656565, Direction=134, Strength=30);  
+}
+
+/*yellow f7d639 and violet 876998
+
 
 
