@@ -68,4 +68,17 @@ class action_dobble extends APP_GameAction
 
     self::ajaxResponse();
   }
+
+  public function chooseSymbolWithTriplet()
+  {
+    self::setAjaxMode();
+
+    $symbol = self::getArg("symbol", AT_alphanum, true);
+    $card1 = self::getArg("card1", AT_posint, true);
+    $card2 = self::getArg("card2", AT_posint, true);
+    $card3 = self::getArg("card3", AT_posint, true);
+    $this->game->chooseSymbolWithTriplet($symbol, $card1, $card2, $card3);
+
+    self::ajaxResponse();
+  }
 }

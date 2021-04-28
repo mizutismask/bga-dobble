@@ -72,7 +72,7 @@ class view_dobble_dobble extends game_view
       $this->page->insert_block("myHand", array());
     }
 
-    if ($miniGame == WELL || $miniGame == TOWERING_INFERNO || $miniGame == POISONED_GIFT) {
+    if ($miniGame == WELL || $miniGame == TOWERING_INFERNO || $miniGame == POISONED_GIFT || $miniGame == TRIPLET) {
       $this->page->insert_block("pattern", array());
     }
 

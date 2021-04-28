@@ -31,9 +31,9 @@ $game_options = array(
         'values' => array(
             TOWERING_INFERNO => array('name' => totranslate('Towering inferno'), 'tmdisplay' => totranslate('Towering inferno'), 'description' => totranslate('Get the most cards')),
             WELL => array('name' => totranslate('Well'), 'tmdisplay' => totranslate('Well'), 'description' => totranslate('Be the first to get rid of all yours cards')),
-            HOT_POTATO => array('name' => totranslate('Hot potato'), 'tmdisplay' => totranslate('Hot potato'), 'description' => totranslate('Get rid of your cards giving your entire deck to your opponents (several rounds)')),
+            HOT_POTATO => array('name' => totranslate('Hot potato'), 'tmdisplay' => totranslate('Hot potato'), 'description' => totranslate('Get rid of your cards giving them all to your opponents (several rounds)')),
             POISONED_GIFT => array('name' => totranslate('Poisoned gift'), 'tmdisplay' => totranslate('Poisoned gift'), 'description' => totranslate('Empty the pile giving cards to your opponents')),
-            TRIPLET => array('name' => totranslate('Triplet'), 'tmdisplay' => totranslate('Triplet'), 'description' => totranslate('Find the common symbol on 3 cards (several rounds)')),
+            TRIPLET => array('name' => totranslate('Triplet'), 'tmdisplay' => totranslate('Triplet'), 'description' => totranslate('Find the common symbol on 3 cards on 9 until there is not enough cards')),
 
         ),
         'default' => TOWERING_INFERNO

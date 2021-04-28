@@ -218,10 +218,6 @@ class Dobble extends Table
         $players = self::loadPlayersBasicInfos();
 
         switch ($this->getMiniGame()) {
-
-            case TRIPLET:
-
-                break;
             case WELL:
                 $number = floor((count($this->cards_description) - 1) / count($players));
                 $this->dealCardsToAllPlayers($players, $number);
@@ -322,14 +318,23 @@ class Dobble extends Table
         return $intersection[0] === $this->symbols[$symbol];
     }
 
-    function symbolFoundActions($player_id, $template, $myCard, $opponent_player_id = null)
+    function symbolFoundActions($player_id, $template, $myCard, $opponent_player_id = null, $card3 = null)
     {
         self::incStat(1, "symbols_spotted", $player_id);
 
         switch ($this->getMiniGame()) {
 
             case TRIPLET:
-
+                $this->deck->moveCard($myCard["id"], DECK_LOC_WON, $player_id);
+                $this->deck->moveCard($template["id"], DECK_LOC_WON, $player_id);
+                $this->deck->moveCard($card3["id"], DECK_LOC_WON, $player_id);
+                $this->incScore($player_id, 3);
+                self::notifyAllPlayers(NOTIF_CARDS_MOVE, clienttranslate('${player_name} spotted the common symbol on three cards'), array(
+                    'player_name' => $this->getPlayerName($player_id),
+                    'cards' => [$template, $myCard],
+                    'from' => 'pattern',
+                    'to' => $player_id,
+                ));
                 break;
             case WELL:
                 $this->deck->moveCard($myCard["id"], DECK_LOC_DECK);
@@ -402,9 +407,8 @@ class Dobble extends Table
         switch ($this->getMiniGame()) {
 
             case TRIPLET:
-
+                return $this->enhanceCards($this->deck->getCardsOnTop(9, DECK_LOC_DECK));
                 break;
-
             case HOT_POTATO:
                 return [];
             case POISONED_GIFT:
@@ -500,6 +504,20 @@ class Dobble extends Table
         }));
         return $withCards;
     }
+
+    function isTripletPossible()
+    {
+        $cards = $this->enhanceCards($this->deck->getCardsInLocation(DECK_LOC_DECK));
+        $allSymbols = [];
+        foreach ($cards as $card) {
+            $allSymbols = array_merge($allSymbols, $card["symbols"]);
+        }
+        $symbolsCount = array_count_values($allSymbols);
+        $triplets = array_filter($symbolsCount, function ($nb) {
+            return $nb >= 3;
+        });
+        return count($triplets) > 0;
+    }
     //////////////////////////////////////////////////////////////////////////////
     //////////// Player actions
     //////////// 
@@ -517,11 +535,6 @@ class Dobble extends Table
 
         $player_id = self::getCurrentPlayerId();
         switch ($this->getMiniGame()) {
-
-            case TRIPLET:
-
-
-                break;
             case WELL:
             case TOWERING_INFERNO:
                 $template = $this->getPatternCards()[0];
@@ -551,8 +564,6 @@ class Dobble extends Table
 
         $player_id = self::getCurrentPlayerId();
         switch ($this->getMiniGame()) {
-
-
             case HOT_POTATO:
                 $myCard = $this->getMyCard($player_id);
                 $opponentCard = $this->getMyCard($opponent_player_id);
@@ -571,7 +582,6 @@ class Dobble extends Table
                         'player_name2' => $this->getPlayerName($opponent_player_id),
                     ));
                 }
-                break;
                 break;
             case POISONED_GIFT:
                 $template = $this->getPatternCards()[0];
@@ -592,6 +602,25 @@ class Dobble extends Table
 
         // Notify all players about the card played
 
+    }
+
+    function chooseSymbolWithTriplet($symbol, $card1Id, $card2Id, $card3Id)
+    {
+        if ($this->getMiniGame() == TRIPLET) {
+            $player_id = self::getCurrentPlayerId();
+            $card1 = $this->deck->getCard($card1Id);
+            $card2 = $this->deck->getCard($card2Id);
+            $card3 = $this->deck->getCard($card3Id);
+            if ($this->isSymboleCommon($symbol, $card1, $card2) && $this->isSymboleCommon($symbol, $card2, $card3)) {
+                $this->symbolFoundActions($player_id, $card1, $card2, null, $card3);
+                $this->gamestate->nextState(TRANSITION_NEXT_TURN);
+            } else {
+                $this->symbolNotFoundActions($player_id);
+                self::notifyAllPlayers("msg", clienttranslate('${player_name} failed to spot the common symbol'), array(
+                    'player_name' => $this->getPlayerName($player_id),
+                ));
+            }
+        }
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -629,9 +658,13 @@ class Dobble extends Table
             case HOT_POTATO:
                 //no pattern
                 break;
+            case TRIPLET:
+                $args['pattern'] = $this->getPatternCards();
+                //no possible symbols, symbols are displayed on selection
+                break;
             default:
                 $possibleSymbols = $this->getPatternCards();
-                $args['pattern'] = $this->getPatternCards();
+                //$args['pattern'] = $this->getPatternCards();
                 $args['possibleSymbols'] = $possibleSymbols[0]["symbols"];
                 self::dump("**************************possibleSymbols", $possibleSymbols);
         }
@@ -657,7 +690,11 @@ class Dobble extends Table
         switch ($this->getMiniGame()) {
 
             case TRIPLET:
-
+                if ($this->deck->countCardInLocation(DECK_LOC_DECK) <= 9 && !$this->isTripletPossible()) {
+                    $this->gamestate->nextState(TRANSITION_END_GAME); //not enough cards to go on
+                } else {
+                    $this->gamestate->nextState(TRANSITION_PLAYER_TURN);
+                }
                 break;
             case WELL:
                 if ($this->onlyOnePlayerHasAHand()) {

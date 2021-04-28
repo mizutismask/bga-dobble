@@ -72,11 +72,16 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
             if (
                 this.minigame == this.WELL ||
                 this.minigame == this.TOWERING_INFERNO ||
-                this.minigame == this.POISONED_GIFT
+                this.minigame == this.POISONED_GIFT ||
+                this.minigame == this.TRIPLET
             ) {
                 this.patternPile = this.createStock("pattern_pile");
                 this.createCardTypes(this.patternPile);
                 this.addCardsToStock(gamedatas.pattern, this.patternPile);
+            }
+            if (this.minigame == this.TRIPLET) {
+                this.patternPile.setSelectionMode(2);
+                dojo.connect(this.patternPile, "onChangeSelection", this, "onSelectTriplet");
             }
 
             if (this.minigame == this.POISONED_GIFT || this.minigame == this.HOT_POTATO) {
@@ -117,10 +122,10 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                         case this.TOWERING_INFERNO:
                         case this.WELL:
                         case this.POISONED_GIFT:
+                        case this.TRIPLET:
                             var patterns = args.args.pattern;
                             this.patternPile.removeAll();
                             this.addCardsToStock(patterns, this.patternPile);
-                            break;
                             break;
 
                         default:
@@ -154,7 +159,6 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 
                             var player = this.getUniqueOpponentWithCards();
                             if (player) {
-                                console.log("1 player");
                                 var playerStock = this.getPlayerStock(player);
                                 playerStock.selectItem(playerStock.getAllItems().pop().id);
                                 this.onSelectOpponentHandDisplayActionButtons(player);
@@ -228,6 +232,21 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                                 this.onSelectOpponentHandDisplayActionButtons(player);
                             }
                         }
+
+                        if (args.pattern) {
+                            //add buttons for each card
+                            for (const c of args.pattern) {
+                                for (const s of c.symbols) {
+                                    console.log(s);
+                                    var buttonId = "button_" + c.id + "_symbol_" + s;
+                                    this.addActionButton(buttonId, _(s), "onChooseSymbol"); //_('s')
+                                    dojo.style(buttonId, "display", "none");
+                                    dojo.setAttr(buttonId, "data-card-id", c.id);
+                                    dojo.setAttr(buttonId, "data-symbol", s);
+                                }
+                            }
+                        }
+
                         break;
                     /*               
                  Example:
@@ -437,6 +456,23 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                         }
 
                         break;
+                    case this.TRIPLET:
+                        var selectedCards = this.patternPile.getSelectedItems();
+                        if (selectedCards.length != 3) {
+                            this.showMessage(
+                                _("You have to select three cards before choosing the common symbol"),
+                                "error"
+                            );
+                        } else {
+                            this.ajaxcallwrapper("chooseSymbolWithTriplet", {
+                                symbol: symbol,
+                                card3: selectedCards.pop().id,
+                                card2: selectedCards.pop().id,
+                                card1: selectedCards.pop().id,
+                            });
+                        }
+
+                        break;
 
                     default:
                         break;
@@ -477,11 +513,19 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
             }
         },
 
+        onSelectTriplet: function (control_name, item_id) {
+            dojo.query("#generalactions [data-card-id]").style("display", "none");
+            var selectedItems = this.patternPile.getSelectedItems();
+            if (selectedItems.length >= 1) {
+                var card = selectedItems.shift();
+                dojo.query("#generalactions [data-card-id=" + card.id + "]").style("display", "inline");
+            }
+        },
+
         /**
          * Displays action buttons on selection for hot potato.
          */
         onSelectOpponentHandDisplayActionButtons: function (playerId) {
-            console.log("onSelectOpponentHandDisplayActionButtons", playerId);
             dojo.query("#generalactions [data-player-id=" + playerId + "]").style("display", "inline");
         },
 
