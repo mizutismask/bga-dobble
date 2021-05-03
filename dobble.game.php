@@ -229,7 +229,6 @@ class Dobble extends Table
                 break;
             case TOWERING_INFERNO:
                 $this->dealCardsToAllPlayers($players, 1);
-                $this->pickPatternAndNotifyPlayers();
                 break;
             default:
         }
@@ -247,16 +246,6 @@ class Dobble extends Table
         $cards = $this->deck->pickCards($nb, DECK_LOC_DECK, $player_id);
         // Notify player about his cards
         self::notifyPlayer($player_id, NOTIF_HAND_CHANGE, '', array('added' => $cards));
-    }
-
-    function pickPatternAndNotifyPlayers()
-    {
-        $card = $this->getPatternCards();
-        self::notifyAllPlayers(NOTIF_CARDS_MOVE, '', array(
-            'added' => [$card],
-
-            //'player_id' => $player_id
-        ));
     }
 
     function discardRemainingCards()
@@ -659,12 +648,12 @@ class Dobble extends Table
                 //no pattern
                 break;
             case TRIPLET:
-                $args['pattern'] = $this->getPatternCards();
+                $args['pattern'] = $this->getPatternCards(); //pattern are the 9 cards
                 //no possible symbols, symbols are displayed on selection
                 break;
             default:
                 $possibleSymbols = $this->getPatternCards();
-                //$args['pattern'] = $this->getPatternCards();
+                $args['pattern'] = $this->getPatternCards();
                 $args['possibleSymbols'] = $possibleSymbols[0]["symbols"];
                 self::dump("**************************possibleSymbols", $possibleSymbols);
         }
@@ -711,8 +700,6 @@ class Dobble extends Table
                 if ($this->deck->countCardInLocation(DECK_LOC_DECK) == 0) {
                     $this->gamestate->nextState(TRANSITION_END_GAME); //no more cards in the pile
                 } else {
-                    $this->pickPatternAndNotifyPlayers();
-
                     $this->gamestate->nextState(TRANSITION_PLAYER_TURN);
                 }
                 break;

@@ -206,7 +206,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                             var symbols = args.possibleSymbols;
                             for (const s of symbols) {
                                 console.log(s);
-                                this.addActionButton("button_symbol_" + s, _(s), "onChooseSymbol"); //_('s')
+                                var buttonId = "button_symbol_" + s;
+                                this.addActionButton(buttonId, _(s), "onChooseSymbol"); //_('s')
+                                dojo.setAttr(buttonId, "data-symbol", s);
                             }
                         }
 
