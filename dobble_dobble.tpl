@@ -31,6 +31,10 @@
         <h3 class="dbl_block_title">{PLAYING_ZONE}</h3>
         <div id="pattern_pile">
         </div>
+        <div class="dbl_cards_count_wrapper">
+            <span class="dbl_counter_prefix">x</span>
+            <span id="cards_count_pattern" class="dbl_cards_counter dbl_cards_count"></span>
+        </div>
     </div>
     <!-- END pattern -->
 
@@ -42,7 +46,10 @@
             </div>
             <div class="playerHand" id="player_hand_stock_{PLAYER_ID}">
             </div>
-            <span id="cards_count_{PLAYER_ID}" class="dbl_cards_counter dbl_cards_count"></span>
+             <div class="dbl_cards_count_wrapper">
+                <span class="dbl_counter_prefix">x</span>
+                <span id="cards_count_{PLAYER_ID}" class="dbl_cards_counter dbl_cards_count"></span>
+            </div>
         </div>
         <!-- END player -->
     </div>
@@ -51,6 +58,10 @@
     <div id="myhand_wrap" class="whiteblock">
         <h3 class="dbl_block_title">{MY_HAND}</h3>
         <div id="myhand">
+        </div>
+         <div class="dbl_cards_count_wrapper">
+            <span class="dbl_counter_prefix">x</span>
+            <span id="cards_count_{PLAYER_ID}" class="dbl_cards_counter dbl_cards_count"></span>
         </div>
     </div>
      <!-- END myHand -->

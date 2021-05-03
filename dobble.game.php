@@ -137,7 +137,7 @@ class Dobble extends Table
         }
         $result['pattern'] = $this->getPatternCards();
         $result['minigame'] = $this->getMiniGame();
-
+        $result['counters'] = $this->argCardsCounters();
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
 
         return $result;
@@ -507,6 +507,31 @@ class Dobble extends Table
         });
         return count($triplets) > 0;
     }
+
+    function argCardsCounters()
+    {
+        $players = self::getObjectListFromDB("SELECT player_id id FROM player", true);
+        $counters = array();
+        for ($i = 0; $i < ($this->getPlayersNumber()); $i++) {
+            $counters['cards_count_' . $players[$i]] = array('counter_name' => 'cards_count_' . $players[$i], 'counter_value' => 0);
+        }
+        $cards_in_hand = $this->deck->countCardsByLocationArgs(DECK_LOC_HAND);
+        $cards_won = $this->deck->countCardsByLocationArgs(DECK_LOC_WON);
+        foreach ($cards_in_hand as $player_id => $cards_nbr) {
+            $counters['cards_count_' . $player_id]['counter_value'] = $cards_nbr;
+        }
+        foreach ($cards_won as $player_id => $cards_won_nb) {
+            $counters['cards_count_' . $player_id]['counter_value'] += $cards_won_nb;
+        }
+
+        if ($this->getMiniGame() != HOT_POTATO) {
+
+            $counters['cards_count_pattern']['counter_name'] = 'cards_count_pattern';
+            $counters['cards_count_pattern']['counter_value'] = $this->deck->countCardsInLocation(DECK_LOC_DECK);
+        }
+
+        return $counters;
+    }
     //////////////////////////////////////////////////////////////////////////////
     //////////// Player actions
     //////////// 
@@ -657,6 +682,7 @@ class Dobble extends Table
                 $args['possibleSymbols'] = $possibleSymbols[0]["symbols"];
                 self::dump("**************************possibleSymbols", $possibleSymbols);
         }
+        $args['counters'] = $this->argCardsCounters();
         return $args;
     }
 
@@ -746,7 +772,7 @@ class Dobble extends Table
     // this will make all players multiactive just before entering the state
     function st_multiPlayerInit()
     {
-        if ($this->getMiniGame() == HOT_POTATO) {
+        if ($this->getMiniGame() == HOT_POTATO || $this->getMiniGame() == WELL) {
             $players = $this->getPlayersWithHand();
             $this->gamestate->setPlayersMultiactive($players, STATE_PLAYER_TURN, true); // activate players with cards
         } else {

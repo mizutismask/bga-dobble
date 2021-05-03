@@ -50,11 +50,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 
             this.minigame = parseInt(gamedatas.minigame);
             // Setting up player boards
-            for (var player_id in gamedatas.players) {
-                var player = gamedatas.players[player_id];
-
-                // TODO: Setting up players boards if needed
-            }
+            dojo.addClass("mainLine", "minigame" + this.minigame);
             console.log("minigame ", this.minigame);
 
             // TODO: Set up your game interface here, according to "gamedatas"
@@ -99,7 +95,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                     }
                 }
             }
-
+            this.updateCountersIfPossible(gamedatas.counters);
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
 
@@ -118,6 +114,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
             //handle pattern
             switch (stateName) {
                 case "playerTurn":
+                    this.updateCountersIfPossible(args.args.counters);
                     switch (this.minigame) {
                         case this.TOWERING_INFERNO:
                         case this.WELL:
@@ -381,6 +378,18 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                 }
             }
             return false;
+        },
+
+        updateCountersIfPossible: function (counters) {
+            var existingCounters = this.filterObject(counters, (item, key) => {
+                console.log(item.counter_name);
+                return dojo.byId(item.counter_name) != undefined;
+            });
+            this.updateCounters(existingCounters);
+        },
+
+        filterObject: function (obj, callback) {
+            return Object.fromEntries(Object.entries(obj).filter(([key, val]) => callback(val, key)));
         },
 
         ///////////////////////////////////////////////////

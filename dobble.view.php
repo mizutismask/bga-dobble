@@ -39,7 +39,7 @@ class view_dobble_dobble extends game_view
     $players = $this->game->loadPlayersBasicInfos();
     $players_nbr = count($players);
     $players_in_order = $this->game->getPlayersInOrder(false);
-    $active_player_id = $this->game->publicGetCurrentPlayerId();
+    $current_player_id = $this->game->publicGetCurrentPlayerId();
     $template = self::getGameName() . "_" . self::getGameName();
     $miniGame = $this->game->getMiniGame();
 
@@ -69,7 +69,7 @@ class view_dobble_dobble extends game_view
     $this->page->begin_block($template, "myHand");
 
     if ($miniGame == WELL || $miniGame == TOWERING_INFERNO || $miniGame == HOT_POTATO) {
-      $this->page->insert_block("myHand", array());
+      $this->page->insert_block("myHand", array("PLAYER_ID" => $current_player_id));
     }
 
     if ($miniGame == WELL || $miniGame == TOWERING_INFERNO || $miniGame == POISONED_GIFT || $miniGame == TRIPLET) {
@@ -79,7 +79,7 @@ class view_dobble_dobble extends game_view
     if ($miniGame == POISONED_GIFT || $miniGame == HOT_POTATO) {
 
       foreach ($players_in_order  as $player_id) {
-        if (key_exists($active_player_id, $players) && $active_player_id != $player_id) {
+        if (key_exists($current_player_id, $players) && $current_player_id != $player_id) {
           $this->page->insert_block("player", array(
             "PLAYER_ID" => $player_id,
             "PLAYER_NAME" => $players[$player_id]['player_name'],

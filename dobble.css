@@ -87,6 +87,16 @@
     filter:progid:DXImageTransform.Microsoft.Shadow(color=#656565, Direction=134, Strength=30);  
 }
 
+.dbl_cards_count_wrapper{
+    color: #876998;
+    font-size: x-large;
+    font-weight: bold;
+}
+
+.dbl_counter_prefix{
+    margin-right:-6px;
+}
+
 /*yellow f7d639 and violet 876998
 
 
