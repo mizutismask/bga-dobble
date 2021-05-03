@@ -525,9 +525,14 @@ class Dobble extends Table
         }
 
         if ($this->getMiniGame() != HOT_POTATO) {
-
             $counters['cards_count_pattern']['counter_name'] = 'cards_count_pattern';
-            $counters['cards_count_pattern']['counter_value'] = $this->deck->countCardsInLocation(DECK_LOC_DECK);
+
+            if ($this->getMiniGame() == TRIPLET) {
+                $deckCount = $this->deck->countCardsInLocation(DECK_LOC_DECK);
+                $counters['cards_count_pattern']['counter_value'] = max(0, $deckCount - 9);
+            } else {
+                $counters['cards_count_pattern']['counter_value'] = $this->deck->countCardsInLocation(DECK_LOC_DECK);
+            }
         }
 
         return $counters;
