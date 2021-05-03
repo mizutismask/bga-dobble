@@ -77,6 +77,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
             }
             if (this.minigame == this.TRIPLET) {
                 this.patternPile.setSelectionMode(2);
+                this.patternPile.autowidth = false;
                 dojo.connect(this.patternPile, "onChangeSelection", this, "onSelectTriplet");
             }
 
