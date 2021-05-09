@@ -30,6 +30,8 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
             this.HOT_POTATO = 3;
             this.POISONED_GIFT = 4;
             this.TRIPLET = 5;
+
+            this.DIV_PATTERN = "pattern_pile";
         },
 
         /*
@@ -47,7 +49,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 
         setup: function (gamedatas) {
             console.log("gamedatas ", gamedatas);
-
+            this.cardsDescription = gamedatas.cardsDescription;
             this.minigame = parseInt(gamedatas.minigame);
             // Setting up player boards
             dojo.addClass("mainLine", "minigame" + this.minigame);
@@ -76,7 +78,8 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                 this.addCardsToStock(gamedatas.pattern, this.patternPile);
             }
             if (this.minigame == this.TRIPLET) {
-                this.patternPile.setSelectionMode(2);
+                this.patternPile.setSelectionMode(0);
+               // this.patternPile.setSelectionMode(2);//todo
                 this.patternPile.autowidth = false;
                 dojo.connect(this.patternPile, "onChangeSelection", this, "onSelectTriplet");
             }
@@ -283,13 +286,64 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
             stock.setSelectionAppearance("class");
             stock.setSelectionMode(0);
             stock.autowidth = true;
+            if (this.minigame == this.TRIPLET) {
+               // stock.onItemCreate = dojo.hitch( this, 'setupZones' ); 
+                
+            }
+
             return stock;
         },
 
         addCardsToStock: function (cards, stock) {
-            for (var card_id in cards) {
-                var card = cards[card_id];
-                stock.addToStockWithId(card.type, card.id);
+            if (this.minigame != this.TRIPLET) {
+                for (var card_id in cards) {
+                    var card = cards[card_id];
+                    stock.addToStockWithId(card.type, card.id);
+                }
+            } else {
+                for (var card_id in cards) {
+                    var card = cards[card_id];
+                    var cardId = "card_" + card.id;
+                    var divCard = this.format_block('jstpl_card', { cardId: cardId });
+                    dojo.place(divCard, this.DIV_PATTERN);
+                    dojo.setAttr(cardId, "data-card-id", card.id);
+
+                    console.log("card",card);
+                    var zones = this.cardsDescription[card.type].zones;
+                    console.log("desc",this.cardsDescription[card.type]);
+                   
+                    if (!zones) {
+                        zones = {
+                            "03": {
+                                "top": "10",
+                                "left": "23",
+                                "rotation": "0",
+                                "size": "15",
+                            },
+                            "52": {
+                                "top": "30",
+                                "left": "43",
+                                "rotation": "15",
+                                "size": "60",
+                            }
+                        };
+                    }
+                    for (const i in zones) {
+                        var z = zones[i];
+                        var zoneId = cardId + "-zone-" + i;
+                        var zoneContent = this.format_block('jstpl_card_zone', {
+                            zoneId:zoneId,
+                            top: z.top,
+                            left: z.left,
+                            rotation: z.rotation,
+                            symbolClass: "symbol-" + i,
+                            size: z.size,
+                        });
+                        dojo.place(zoneContent, cardId);
+                        dojo.setAttr(zoneId, "data-symbol", i);
+                        dojo.connect(dojo.byId(zoneId), "onclick",this,"onClickZone");
+                    }
+                }
             }
         },
         getFormatedType: function (typeNumber) {
@@ -393,6 +447,34 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
             return Object.fromEntries(Object.entries(obj).filter(([key, val]) => callback(val, key)));
         },
 
+     /*   setupZones: function( card_div, card_type_id, card_id ){
+       // Note that "card_type_id" contains the type of the item, so you can do special actions depending on the item type
+            console.log("card_id", card_id);
+            
+       // Add some custom HTML content INSIDE the Stock item:
+       var svgId="svg"+card_type_id;
+            if(!dojo.byId(svgId)){
+            var svg = this.format_block('jstpl_svg', {svgId: svgId});
+            dojo.query("#"+card_div.id).wrap(svg);
+            
+            var zones = this.cardsDescription[card_type_id].zones;
+            if (!zones) {
+                zones = {
+                    "0": "0,0 100,0 100,100 0,100", "1": "50,0 100,0 100,100 0,100", "2": "200,0 100,0 100,100 0,100", "3": "300,0 100,0 100,100 0,100",
+                    "4": "0,0 100,0 100,100 0,100", "5": "0,0 100,0 100,100 0,100", "6": "0,0 100,0 100,100 0,100", "7": "100 100, 200 200",};
+            }
+            for (const i in zones) {
+                            var zoneContent = this.format_block('jstpl_svg_zone', {
+                    zoneId: svgId+"_polygone_"+i,
+                    polygonPoints: zones[i],
+                });
+                console.log(zoneContent);
+                dojo.place(zoneContent, svgId);
+            }
+                dojo.destroy(card_div.id);
+            }
+    },
+*/
         ///////////////////////////////////////////////////
         //// Player's action
 
@@ -440,6 +522,24 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         },        
         
         */
+        onClickZone: function (evt) {
+            //gets the clicked symbol
+            var symbol = dojo.getAttr(evt.currentTarget.id, "data-symbol");
+
+            //allows one selection by card
+            var newSelection = !dojo.hasClass(evt.currentTarget.id, "stockitem_selected");
+            if (newSelection) {
+                //deselect previous selection
+                dojo.query("#"+evt.currentTarget.parentElement.id+" .symbol").removeClass("stockitem_selected");
+            }
+            dojo.toggleClass(evt.currentTarget.id, "stockitem_selected");
+            
+            console.log("onClickZone ", symbol);
+            if(newSelection)
+                this.onChooseSymbol(evt);
+           
+        },
+
         onChooseSymbol: function (evt) {
             var symbol = dojo.getAttr(evt.currentTarget.id, "data-symbol");
             console.log("onChooseSymbol ", symbol);
@@ -469,23 +569,19 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 
                         break;
                     case this.TRIPLET:
-                        var selectedCards = this.patternPile.getSelectedItems();
-                        if (selectedCards.length != 3) {
-                            this.showMessage(
-                                _("You have to select three cards before choosing the common symbol"),
-                                "error"
-                            );
-                        } else {
+                        var selectedCardDivs = dojo.query(".card > .stockitem_selected");
+                        console.log("selectedCardDivs",selectedCardDivs);
+                        var selectedCardIds = selectedCardDivs.map(div => dojo.getAttr(div.parentElement.id, "data-card-id"));
+                        
+                        if (selectedCardIds.length == 3) { 
                             this.ajaxcallwrapper("chooseSymbolWithTriplet", {
                                 symbol: symbol,
-                                card3: selectedCards.pop().id,
-                                card2: selectedCards.pop().id,
-                                card1: selectedCards.pop().id,
+                                card3: selectedCardIds.pop(),
+                                card2: selectedCardIds.pop(),
+                                card1: selectedCardIds.pop(),
                             });
-                        }
-
+                       }
                         break;
-
                     default:
                         break;
                 }
