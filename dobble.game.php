@@ -138,6 +138,7 @@ class Dobble extends Table
         $result['pattern'] = $this->getPatternCards();
         $result['minigame'] = $this->getMiniGame();
         $result['counters'] = $this->argCardsCounters();
+        $result['cardsDescription'] = $this->cards_description;
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
 
         return $result;
@@ -302,9 +303,9 @@ class Dobble extends Table
 
         $intersection = array_values(array_intersect($templateSymbolsArr, $mySymbolsArr));
         self::dump("**************************intersection", $intersection[0]);
-        self::dump("**************************guess", $symbol, $this->symbols[$symbol]);
-        self::dump("**************************guess number", $this->symbols[$symbol]);
-        return $intersection[0] === $this->symbols[$symbol];
+       // self::dump("**************************guess", $symbol, $this->symbols[$symbol]);
+       // self::dump("**************************guess number", $this->symbols[$symbol]);
+        return $intersection[0] === $symbol;// $intersection[0] === $this->symbols[$symbol];
     }
 
     function symbolFoundActions($player_id, $template, $myCard, $opponent_player_id = null, $card3 = null)
