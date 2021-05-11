@@ -14,8 +14,7 @@
  * In this file, you are describing the logic of your user interface, in Javascript language.
  *
  */
-
-define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/stock"], function (dojo, declare) {
+define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/stock","bgagame/modules/js/dobble_custom_stock",], function (dojo, declare) {
     return declare("bgagame.dobble", ebg.core.gamegui, {
         constructor: function () {
             console.log("dobble constructor");
@@ -63,7 +62,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
             ) {
                 //---------- Player hand setup
                 this.playerHand = this.createStock("myhand");
-                this.createCardTypes(this.playerHand);
+                //this.createCardTypes(this.playerHand);
                 this.addCardsToStock(gamedatas.hand, this.playerHand);
             }
 
@@ -74,15 +73,18 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                 this.minigame == this.TRIPLET
             ) {
                 this.patternPile = this.createStock("pattern_pile");
-                this.createCardTypes(this.patternPile);
+               // if (this.minigame != this.TRIPLET) {
+                    //this.createCardTypes(this.patternPile);
+                //}
                 this.addCardsToStock(gamedatas.pattern, this.patternPile);
             }
             if (this.minigame == this.TRIPLET) {
-                this.patternPile.setSelectionMode(0);
-               // this.patternPile.setSelectionMode(2);//todo
-                this.patternPile.autowidth = false;
-                dojo.connect(this.patternPile, "onChangeSelection", this, "onSelectTriplet");
+               this.patternPile.setSelectionMode(2);
+               // this.patternPile.autowidth = false;
+                //dojo.connect(this.patternPile, "onChangeSelection", this, "onSelectTriplet");
+               
             }
+            dojo.subscribe("onChangeSelection", this, 'onChooseSymbol');
 
             if (this.minigame == this.POISONED_GIFT || this.minigame == this.HOT_POTATO) {
                 this.playerHands = [];
@@ -91,7 +93,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                     if (player_id != this.player_id) {
                         playerHand = this.createStock("player_hand_stock_" + player_id);
                         playerHand.setSelectionMode(1);
-                        this.createCardTypes(playerHand);
+                       // this.createCardTypes(playerHand);
                         this.addCardsToStock(gamedatas.pattern, playerHand);
 
                         dojo.connect(playerHand, "onChangeSelection", this, "onSelectOpponentHand");
@@ -127,6 +129,10 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                             var patterns = args.args.pattern;
                             this.patternPile.removeAll();
                             this.addCardsToStock(patterns, this.patternPile);
+                            if (!this.isCurrentPlayerActive()
+                            ) {
+                                this.patternPile.setSelectionMode(0);
+                            }
                             break;
 
                         default:
@@ -277,74 +283,42 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         
         */
         createStock: function (divName) {
-            var stock = new ebg.stock(); // new stock object for hand
-            console.log("creation stock ", divName);
-            stock.create(this, $(divName), this.cardwidth, this.cardheight); //myhand is the div where the card is going
-            stock.image_items_per_row = this.image_items_per_row;
-            stock.item_margin = 6;
-            stock.apparenceBorderWidth = "2px";
-            stock.setSelectionAppearance("class");
-            stock.setSelectionMode(0);
-            stock.autowidth = true;
-            if (this.minigame == this.TRIPLET) {
-               // stock.onItemCreate = dojo.hitch( this, 'setupZones' ); 
+            /*if (this.minigame != this.TRIPLET) {
+                var stock = new ebg.stock(); // new stock object for hand
+                console.log("creation stock ", divName);
+                stock.create(this, $(divName), this.cardwidth, this.cardheight); //myhand is the div where the card is going
+                stock.image_items_per_row = this.image_items_per_row;
+                stock.item_margin = 6;
+                stock.apparenceBorderWidth = "2px";
+                stock.setSelectionAppearance("class");
+                stock.setSelectionMode(0);
+                stock.autowidth = true;
+                if (this.minigame == this.TRIPLET) {
+                    // stock.onItemCreate = dojo.hitch( this, 'setupZones' ); 
                 
-            }
+                }
 
+                return stock;
+            }
+            else {*/
+            var stock = new DobbleStock(this, divName);
+            stock.setSelectionMode(1);
+            console.log("return stock", stock);
             return stock;
+            /*}**/
         },
 
         addCardsToStock: function (cards, stock) {
-            if (this.minigame != this.TRIPLET) {
+            /*if (this.minigame != this.TRIPLET) {
                 for (var card_id in cards) {
                     var card = cards[card_id];
-                    stock.addToStockWithId(card.type, card.id);
+                    stock.addCard(card.type, card.id);
                 }
             } else {
-                for (var card_id in cards) {
-                    var card = cards[card_id];
-                    var cardId = "card_" + card.id;
-                    var divCard = this.format_block('jstpl_card', { cardId: cardId });
-                    dojo.place(divCard, this.DIV_PATTERN);
-                    dojo.setAttr(cardId, "data-card-id", card.id);
-
-                    console.log("card",card);
-                    var zones = this.cardsDescription[card.type].zones;
-                    console.log("desc",this.cardsDescription[card.type]);
-                   
-                    if (!zones) {
-                        zones = {
-                            "03": {
-                                "top": "10",
-                                "left": "23",
-                                "rotation": "0",
-                                "size": "15",
-                            },
-                            "52": {
-                                "top": "30",
-                                "left": "43",
-                                "rotation": "15",
-                                "size": "60",
-                            }
-                        };
-                    }
-                    for (const i in zones) {
-                        var z = zones[i];
-                        var zoneId = cardId + "-zone-" + i;
-                        var zoneContent = this.format_block('jstpl_card_zone', {
-                            zoneId:zoneId,
-                            top: z.top,
-                            left: z.left,
-                            rotation: z.rotation,
-                            symbolClass: "symbol-" + i,
-                            size: z.size,
-                        });
-                        dojo.place(zoneContent, cardId);
-                        dojo.setAttr(zoneId, "data-symbol", i);
-                        dojo.connect(dojo.byId(zoneId), "onclick",this,"onClickZone");
-                    }
-                }
-            }
+               */
+                    stock.addCards(cards);
+                
+          /*  }*/
         },
         getFormatedType: function (typeNumber) {
             return typeNumber < 10 ? "0" + typeNumber : typeNumber;
@@ -522,25 +496,8 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         },        
         
         */
-        onClickZone: function (evt) {
-            //gets the clicked symbol
-            var symbol = dojo.getAttr(evt.currentTarget.id, "data-symbol");
-
-            //allows one selection by card
-            var newSelection = !dojo.hasClass(evt.currentTarget.id, "stockitem_selected");
-            if (newSelection) {
-                //deselect previous selection
-                dojo.query("#"+evt.currentTarget.parentElement.id+" .symbol").removeClass("stockitem_selected");
-            }
-            dojo.toggleClass(evt.currentTarget.id, "stockitem_selected");
-            
-            console.log("onClickZone ", symbol);
-            if(newSelection)
-                this.onChooseSymbol(evt);
-           
-        },
-
-        onChooseSymbol: function (evt) {
+        onChooseSymbol: function (evt, selected = false) {
+            console.log("onChooseSymbol ");
             var symbol = dojo.getAttr(evt.currentTarget.id, "data-symbol");
             console.log("onChooseSymbol ", symbol);
 
@@ -569,18 +526,18 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 
                         break;
                     case this.TRIPLET:
-                        var selectedCardDivs = dojo.query(".card > .stockitem_selected");
-                        console.log("selectedCardDivs",selectedCardDivs);
-                        var selectedCardIds = selectedCardDivs.map(div => dojo.getAttr(div.parentElement.id, "data-card-id"));
-                        
-                        if (selectedCardIds.length == 3) { 
-                            this.ajaxcallwrapper("chooseSymbolWithTriplet", {
-                                symbol: symbol,
-                                card3: selectedCardIds.pop(),
-                                card2: selectedCardIds.pop(),
-                                card1: selectedCardIds.pop(),
-                            });
-                       }
+                        if (selected) {
+                            var selectedCardIds = this.patternPile.getSelectedItems();
+                            
+                            if (selectedCardIds.length == 3) { 
+                                this.ajaxcallwrapper("chooseSymbolWithTriplet", {
+                                    symbol: symbol,
+                                    card3: selectedCardIds.pop(),
+                                    card2: selectedCardIds.pop(),
+                                    card1: selectedCardIds.pop(),
+                                });
+                            }
+                        }
                         break;
                     default:
                         break;
@@ -664,6 +621,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
             // this.notifqueue.setSynchronous( 'cardPlayed', 3000 );
             //
             dojo.subscribe("cardsMove", this, "notifCardsMove");
+
+            //evt from the stock
+           // dojo.subscribe("selectionChanged", this, "onsel");
         },
 
         // TODO: from this point and below, you can write your game notifications handling methods
@@ -687,7 +647,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                         }
                         if (to == this.player_id) {
                             this.playerHand.removeAll();
-                            this.playerHand.addToStockWithId(card.type, card.id, from);
+                            this.playerHand.addCard(card, from);
                         }
                     }
                     break;
@@ -702,13 +662,13 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                             var fromDiv = "myhand_item_" + card.id;
 
                             this.patternPile.removeAll();
-                            this.patternPile.addToStockWithId(card.type, card.id, fromDiv);
+                            this.patternPile.addCard(card, fromDiv);
                         }
                     }
                     if (from == this.player_id && newHand) {
                         //display the card under my pile
                         this.playerHand.removeAll();
-                        this.playerHand.addToStockWithId(newHand.type, newHand.id);
+                        this.playerHand.addCard(newHand);
                     }
                     break;
                 case this.POISONED_GIFT:
@@ -722,13 +682,13 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                         }
 
                         this.playerHands[to].removeAll();
-                        this.playerHands[to].addToStockWithId(card.type, card.id, from);
+                        this.playerHands[to].addCard(card, from);
                     }
                     break;
                 case this.HOT_POTATO:
                     for (var card of cards) {
                         this.getPlayerStock(to).removeAll();
-                        this.getPlayerStock(to).addToStockWithId(card.type, card.id, this.getStockDiv(from, card));
+                        this.getPlayerStock(to).addCard(card, this.getStockDiv(from, card));
                         this.getPlayerStock(from).removeAll();
                     }
                     break;

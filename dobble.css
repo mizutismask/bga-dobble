@@ -89,6 +89,10 @@
     filter:progid:DXImageTransform.Microsoft.Shadow(color=#656565, Direction=134, Strength=30);  
 }
 
+.stockitem_unselectable{
+    cursor: none;
+}
+
 .dbl_cards_count_wrapper{
     color: #876998;
     font-size: x-large;
@@ -101,8 +105,10 @@
 
 .minigame5 #pattern_pile{
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 10px;
+   /* grid-template-columns: repeat(3, 1fr);
      grid-auto-rows: 120%;
+     grid-gap: 10px;*/
    /* grid-template-rows: fit-content(33%);*/
 
     /*
@@ -118,13 +124,31 @@
     grid-gap: 10px;
    grid-auto-columns: 33vh;*/
     /*grid-auto-rows: 33vh;*/
-    
-}
+
+  
+    grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+    grid-auto-rows: 1fr;
+  }
+  
+  .grid::before {
+    content: '';
+    width: 0;
+    padding-bottom: 100%;
+    grid-row: 1 / 1;
+    grid-column: 1 / 1;
+  }
+  
+  .grid > *:first-child {
+    grid-row: 1 / 1;
+    grid-column: 1 / 1;
+  }
+
 .card {
-    --width: 100%;
+    --width: 35%;
+    /*--width: 100%;*/
     width: var(--width);
-    height: var(--width);
-    /*padding-top: var(--width);*/
+    /*height: var(--width);*/
+    padding-top: var(--width);
     border: 1px solid black;
     margin: auto;
     border-radius: 50%;

@@ -8,6 +8,7 @@ class DobbleStock {
 		this.game = game;
         this.div = div;
         this.setSelectionMode(1);
+        this.divByCardMap = new Map();
 	}
 	onButtonClick(event) {
 		console.log('onButtonClick',event);
@@ -22,6 +23,8 @@ class DobbleStock {
             dojo.setAttr(cardId, "data-card-id", card.id);
             dojo.setAttr(cardId, "data-card-type", card.type);
 
+            this.divByCardMap.set(card, cardId);
+            
             console.log("card",card);
             var zones = this.game.cardsDescription[card.type].zones;
             console.log("desc",this.game.cardsDescription[card.type]);
@@ -48,6 +51,10 @@ class DobbleStock {
         }
             
     }
+    
+    addCard(card, from) {
+        this.addCards([card]);
+    }
 
     //same as classic stock
     setSelectionMode(mode) {
@@ -62,6 +69,7 @@ class DobbleStock {
 
     removeAll() {
         dojo.empty(this.div);
+        this.divByCardMap = new Map();
     }
 
     onClickZone(evt) {
@@ -81,6 +89,10 @@ class DobbleStock {
         dojo.publish("onChangeSelection", [evt, newSelection]);
     }
 
+    selectItem(cardId) {
+        //dojo.toggleClass(this.divByCardMap., "stockitem_selected");
+    }
+
     /**
     Returns a list of card ids.
     */
@@ -89,5 +101,22 @@ class DobbleStock {
                         console.log("selectedCardDivs",selectedCardDivs);
         var selectedCardIds = selectedCardDivs.map(div => dojo.getAttr(div.parentElement.id, "data-card-id"));
         return selectedCardIds;
+    }
+
+    unselectAll() {
+        dojo.query("#"+this.div+" .symbol").removeClass("stockitem_selected");
+    }
+
+    count() {
+        return this.divByCardMap.size;
+    }
+
+    /** by card id */
+    getItemById(cardId) {
+        this.divByCardMap.keys.filter(c => c.id = cardId);
+    }
+
+    getAllItems() {
+        return this.divByCardMap.keys;
     }
 };
