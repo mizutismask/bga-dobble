@@ -63,6 +63,10 @@ define([
                 this.addCardsToStock(gamedatas.hand, this.playerHand);
             }
 
+            if (this.minigame == this.HOT_POTATO) {
+                this.playerHand.setSelectionMode(0);
+            }
+
             if (
                 this.minigame == this.WELL ||
                 this.minigame == this.TOWERING_INFERNO ||
@@ -83,7 +87,7 @@ define([
                 for (var player_id of gamedatas.playerorder) {
                     if (player_id != this.player_id) {
                         playerHand = this.createStock("player_hand_stock_" + player_id);
-                        playerHand.setSelectionMode(1);
+                        //playerHand.setSelectionMode(1);
                         this.addCardsToStock(gamedatas.pattern, playerHand);
 
                         dojo.connect(playerHand, "onChangeSelection", this, "onSelectOpponentHand");
@@ -140,7 +144,9 @@ define([
                                     this.addCardsToStock(cards, this.playerHands[player_id]);
                                 }
                             }
-
+                            if (!this.isCurrentPlayerActive()) {
+                                this.playerHands[player_id].setSelectionMode(0);
+                            }
                             break;
 
                         case this.HOT_POTATO:
@@ -151,6 +157,9 @@ define([
                                     playerStock.removeAll();
                                     this.addCardsToStock(cards, playerStock, false);
                                 }
+                                /* if (!this.isCurrentPlayerActive()) {
+                                    playerStock.setSelectionMode(0);
+                                }*/
                             }
 
                             var player = this.getUniqueOpponentWithCards();
@@ -254,15 +263,13 @@ define([
             //}
         },
 
-        getSelectedPlayer: function () {
+        getSelectedPlayer: function (clickedStockDiv) {
             for (var player_id in this.playerHands) {
                 var stock = this.playerHands[player_id];
-                if (stock.getSelectedItems().length > 0) {
+                if (stock.div == clickedStockDiv) {
                     return player_id;
                 }
             }
-            //if there is only one player with cards, he's considered like selected
-            return this.getUniqueOpponentWithCards();
         },
 
         /**
@@ -373,8 +380,9 @@ define([
         },        
         
         */
-        onChooseSymbol: function (evt, selected = false) {
+        onChooseSymbol: function (evt, selected = false, divId) {
             var symbol = dojo.getAttr(evt.currentTarget.id, "data-symbol");
+            console.log("evt.currentTarget.id", evt.currentTarget.id);
             console.log("onChooseSymbol ", symbol);
 
             // Preventing default browser reaction
@@ -391,12 +399,12 @@ define([
                         break;
                     case this.POISONED_GIFT:
                     case this.HOT_POTATO:
-                        if (!this.getSelectedPlayer()) {
+                        if (!this.getSelectedPlayer(divId)) {
                             this.showMessage(_("You have to select a player first"), "error");
                         } else {
                             this.ajaxcallwrapper("chooseSymbolWithPlayer", {
                                 symbol: symbol,
-                                player_id: this.getSelectedPlayer(),
+                                player_id: this.getSelectedPlayer(divId),
                             });
                         }
 

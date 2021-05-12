@@ -20,6 +20,7 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
         },
 
         addCards(cards, from = undefined, replaceContent = false) {
+            console.log("add cards on div", this.div);
             for (var card of cards) {
                 if (from) {
                     console.log("animate ", from);
@@ -43,7 +44,7 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
             }
 
             if (this.selectionMode == 0) {
-                dojo.query(".symbol").addClass("stockitem_unselectable");
+                dojo.query(this.getSymbolsQuery()).addClass("stockitem_unselectable");
             }
         },
 
@@ -83,12 +84,11 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
 
         //same as classic stock
         setSelectionMode(mode) {
-            console.log("setSelectionMode", mode);
             this.selectionMode = mode;
             if (mode == 0) {
-                dojo.query(".symbol").addClass("stockitem_unselectable");
+                dojo.query(this.getSymbolsQuery()).addClass("stockitem_unselectable");
             } else {
-                dojo.query(".symbol").removeClass("stockitem_unselectable");
+                dojo.query(this.getSymbolsQuery()).removeClass("stockitem_unselectable");
             }
         },
 
@@ -111,7 +111,7 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
             dojo.toggleClass(evt.currentTarget.id, "stockitem_selected");
 
             console.log("onClickZone ", symbol);
-            dojo.publish("onChangeSelection", [evt, newSelection]);
+            dojo.publish("onChangeSelection", [evt, newSelection, this.div]);
         },
 
         selectItem(cardId) {
@@ -129,7 +129,7 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
         },
 
         unselectAll() {
-            dojo.query("#" + this.div + " .symbol").removeClass("stockitem_selected");
+            dojo.query(this.getSymbolsQuery()).removeClass("stockitem_selected");
         },
 
         count() {
@@ -142,7 +142,11 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
         },
 
         getAllItems() {
-            return this.divByCardMap.keys();
+            return Array.from(this.divByCardMap.keys());
+        },
+
+        getSymbolsQuery() {
+            return "#" + this.div + " .symbol";
         },
     });
 });
