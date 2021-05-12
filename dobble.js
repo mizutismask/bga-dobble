@@ -14,7 +14,14 @@
  * In this file, you are describing the logic of your user interface, in Javascript language.
  *
  */
-define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/stock","bgagame/modules/js/dobble_custom_stock",], function (dojo, declare) {
+define([
+    "dojo",
+    "dojo/_base/declare",
+    "ebg/core/gamegui",
+    "ebg/counter",
+    "ebg/stock",
+    "bgagame/modules/js/dobble_custom_stock",
+], function (dojo, declare) {
     return declare("bgagame.dobble", ebg.core.gamegui, {
         constructor: function () {
             console.log("dobble constructor");
@@ -73,18 +80,17 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                 this.minigame == this.TRIPLET
             ) {
                 this.patternPile = this.createStock("pattern_pile");
-               // if (this.minigame != this.TRIPLET) {
-                    //this.createCardTypes(this.patternPile);
+                // if (this.minigame != this.TRIPLET) {
+                //this.createCardTypes(this.patternPile);
                 //}
                 this.addCardsToStock(gamedatas.pattern, this.patternPile);
             }
             if (this.minigame == this.TRIPLET) {
-               this.patternPile.setSelectionMode(2);
-               // this.patternPile.autowidth = false;
+                this.patternPile.setSelectionMode(2);
+                // this.patternPile.autowidth = false;
                 //dojo.connect(this.patternPile, "onChangeSelection", this, "onSelectTriplet");
-               
             }
-            dojo.subscribe("onChangeSelection", this, 'onChooseSymbol');
+            dojo.subscribe("onChangeSelection", this, "onChooseSymbol");
 
             if (this.minigame == this.POISONED_GIFT || this.minigame == this.HOT_POTATO) {
                 this.playerHands = [];
@@ -93,7 +99,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                     if (player_id != this.player_id) {
                         playerHand = this.createStock("player_hand_stock_" + player_id);
                         playerHand.setSelectionMode(1);
-                       // this.createCardTypes(playerHand);
+                        // this.createCardTypes(playerHand);
                         this.addCardsToStock(gamedatas.pattern, playerHand);
 
                         dojo.connect(playerHand, "onChangeSelection", this, "onSelectOpponentHand");
@@ -129,8 +135,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                             var patterns = args.args.pattern;
                             this.patternPile.removeAll();
                             this.addCardsToStock(patterns, this.patternPile);
-                            if (!this.isCurrentPlayerActive()
-                            ) {
+                            if (!this.isCurrentPlayerActive()) {
                                 this.patternPile.setSelectionMode(0);
                             }
                             break;
@@ -212,7 +217,6 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                         if (args.possibleSymbols) {
                             var symbols = args.possibleSymbols;
                             for (const s of symbols) {
-                                console.log(s);
                                 var buttonId = "button_symbol_" + s;
                                 this.addActionButton(buttonId, _(s), "onChooseSymbol"); //_('s')
                                 dojo.setAttr(buttonId, "data-symbol", s);
@@ -225,7 +229,6 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                                 if (playerId != this.player_id) {
                                     for (const c of cards) {
                                         for (const s of c.symbols) {
-                                            console.log(s);
                                             var buttonId = "button_" + playerId + "_symbol_" + s;
                                             this.addActionButton(buttonId, _(s), "onChooseSymbol"); //_('s')
                                             dojo.style(buttonId, "display", "none");
@@ -246,7 +249,6 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                             //add buttons for each card
                             for (const c of args.pattern) {
                                 for (const s of c.symbols) {
-                                    console.log(s);
                                     var buttonId = "button_" + c.id + "_symbol_" + s;
                                     this.addActionButton(buttonId, _(s), "onChooseSymbol"); //_('s')
                                     dojo.style(buttonId, "display", "none");
@@ -301,7 +303,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                 return stock;
             }
             else {*/
-            var stock = new DobbleStock(this, divName);
+            var stock = new dobble.stock(this, divName);
             stock.setSelectionMode(1);
             console.log("return stock", stock);
             return stock;
@@ -316,9 +318,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                 }
             } else {
                */
-                    stock.addCards(cards);
-                
-          /*  }*/
+            stock.addCards(cards);
+
+            /*  }*/
         },
         getFormatedType: function (typeNumber) {
             return typeNumber < 10 ? "0" + typeNumber : typeNumber;
@@ -421,7 +423,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
             return Object.fromEntries(Object.entries(obj).filter(([key, val]) => callback(val, key)));
         },
 
-     /*   setupZones: function( card_div, card_type_id, card_id ){
+        /*   setupZones: function( card_div, card_type_id, card_id ){
        // Note that "card_type_id" contains the type of the item, so you can do special actions depending on the item type
             console.log("card_id", card_id);
             
@@ -528,8 +530,8 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                     case this.TRIPLET:
                         if (selected) {
                             var selectedCardIds = this.patternPile.getSelectedItems();
-                            
-                            if (selectedCardIds.length == 3) { 
+
+                            if (selectedCardIds.length == 3) {
                                 this.ajaxcallwrapper("chooseSymbolWithTriplet", {
                                     symbol: symbol,
                                     card3: selectedCardIds.pop(),
@@ -623,7 +625,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
             dojo.subscribe("cardsMove", this, "notifCardsMove");
 
             //evt from the stock
-           // dojo.subscribe("selectionChanged", this, "onsel");
+            // dojo.subscribe("selectionChanged", this, "onsel");
         },
 
         // TODO: from this point and below, you can write your game notifications handling methods
@@ -643,7 +645,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 
                     for (var card of cards) {
                         if (from == "pattern") {
-                            from = "pattern_pile_item_" + card.id;
+                            from = "pattern_pile-card-" + card.id;
                         }
                         if (to == this.player_id) {
                             this.playerHand.removeAll();
@@ -659,7 +661,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 
                     for (var card of cards) {
                         if (from == this.player_id) {
-                            var fromDiv = "myhand_item_" + card.id;
+                            var fromDiv = "myhand-card-" + card.id;
 
                             this.patternPile.removeAll();
                             this.patternPile.addCard(card, fromDiv);
@@ -678,7 +680,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 
                     for (var card of cards) {
                         if (from == "pattern") {
-                            from = "pattern_pile_item_" + card.id;
+                            from = "pattern_pile-card-" + card.id;
                         }
 
                         this.playerHands[to].removeAll();
