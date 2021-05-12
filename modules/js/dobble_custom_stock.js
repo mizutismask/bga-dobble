@@ -1,12 +1,10 @@
-define([
-    "dojo",
-    "dojo/_base/declare",
-    "dojo/fx",
-    "dojo/dom",
-    "dojo/dom-geometry",
-    "dojo/on",
-    "dojo/domReady!",
-], function (dojo, declare, coreFx, dom, domGeom, on, domReady) {
+define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"], function (
+    dojo,
+    declare,
+    coreFx,
+    dom,
+    domGeom
+) {
     return declare("dobble.stock", null, {
         //DobbleStock
         //class DobbleStock {
@@ -21,20 +19,21 @@ define([
             console.log("onButtonClick", event);
         },
 
-        addCards(cards, from = undefined) {
+        addCards(cards, from = undefined, replaceContent = false) {
             for (var card of cards) {
                 if (from) {
                     console.log("animate ", from);
-                    //dojo.anim(from, { width: 500 }, 1000, undefined, undefined, 0);
-                    var animation = coreFx.slideTo({
+                    var animation = dojo.fx.slideTo({
                         node: from,
                         top: 150,
                         left: 160,
                         unit: "px",
                     });
+                    // var animation = coreFx.fadeOut({ node: from });
                     dojo.connect(animation, "onEnd", this, function () {
                         console.log("setupCardAndZones");
-                        // this.setupCardAndZones(card);
+                        this.removeAll();
+                        this.setupCardAndZones(card);
                     });
                     console.log("animation.play");
                     animation.play();
@@ -78,8 +77,8 @@ define([
             }
         },
 
-        addCard(card, from) {
-            this.addCards([card], from);
+        addCard(card, from, replaceContent) {
+            this.addCards([card], from, replaceContent);
         },
 
         //same as classic stock
@@ -139,11 +138,11 @@ define([
 
         /** by card id */
         getItemById(cardId) {
-            this.divByCardMap.keys.filter((c) => (c.id = cardId));
+            Array.from(this.divByCardMap.keys()).filter((c) => (c.id = cardId));
         },
 
         getAllItems() {
-            return this.divByCardMap.keys;
+            return this.divByCardMap.keys();
         },
     });
 });

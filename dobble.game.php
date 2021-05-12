@@ -104,7 +104,7 @@ class Dobble extends Table
             $cards[] = array('type' => $name, 'type_arg' => $card["type"], 'nbr' => 1);
         }
         $this->deck->createCards($cards, DECK_LOC_DECK);
-        $this->deck->shuffle(DECK_LOC_DECK);
+        //$this->deck->shuffle(DECK_LOC_DECK);//todo
         $this->dealCards();
 
 
@@ -397,7 +397,7 @@ class Dobble extends Table
         switch ($this->getMiniGame()) {
 
             case TRIPLET:
-                return $this->enhanceCards($this->deck->getCardsOnTop(9, DECK_LOC_DECK));
+                return $this->enhanceCards($this->deck->getCardsOnTop(54, DECK_LOC_DECK));//todo 9
                 break;
             case HOT_POTATO:
                 return [];

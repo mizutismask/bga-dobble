@@ -24,20 +24,11 @@ define([
 ], function (dojo, declare) {
     return declare("bgagame.dobble", ebg.core.gamegui, {
         constructor: function () {
-            console.log("dobble constructor");
-
-            this.cardwidth = 200;
-            this.cardheight = 200;
-            this.image_items_per_row = 10;
-            this.cards_img = "img/cards/cards200x200.png";
-
             this.TOWERING_INFERNO = 1;
             this.WELL = 2;
             this.HOT_POTATO = 3;
             this.POISONED_GIFT = 4;
             this.TRIPLET = 5;
-
-            this.DIV_PATTERN = "pattern_pile";
         },
 
         /*
@@ -69,7 +60,6 @@ define([
             ) {
                 //---------- Player hand setup
                 this.playerHand = this.createStock("myhand");
-                //this.createCardTypes(this.playerHand);
                 this.addCardsToStock(gamedatas.hand, this.playerHand);
             }
 
@@ -80,15 +70,10 @@ define([
                 this.minigame == this.TRIPLET
             ) {
                 this.patternPile = this.createStock("pattern_pile");
-                // if (this.minigame != this.TRIPLET) {
-                //this.createCardTypes(this.patternPile);
-                //}
                 this.addCardsToStock(gamedatas.pattern, this.patternPile);
             }
             if (this.minigame == this.TRIPLET) {
                 this.patternPile.setSelectionMode(2);
-                // this.patternPile.autowidth = false;
-                //dojo.connect(this.patternPile, "onChangeSelection", this, "onSelectTriplet");
             }
             dojo.subscribe("onChangeSelection", this, "onChooseSymbol");
 
@@ -99,7 +84,6 @@ define([
                     if (player_id != this.player_id) {
                         playerHand = this.createStock("player_hand_stock_" + player_id);
                         playerHand.setSelectionMode(1);
-                        // this.createCardTypes(playerHand);
                         this.addCardsToStock(gamedatas.pattern, playerHand);
 
                         dojo.connect(playerHand, "onChangeSelection", this, "onSelectOpponentHand");
@@ -134,7 +118,7 @@ define([
                         case this.TRIPLET:
                             var patterns = args.args.pattern;
                             this.patternPile.removeAll();
-                            this.addCardsToStock(patterns, this.patternPile);
+                            this.addCardsToStock(patterns, this.patternPile, false);
                             if (!this.isCurrentPlayerActive()) {
                                 this.patternPile.setSelectionMode(0);
                             }
@@ -165,7 +149,7 @@ define([
                                 var playerStock = this.getPlayerStock(player_id);
                                 if (this.stockContentIsDifferentFromHand(playerStock, cards)) {
                                     playerStock.removeAll();
-                                    this.addCardsToStock(cards, playerStock);
+                                    this.addCardsToStock(cards, playerStock, false);
                                 }
                             }
 
@@ -173,7 +157,6 @@ define([
                             if (player) {
                                 var playerStock = this.getPlayerStock(player);
                                 playerStock.selectItem(playerStock.getAllItems().pop().id);
-                                this.onSelectOpponentHandDisplayActionButtons(player);
                             }
                             break;
 
@@ -209,55 +192,11 @@ define([
         //                        action status bar (ie: the HTML links in the status bar).
         //
         onUpdateActionButtons: function (stateName, args) {
-            console.log("onUpdateActionButtons: " + stateName, args);
+            //console.log("onUpdateActionButtons: " + stateName, args);
 
             if (this.isCurrentPlayerActive()) {
                 switch (stateName) {
                     case "playerTurn":
-                        if (args.possibleSymbols) {
-                            var symbols = args.possibleSymbols;
-                            for (const s of symbols) {
-                                var buttonId = "button_symbol_" + s;
-                                this.addActionButton(buttonId, _(s), "onChooseSymbol"); //_('s')
-                                dojo.setAttr(buttonId, "data-symbol", s);
-                            }
-                        }
-
-                        if (args.hands) {
-                            var hands = args.hands;
-                            for (const [playerId, cards] of Object.entries(hands)) {
-                                if (playerId != this.player_id) {
-                                    for (const c of cards) {
-                                        for (const s of c.symbols) {
-                                            var buttonId = "button_" + playerId + "_symbol_" + s;
-                                            this.addActionButton(buttonId, _(s), "onChooseSymbol"); //_('s')
-                                            dojo.style(buttonId, "display", "none");
-                                            dojo.setAttr(buttonId, "data-player-id", playerId);
-                                            dojo.setAttr(buttonId, "data-symbol", s);
-                                        }
-                                    }
-                                }
-                            }
-
-                            var player = this.getUniqueOpponentWithCards();
-                            if (player) {
-                                this.onSelectOpponentHandDisplayActionButtons(player);
-                            }
-                        }
-
-                        if (args.pattern) {
-                            //add buttons for each card
-                            for (const c of args.pattern) {
-                                for (const s of c.symbols) {
-                                    var buttonId = "button_" + c.id + "_symbol_" + s;
-                                    this.addActionButton(buttonId, _(s), "onChooseSymbol"); //_('s')
-                                    dojo.style(buttonId, "display", "none");
-                                    dojo.setAttr(buttonId, "data-card-id", c.id);
-                                    dojo.setAttr(buttonId, "data-symbol", s);
-                                }
-                            }
-                        }
-
                         break;
                     /*               
                  Example:
@@ -285,52 +224,17 @@ define([
         
         */
         createStock: function (divName) {
-            /*if (this.minigame != this.TRIPLET) {
-                var stock = new ebg.stock(); // new stock object for hand
-                console.log("creation stock ", divName);
-                stock.create(this, $(divName), this.cardwidth, this.cardheight); //myhand is the div where the card is going
-                stock.image_items_per_row = this.image_items_per_row;
-                stock.item_margin = 6;
-                stock.apparenceBorderWidth = "2px";
-                stock.setSelectionAppearance("class");
-                stock.setSelectionMode(0);
-                stock.autowidth = true;
-                if (this.minigame == this.TRIPLET) {
-                    // stock.onItemCreate = dojo.hitch( this, 'setupZones' ); 
-                
-                }
-
-                return stock;
-            }
-            else {*/
             var stock = new dobble.stock(this, divName);
             stock.setSelectionMode(1);
-            console.log("return stock", stock);
             return stock;
-            /*}**/
         },
 
-        addCardsToStock: function (cards, stock) {
-            /*if (this.minigame != this.TRIPLET) {
-                for (var card_id in cards) {
-                    var card = cards[card_id];
-                    stock.addCard(card.type, card.id);
-                }
-            } else {
-               */
-            stock.addCards(cards);
-
-            /*  }*/
+        addCardsToStock: function (cards, stock, replaceContent = false) {
+            stock.addCards(cards, replaceContent);
         },
+
         getFormatedType: function (typeNumber) {
             return typeNumber < 10 ? "0" + typeNumber : typeNumber;
-        },
-
-        createCardTypes: function (stock) {
-            for (let i = 0; i < 55; i++) {
-                var formattedNumber = this.getFormatedType(i);
-                stock.addItemType(formattedNumber, 0, g_gamethemeurl + this.cards_img, i);
-            }
         },
 
         ajaxcallwrapper: function (action, args, handler) {
@@ -394,7 +298,7 @@ define([
                 fromDiv = "player_hand_stock_" + playerId;
             }
             if (card) {
-                fromDiv += "_item_" + card.id;
+                fromDiv += "-card-" + card.id;
             }
             console.log("fromDiv ", fromDiv);
             return fromDiv;
@@ -413,7 +317,6 @@ define([
 
         updateCountersIfPossible: function (counters) {
             var existingCounters = this.filterObject(counters, (item, key) => {
-                console.log(item.counter_name);
                 return dojo.byId(item.counter_name) != undefined;
             });
             this.updateCounters(existingCounters);
@@ -423,34 +326,6 @@ define([
             return Object.fromEntries(Object.entries(obj).filter(([key, val]) => callback(val, key)));
         },
 
-        /*   setupZones: function( card_div, card_type_id, card_id ){
-       // Note that "card_type_id" contains the type of the item, so you can do special actions depending on the item type
-            console.log("card_id", card_id);
-            
-       // Add some custom HTML content INSIDE the Stock item:
-       var svgId="svg"+card_type_id;
-            if(!dojo.byId(svgId)){
-            var svg = this.format_block('jstpl_svg', {svgId: svgId});
-            dojo.query("#"+card_div.id).wrap(svg);
-            
-            var zones = this.cardsDescription[card_type_id].zones;
-            if (!zones) {
-                zones = {
-                    "0": "0,0 100,0 100,100 0,100", "1": "50,0 100,0 100,100 0,100", "2": "200,0 100,0 100,100 0,100", "3": "300,0 100,0 100,100 0,100",
-                    "4": "0,0 100,0 100,100 0,100", "5": "0,0 100,0 100,100 0,100", "6": "0,0 100,0 100,100 0,100", "7": "100 100, 200 200",};
-            }
-            for (const i in zones) {
-                            var zoneContent = this.format_block('jstpl_svg_zone', {
-                    zoneId: svgId+"_polygone_"+i,
-                    polygonPoints: zones[i],
-                });
-                console.log(zoneContent);
-                dojo.place(zoneContent, svgId);
-            }
-                dojo.destroy(card_div.id);
-            }
-    },
-*/
         ///////////////////////////////////////////////////
         //// Player's action
 
@@ -499,7 +374,6 @@ define([
         
         */
         onChooseSymbol: function (evt, selected = false) {
-            console.log("onChooseSymbol ");
             var symbol = dojo.getAttr(evt.currentTarget.id, "data-symbol");
             console.log("onChooseSymbol ", symbol);
 
@@ -530,7 +404,6 @@ define([
                     case this.TRIPLET:
                         if (selected) {
                             var selectedCardIds = this.patternPile.getSelectedItems();
-
                             if (selectedCardIds.length == 3) {
                                 this.ajaxcallwrapper("chooseSymbolWithTriplet", {
                                     symbol: symbol,
@@ -567,33 +440,9 @@ define([
                     var stock = this.playerHands[player_id];
                     if (stock.control_name != clickedStock.control_name) {
                         stock.unselectAll();
-                        if (this.minigame == this.HOT_POTATO) {
-                            dojo.query("#generalactions [data-player-id=" + player_id + "]").style("display", "none");
-                        }
                     }
                 }
-                if (this.minigame == this.HOT_POTATO) {
-                    this.onSelectOpponentHandDisplayActionButtons(clickedPlayerId);
-                }
-            } else if (this.minigame == this.HOT_POTATO) {
-                dojo.query("#generalactions [data-player-id]").style("display", "none");
             }
-        },
-
-        onSelectTriplet: function (control_name, item_id) {
-            dojo.query("#generalactions [data-card-id]").style("display", "none");
-            var selectedItems = this.patternPile.getSelectedItems();
-            if (selectedItems.length >= 1) {
-                var card = selectedItems.shift();
-                dojo.query("#generalactions [data-card-id=" + card.id + "]").style("display", "inline");
-            }
-        },
-
-        /**
-         * Displays action buttons on selection for hot potato.
-         */
-        onSelectOpponentHandDisplayActionButtons: function (playerId) {
-            dojo.query("#generalactions [data-player-id=" + playerId + "]").style("display", "inline");
         },
 
         ///////////////////////////////////////////////////
@@ -622,10 +471,8 @@ define([
             // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
             // this.notifqueue.setSynchronous( 'cardPlayed', 3000 );
             //
-            dojo.subscribe("cardsMove", this, "notifCardsMove");
-
             //evt from the stock
-            // dojo.subscribe("selectionChanged", this, "onsel");
+            dojo.subscribe("cardsMove", this, "notifCardsMove");
         },
 
         // TODO: from this point and below, you can write your game notifications handling methods

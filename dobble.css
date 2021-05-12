@@ -144,13 +144,14 @@
   }
 
 .card {
-    --width: 35%;
+  min-width: 220px;
+    --width: min(32vh,100%);
     /*--width: 100%;*/
     width: var(--width);
     /*height: var(--width);*/
     padding-top: var(--width);
     border: 1px solid black;
-    margin: auto;
+    /*margin: auto; centers*/
     border-radius: 50%;
     position: relative;
     background-color: white;
@@ -159,6 +160,10 @@
     -o-box-shadow: 5px 5px 5px 0px rgba(0,0,0,0.4);
     box-shadow: 5px 5px 5px 0px rgba(0,0,0,0.4);
     filter:progid:DXImageTransform.Microsoft.Shadow(color=#656565, Direction=134, Strength=30);  
+}
+
+@media only screen and (max-width: 1100px) {
+
 }
 
 .symbol {
