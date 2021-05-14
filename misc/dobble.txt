@@ -1,2 +1,1 @@
-montage -tile 10 -geometry 220x220+0+0 `ls -v ./test/*.jpg`  miff:- | convert miff:- -resize 2200x2200 -quality 100 density 300 cards220x220.png
-
+to determine clip-paths: https://www.cssportal.com/css-clip-path-generator/
