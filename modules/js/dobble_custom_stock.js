@@ -54,6 +54,7 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
             dojo.place(divCard, this.div);
             dojo.setAttr(cardId, "data-card-id", card.id);
             dojo.setAttr(cardId, "data-card-type", card.type);
+            dojo.addClass( cardId,"card_size");
 
             this.divByCardMap.set(card, cardId);
 

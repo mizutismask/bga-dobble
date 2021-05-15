@@ -39,6 +39,17 @@
     <!-- END pattern -->
 
     <div id="opponents_wrapper">
+     <!-- BEGIN myHand -->
+    <div id="myhand_wrap" class="whiteblock">
+        <h3 class="dbl_block_title">{MY_HAND}</h3>
+        <div id="myhand">
+        </div>
+         <div class="dbl_cards_count_wrapper">
+            <span class="dbl_counter_prefix">x</span>
+            <span id="cards_count_{PLAYER_ID}" class="dbl_cards_counter dbl_cards_count"></span>
+        </div>
+    </div>
+     <!-- END myHand -->
         <!-- BEGIN player -->
         <div id="player_hand_{PLAYER_ID}" class="whiteblock">
             <div style="color:#{PLAYER_COLOR}">
@@ -54,17 +65,7 @@
         <!-- END player -->
     </div>
 
-    <!-- BEGIN myHand -->
-    <div id="myhand_wrap" class="whiteblock">
-        <h3 class="dbl_block_title">{MY_HAND}</h3>
-        <div id="myhand">
-        </div>
-         <div class="dbl_cards_count_wrapper">
-            <span class="dbl_counter_prefix">x</span>
-            <span id="cards_count_{PLAYER_ID}" class="dbl_cards_counter dbl_cards_count"></span>
-        </div>
-    </div>
-     <!-- END myHand -->
+   
 </div>
 
 
