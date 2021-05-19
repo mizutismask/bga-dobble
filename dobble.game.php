@@ -278,7 +278,7 @@ class Dobble extends Table
             $type = $this->cards_description[$card["type"]]["type"];
 
             $symbols = str_split($type, 2);
-            self::dump("**************************symbols", $symbols);
+            //self::dump("**************************symbols", $symbols);
             foreach ($symbols as $i => $s) {
                 $name = array_search($s, $this->symbols);
                 //self::dump("**************************name", $name);
@@ -286,7 +286,7 @@ class Dobble extends Table
                 //self::dump("**************************card", $card);
             }
         }
-        self::dump("**************************cards", $enhanced);
+        //self::dump("**************************cards", $enhanced);
         return $enhanced;
     }
 
@@ -397,7 +397,7 @@ class Dobble extends Table
         switch ($this->getMiniGame()) {
 
             case TRIPLET:
-                return $this->enhanceCards($this->deck->getCardsOnTop(54, DECK_LOC_DECK));//todo 9
+                return $this->enhanceCards($this->deck->getCardsOnTop(9, DECK_LOC_DECK));
                 break;
             case HOT_POTATO:
                 return [];
