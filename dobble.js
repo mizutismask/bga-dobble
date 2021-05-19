@@ -14,22 +14,23 @@
  * In this file, you are describing the logic of your user interface, in Javascript language.
  *
  */
-
-define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/stock"], function (dojo, declare) {
+define([
+    "dojo",
+    "dojo/_base/declare",
+    "ebg/core/gamegui",
+    "ebg/counter",
+    "ebg/stock",
+    "bgagame/modules/js/dobble_custom_stock",
+], function (dojo, declare) {
     return declare("bgagame.dobble", ebg.core.gamegui, {
         constructor: function () {
-            console.log("dobble constructor");
-
-            this.cardwidth = 200;
-            this.cardheight = 200;
-            this.image_items_per_row = 10;
-            this.cards_img = "img/cards/cards200x200.png";
-
             this.TOWERING_INFERNO = 1;
             this.WELL = 2;
             this.HOT_POTATO = 3;
             this.POISONED_GIFT = 4;
             this.TRIPLET = 5;
+
+            this.DIV_PATTERN = "pattern_pile";
         },
 
         /*
@@ -47,7 +48,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 
         setup: function (gamedatas) {
             console.log("gamedatas ", gamedatas);
-
+            this.cardsDescription = gamedatas.cardsDescription;
             this.minigame = parseInt(gamedatas.minigame);
             // Setting up player boards
             dojo.addClass("mainLine", "minigame" + this.minigame);
@@ -61,8 +62,11 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
             ) {
                 //---------- Player hand setup
                 this.playerHand = this.createStock("myhand");
-                this.createCardTypes(this.playerHand);
                 this.addCardsToStock(gamedatas.hand, this.playerHand);
+            }
+
+            if (this.minigame == this.HOT_POTATO) {
+                this.playerHand.setSelectionMode(0);
             }
 
             if (
@@ -72,14 +76,12 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                 this.minigame == this.TRIPLET
             ) {
                 this.patternPile = this.createStock("pattern_pile");
-                this.createCardTypes(this.patternPile);
                 this.addCardsToStock(gamedatas.pattern, this.patternPile);
             }
             if (this.minigame == this.TRIPLET) {
                 this.patternPile.setSelectionMode(2);
-                this.patternPile.autowidth = false;
-                dojo.connect(this.patternPile, "onChangeSelection", this, "onSelectTriplet");
             }
+            dojo.subscribe("onChangeSelection", this, "onChooseSymbol");
 
             if (this.minigame == this.POISONED_GIFT || this.minigame == this.HOT_POTATO) {
                 this.playerHands = [];
@@ -87,8 +89,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                 for (var player_id of gamedatas.playerorder) {
                     if (player_id != this.player_id) {
                         playerHand = this.createStock("player_hand_stock_" + player_id);
-                        playerHand.setSelectionMode(1);
-                        this.createCardTypes(playerHand);
+                        //playerHand.setSelectionMode(1);
                         this.addCardsToStock(gamedatas.pattern, playerHand);
 
                         dojo.connect(playerHand, "onChangeSelection", this, "onSelectOpponentHand");
@@ -123,7 +124,10 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                         case this.TRIPLET:
                             var patterns = args.args.pattern;
                             this.patternPile.removeAll();
-                            this.addCardsToStock(patterns, this.patternPile);
+                            this.addCardsToStock(patterns, this.patternPile, false);
+                            if (!this.isCurrentPlayerActive()) {
+                                this.patternPile.setSelectionMode(0);
+                            }
                             break;
 
                         default:
@@ -142,7 +146,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                                     this.addCardsToStock(cards, this.playerHands[player_id]);
                                 }
                             }
-
+                            if (!this.isCurrentPlayerActive()) {
+                                this.playerHands[player_id].setSelectionMode(0);
+                            }
                             break;
 
                         case this.HOT_POTATO:
@@ -151,15 +157,17 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                                 var playerStock = this.getPlayerStock(player_id);
                                 if (this.stockContentIsDifferentFromHand(playerStock, cards)) {
                                     playerStock.removeAll();
-                                    this.addCardsToStock(cards, playerStock);
+                                    this.addCardsToStock(cards, playerStock, false);
                                 }
+                                /* if (!this.isCurrentPlayerActive()) {
+                                    playerStock.setSelectionMode(0);
+                                }*/
                             }
 
                             var player = this.getUniqueOpponentWithCards();
                             if (player) {
                                 var playerStock = this.getPlayerStock(player);
                                 playerStock.selectItem(playerStock.getAllItems().pop().id);
-                                this.onSelectOpponentHandDisplayActionButtons(player);
                             }
                             break;
 
@@ -195,58 +203,14 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         //                        action status bar (ie: the HTML links in the status bar).
         //
         onUpdateActionButtons: function (stateName, args) {
-            console.log("onUpdateActionButtons: " + stateName, args);
+            //console.log("onUpdateActionButtons: " + stateName, args);
 
             if (this.isCurrentPlayerActive()) {
                 switch (stateName) {
                     case "playerTurn":
-                        if (args.possibleSymbols) {
-                            var symbols = args.possibleSymbols;
-                            for (const s of symbols) {
-                                console.log(s);
-                                var buttonId = "button_symbol_" + s;
-                                this.addActionButton(buttonId, _(s), "onChooseSymbol"); //_('s')
-                                dojo.setAttr(buttonId, "data-symbol", s);
-                            }
+                        if (this.minigame == this.TRIPLET) {
+                            this.addActionButton( 'button_reset_selection', _('Cancel selection'), 'onCancelSelection' ); 
                         }
-
-                        if (args.hands) {
-                            var hands = args.hands;
-                            for (const [playerId, cards] of Object.entries(hands)) {
-                                if (playerId != this.player_id) {
-                                    for (const c of cards) {
-                                        for (const s of c.symbols) {
-                                            console.log(s);
-                                            var buttonId = "button_" + playerId + "_symbol_" + s;
-                                            this.addActionButton(buttonId, _(s), "onChooseSymbol"); //_('s')
-                                            dojo.style(buttonId, "display", "none");
-                                            dojo.setAttr(buttonId, "data-player-id", playerId);
-                                            dojo.setAttr(buttonId, "data-symbol", s);
-                                        }
-                                    }
-                                }
-                            }
-
-                            var player = this.getUniqueOpponentWithCards();
-                            if (player) {
-                                this.onSelectOpponentHandDisplayActionButtons(player);
-                            }
-                        }
-
-                        if (args.pattern) {
-                            //add buttons for each card
-                            for (const c of args.pattern) {
-                                for (const s of c.symbols) {
-                                    console.log(s);
-                                    var buttonId = "button_" + c.id + "_symbol_" + s;
-                                    this.addActionButton(buttonId, _(s), "onChooseSymbol"); //_('s')
-                                    dojo.style(buttonId, "display", "none");
-                                    dojo.setAttr(buttonId, "data-card-id", c.id);
-                                    dojo.setAttr(buttonId, "data-symbol", s);
-                                }
-                            }
-                        }
-
                         break;
                     /*               
                  Example:
@@ -274,33 +238,17 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         
         */
         createStock: function (divName) {
-            var stock = new ebg.stock(); // new stock object for hand
-            console.log("creation stock ", divName);
-            stock.create(this, $(divName), this.cardwidth, this.cardheight); //myhand is the div where the card is going
-            stock.image_items_per_row = this.image_items_per_row;
-            stock.item_margin = 6;
-            stock.apparenceBorderWidth = "2px";
-            stock.setSelectionAppearance("class");
-            stock.setSelectionMode(0);
-            stock.autowidth = true;
+            var stock = new dobble.stock(this, divName);
+            stock.setSelectionMode(1);
             return stock;
         },
 
-        addCardsToStock: function (cards, stock) {
-            for (var card_id in cards) {
-                var card = cards[card_id];
-                stock.addToStockWithId(card.type, card.id);
-            }
-        },
-        getFormatedType: function (typeNumber) {
-            return typeNumber < 10 ? "0" + typeNumber : typeNumber;
+        addCardsToStock: function (cards, stock, replaceContent = false) {
+            stock.addCards(cards, replaceContent);
         },
 
-        createCardTypes: function (stock) {
-            for (let i = 0; i < 55; i++) {
-                var formattedNumber = this.getFormatedType(i);
-                stock.addItemType(formattedNumber, 0, g_gamethemeurl + this.cards_img, i);
-            }
+        getFormatedType: function (typeNumber) {
+            return typeNumber < 10 ? "0" + typeNumber : typeNumber;
         },
 
         ajaxcallwrapper: function (action, args, handler) {
@@ -320,15 +268,13 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
             //}
         },
 
-        getSelectedPlayer: function () {
+        getSelectedPlayer: function (clickedStockDiv) {
             for (var player_id in this.playerHands) {
                 var stock = this.playerHands[player_id];
-                if (stock.getSelectedItems().length > 0) {
+                if (stock.div == clickedStockDiv) {
                     return player_id;
                 }
             }
-            //if there is only one player with cards, he's considered like selected
-            return this.getUniqueOpponentWithCards();
         },
 
         /**
@@ -364,7 +310,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                 fromDiv = "player_hand_stock_" + playerId;
             }
             if (card) {
-                fromDiv += "_item_" + card.id;
+                fromDiv += "-card-" + card.id;
             }
             console.log("fromDiv ", fromDiv);
             return fromDiv;
@@ -383,7 +329,6 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 
         updateCountersIfPossible: function (counters) {
             var existingCounters = this.filterObject(counters, (item, key) => {
-                console.log(item.counter_name);
                 return dojo.byId(item.counter_name) != undefined;
             });
             this.updateCounters(existingCounters);
@@ -393,6 +338,34 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
             return Object.fromEntries(Object.entries(obj).filter(([key, val]) => callback(val, key)));
         },
 
+     /*   setupZones: function( card_div, card_type_id, card_id ){
+       // Note that "card_type_id" contains the type of the item, so you can do special actions depending on the item type
+            console.log("card_id", card_id);
+            
+       // Add some custom HTML content INSIDE the Stock item:
+       var svgId="svg"+card_type_id;
+            if(!dojo.byId(svgId)){
+            var svg = this.format_block('jstpl_svg', {svgId: svgId});
+            dojo.query("#"+card_div.id).wrap(svg);
+            
+            var zones = this.cardsDescription[card_type_id].zones;
+            if (!zones) {
+                zones = {
+                    "0": "0,0 100,0 100,100 0,100", "1": "50,0 100,0 100,100 0,100", "2": "200,0 100,0 100,100 0,100", "3": "300,0 100,0 100,100 0,100",
+                    "4": "0,0 100,0 100,100 0,100", "5": "0,0 100,0 100,100 0,100", "6": "0,0 100,0 100,100 0,100", "7": "100 100, 200 200",};
+            }
+            for (const i in zones) {
+                            var zoneContent = this.format_block('jstpl_svg_zone', {
+                    zoneId: svgId+"_polygone_"+i,
+                    polygonPoints: zones[i],
+                });
+                console.log(zoneContent);
+                dojo.place(zoneContent, svgId);
+            }
+                dojo.destroy(card_div.id);
+            }
+    },
+*/
         ///////////////////////////////////////////////////
         //// Player's action
 
@@ -440,8 +413,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         },        
         
         */
-        onChooseSymbol: function (evt) {
+        onChooseSymbol: function (evt, selected = false, divId) {
             var symbol = dojo.getAttr(evt.currentTarget.id, "data-symbol");
+            console.log("evt.currentTarget.id", evt.currentTarget.id);
             console.log("onChooseSymbol ", symbol);
 
             // Preventing default browser reaction
@@ -458,34 +432,29 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                         break;
                     case this.POISONED_GIFT:
                     case this.HOT_POTATO:
-                        if (!this.getSelectedPlayer()) {
+                        if (!this.getSelectedPlayer(divId)) {
                             this.showMessage(_("You have to select a player first"), "error");
                         } else {
                             this.ajaxcallwrapper("chooseSymbolWithPlayer", {
                                 symbol: symbol,
-                                player_id: this.getSelectedPlayer(),
+                                player_id: this.getSelectedPlayer(divId),
                             });
                         }
 
                         break;
                     case this.TRIPLET:
-                        var selectedCards = this.patternPile.getSelectedItems();
-                        if (selectedCards.length != 3) {
-                            this.showMessage(
-                                _("You have to select three cards before choosing the common symbol"),
-                                "error"
-                            );
-                        } else {
-                            this.ajaxcallwrapper("chooseSymbolWithTriplet", {
-                                symbol: symbol,
-                                card3: selectedCards.pop().id,
-                                card2: selectedCards.pop().id,
-                                card1: selectedCards.pop().id,
-                            });
+                        if (selected) {
+                            var selectedCardIds = this.patternPile.getSelectedItems();
+                            if (selectedCardIds.length == 3) {
+                                this.ajaxcallwrapper("chooseSymbolWithTriplet", {
+                                    symbol: symbol,
+                                    card3: selectedCardIds.pop(),
+                                    card2: selectedCardIds.pop(),
+                                    card1: selectedCardIds.pop(),
+                                });
+                            }
                         }
-
                         break;
-
                     default:
                         break;
                 }
@@ -512,33 +481,13 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
                     var stock = this.playerHands[player_id];
                     if (stock.control_name != clickedStock.control_name) {
                         stock.unselectAll();
-                        if (this.minigame == this.HOT_POTATO) {
-                            dojo.query("#generalactions [data-player-id=" + player_id + "]").style("display", "none");
-                        }
                     }
                 }
-                if (this.minigame == this.HOT_POTATO) {
-                    this.onSelectOpponentHandDisplayActionButtons(clickedPlayerId);
-                }
-            } else if (this.minigame == this.HOT_POTATO) {
-                dojo.query("#generalactions [data-player-id]").style("display", "none");
             }
         },
 
-        onSelectTriplet: function (control_name, item_id) {
-            dojo.query("#generalactions [data-card-id]").style("display", "none");
-            var selectedItems = this.patternPile.getSelectedItems();
-            if (selectedItems.length >= 1) {
-                var card = selectedItems.shift();
-                dojo.query("#generalactions [data-card-id=" + card.id + "]").style("display", "inline");
-            }
-        },
-
-        /**
-         * Displays action buttons on selection for hot potato.
-         */
-        onSelectOpponentHandDisplayActionButtons: function (playerId) {
-            dojo.query("#generalactions [data-player-id=" + playerId + "]").style("display", "inline");
+        onCancelSelection: function (control_name) {
+            dojo.query(".symbol").removeClass("stockitem_selected");
         },
 
         ///////////////////////////////////////////////////
@@ -567,6 +516,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
             // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
             // this.notifqueue.setSynchronous( 'cardPlayed', 3000 );
             //
+            //evt from the stock
             dojo.subscribe("cardsMove", this, "notifCardsMove");
         },
 
@@ -587,11 +537,11 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 
                     for (var card of cards) {
                         if (from == "pattern") {
-                            from = "pattern_pile_item_" + card.id;
+                            from = "pattern_pile-card-" + card.id;
                         }
                         if (to == this.player_id) {
                             this.playerHand.removeAll();
-                            this.playerHand.addToStockWithId(card.type, card.id, from);
+                            this.playerHand.addCard(card, from);
                         }
                     }
                     break;
@@ -603,16 +553,16 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 
                     for (var card of cards) {
                         if (from == this.player_id) {
-                            var fromDiv = "myhand_item_" + card.id;
+                            var fromDiv = "myhand-card-" + card.id;
 
                             this.patternPile.removeAll();
-                            this.patternPile.addToStockWithId(card.type, card.id, fromDiv);
+                            this.patternPile.addCard(card, fromDiv);
                         }
                     }
                     if (from == this.player_id && newHand) {
                         //display the card under my pile
                         this.playerHand.removeAll();
-                        this.playerHand.addToStockWithId(newHand.type, newHand.id);
+                        this.playerHand.addCard(newHand);
                     }
                     break;
                 case this.POISONED_GIFT:
@@ -622,17 +572,17 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 
                     for (var card of cards) {
                         if (from == "pattern") {
-                            from = "pattern_pile_item_" + card.id;
+                            from = "pattern_pile-card-" + card.id;
                         }
 
                         this.playerHands[to].removeAll();
-                        this.playerHands[to].addToStockWithId(card.type, card.id, from);
+                        this.playerHands[to].addCard(card, from);
                     }
                     break;
                 case this.HOT_POTATO:
                     for (var card of cards) {
                         this.getPlayerStock(to).removeAll();
-                        this.getPlayerStock(to).addToStockWithId(card.type, card.id, this.getStockDiv(from, card));
+                        this.getPlayerStock(to).addCard(card, this.getStockDiv(from, card));
                         this.getPlayerStock(from).removeAll();
                     }
                     break;

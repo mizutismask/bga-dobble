@@ -104,7 +104,7 @@ class Dobble extends Table
             $cards[] = array('type' => $name, 'type_arg' => $card["type"], 'nbr' => 1);
         }
         $this->deck->createCards($cards, DECK_LOC_DECK);
-        $this->deck->shuffle(DECK_LOC_DECK);
+        //$this->deck->shuffle(DECK_LOC_DECK);//todo
         $this->dealCards();
 
 
@@ -138,6 +138,7 @@ class Dobble extends Table
         $result['pattern'] = $this->getPatternCards();
         $result['minigame'] = $this->getMiniGame();
         $result['counters'] = $this->argCardsCounters();
+        $result['cardsDescription'] = $this->cards_description;
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
 
         return $result;
@@ -277,7 +278,7 @@ class Dobble extends Table
             $type = $this->cards_description[$card["type"]]["type"];
 
             $symbols = str_split($type, 2);
-            self::dump("**************************symbols", $symbols);
+            //self::dump("**************************symbols", $symbols);
             foreach ($symbols as $i => $s) {
                 $name = array_search($s, $this->symbols);
                 //self::dump("**************************name", $name);
@@ -285,7 +286,7 @@ class Dobble extends Table
                 //self::dump("**************************card", $card);
             }
         }
-        self::dump("**************************cards", $enhanced);
+        //self::dump("**************************cards", $enhanced);
         return $enhanced;
     }
 
@@ -302,9 +303,9 @@ class Dobble extends Table
 
         $intersection = array_values(array_intersect($templateSymbolsArr, $mySymbolsArr));
         self::dump("**************************intersection", $intersection[0]);
-        self::dump("**************************guess", $symbol, $this->symbols[$symbol]);
-        self::dump("**************************guess number", $this->symbols[$symbol]);
-        return $intersection[0] === $this->symbols[$symbol];
+       // self::dump("**************************guess", $symbol, $this->symbols[$symbol]);
+       // self::dump("**************************guess number", $this->symbols[$symbol]);
+        return $intersection[0] === $symbol;// $intersection[0] === $this->symbols[$symbol];
     }
 
     function symbolFoundActions($player_id, $template, $myCard, $opponent_player_id = null, $card3 = null)
