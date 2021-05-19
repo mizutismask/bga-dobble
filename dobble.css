@@ -130,6 +130,7 @@
    /* grid-template-columns: repeat(3, 1fr);
      grid-auto-rows: 120%;
      grid-gap: 10px;*/
+
    /* grid-template-rows: fit-content(33%);*/
 
     /*
@@ -203,6 +204,91 @@
     padding-top: var(--width);
   }
 }
+.card {
+    --width: 100%;
+    width: var(--width);
+    height: var(--width);
+    /*padding-top: var(--width);*/
+    border: 1px solid black;
+    margin: auto;
+    border-radius: 50%;
+    position: relative;
+    background-color: white;
+    -moz-box-shadow: 5px 5px 5px 0px rgba(0,0,0,0.4);
+    -webkit-box-shadow: 5px 5px 5px 0px rgba(0,0,0,0.4);
+    -o-box-shadow: 5px 5px 5px 0px rgba(0,0,0,0.4);
+    box-shadow: 5px 5px 5px 0px rgba(0,0,0,0.4);
+    filter:progid:DXImageTransform.Microsoft.Shadow(color=#656565, Direction=134, Strength=30);  
+}
+
+.symbol {
+    position: absolute;
+    background-image: url('./img/cards/symbols.png');
+    background-size: 1000%;
+    cursor: pointer;
+  }
+
+  .symbol.symbol-00{
+    background-position: 0 0;
+  }
+  .symbol.symbol-01{
+    background-position: 11.11% 0;
+  }
+  .symbol.symbol-02{
+    background-position: 22.22% 0;
+  }
+  .symbol.symbol-03{
+    background-position: 33.33% 0;
+  }
+  .symbol.symbol-04{
+    background-position: 44.44% 0;
+  }
+  .symbol.symbol-05{
+    background-position: 55.55% 0;
+  }
+  .symbol.symbol-06{
+    background-position: 66.66% 0;
+  }
+  .symbol.symbol-07{
+    background-position: 77.77% 0;
+  }
+  .symbol.symbol-08{
+    background-position: 88.88% 0%;
+  }
+  .symbol.symbol-09{
+    background-position: 99.99% 0%;
+  }
+
+  .symbol.symbol-10{
+    background-position: 0% 20%;
+  }
+  .symbol.symbol-11{
+    background-position: 11.11% 20%;
+  }
+  .symbol.symbol-12{
+    background-position: 22.22% 20%;
+  }
+  .symbol.symbol-13{
+    background-position: 33.33% 20%;
+  }
+  .symbol.symbol-14{
+    background-position: 44.44% 20%;
+  }
+  .symbol.symbol-15{
+    background-position: 55.55% 20%;
+  }
+  .symbol.symbol-16{
+    background-position: 66.66% 20%;
+  }
+  .symbol.symbol-17{
+    background-position: 77.77% 20%;
+  }
+  .symbol.symbol-18{
+    background-position: 88.88% 20%;
+  }
+  .symbol.symbol-19{
+    background-position: 99.99% 20%;
+  }
 
 .symbol {
     position: absolute;

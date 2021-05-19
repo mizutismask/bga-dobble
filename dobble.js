@@ -29,6 +29,8 @@ define([
             this.HOT_POTATO = 3;
             this.POISONED_GIFT = 4;
             this.TRIPLET = 5;
+
+            this.DIV_PATTERN = "pattern_pile";
         },
 
         /*
@@ -336,6 +338,34 @@ define([
             return Object.fromEntries(Object.entries(obj).filter(([key, val]) => callback(val, key)));
         },
 
+     /*   setupZones: function( card_div, card_type_id, card_id ){
+       // Note that "card_type_id" contains the type of the item, so you can do special actions depending on the item type
+            console.log("card_id", card_id);
+            
+       // Add some custom HTML content INSIDE the Stock item:
+       var svgId="svg"+card_type_id;
+            if(!dojo.byId(svgId)){
+            var svg = this.format_block('jstpl_svg', {svgId: svgId});
+            dojo.query("#"+card_div.id).wrap(svg);
+            
+            var zones = this.cardsDescription[card_type_id].zones;
+            if (!zones) {
+                zones = {
+                    "0": "0,0 100,0 100,100 0,100", "1": "50,0 100,0 100,100 0,100", "2": "200,0 100,0 100,100 0,100", "3": "300,0 100,0 100,100 0,100",
+                    "4": "0,0 100,0 100,100 0,100", "5": "0,0 100,0 100,100 0,100", "6": "0,0 100,0 100,100 0,100", "7": "100 100, 200 200",};
+            }
+            for (const i in zones) {
+                            var zoneContent = this.format_block('jstpl_svg_zone', {
+                    zoneId: svgId+"_polygone_"+i,
+                    polygonPoints: zones[i],
+                });
+                console.log(zoneContent);
+                dojo.place(zoneContent, svgId);
+            }
+                dojo.destroy(card_div.id);
+            }
+    },
+*/
         ///////////////////////////////////////////////////
         //// Player's action
 
