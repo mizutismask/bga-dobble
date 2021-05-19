@@ -206,6 +206,9 @@ define([
             if (this.isCurrentPlayerActive()) {
                 switch (stateName) {
                     case "playerTurn":
+                        if (this.minigame == this.TRIPLET) {
+                            this.addActionButton( 'button_reset_selection', _('Cancel selection'), 'onCancelSelection' ); 
+                        }
                         break;
                     /*               
                  Example:
@@ -451,6 +454,10 @@ define([
                     }
                 }
             }
+        },
+
+        onCancelSelection: function (control_name) {
+            dojo.query(".symbol").removeClass("stockitem_selected");
         },
 
         ///////////////////////////////////////////////////
