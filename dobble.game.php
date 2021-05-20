@@ -164,7 +164,7 @@ class Dobble extends Table
                 break;
             case WELL:
                 $cardsNbAtTheBeginning = floor((count($this->cards_description) - 1) / count($players));
-                $remaining = min($this->deck->countCardsByLocationArgs(DECK_LOC_HAND));
+                $remaining = min(array_values($this->countCardsByLocationArgsIncludingNoCard(DECK_LOC_HAND)));
                 $done = $cardsNbAtTheBeginning - $remaining;
                 return $done *  100 / $cardsNbAtTheBeginning;
                 break;
@@ -392,6 +392,17 @@ class Dobble extends Table
         self::DbQuery($sql);
     }
 
+    function countCardsByLocationArgsIncludingNoCard($location){
+        $cardsByLocation= $this->deck->countCardsByLocationArgs($location);
+        $players = self::loadPlayersBasicInfos();
+        foreach ($players as $player_id => $player) {
+            if(!array_key_exists($player_id,$cardsByLocation)){
+                $cardsByLocation[$player_id]=0;
+            }
+        }
+        return $cardsByLocation;
+    }
+
     function getPatternCards()
     {
         switch ($this->getMiniGame()) {
@@ -493,6 +504,14 @@ class Dobble extends Table
             return $nb > 0;
         }));
         return $withCards;
+    }
+
+    function isAnyPlayerWithoutHand()
+    {
+        //countCardsByLocationArgs does not return players with 0 cards
+        $nbByPlayer = $this->deck->countCardsByLocationArgs(DECK_LOC_HAND);
+        $players = self::loadPlayersBasicInfos();
+        return count($nbByPlayer) != count($players);
     }
 
     function isTripletPossible()
@@ -718,7 +737,7 @@ class Dobble extends Table
                 }
                 break;
             case WELL:
-                if ($this->onlyOnePlayerHasAHand()) {
+                if ($this->isAnyPlayerWithoutHand()) {
                     $this->gamestate->nextState(TRANSITION_END_GAME); //only one player with cards in hand
                 } else {
                     $this->gamestate->nextState(TRANSITION_PLAYER_TURN);
