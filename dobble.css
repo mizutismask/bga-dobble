@@ -66,6 +66,9 @@
         background-repeat: none;
     }
 */
+html{
+  background: url('img/fond.jpg');
+}
 #opponents_wrapper
 { 
     display: inline-flex;
@@ -204,22 +207,7 @@
     padding-top: var(--width);
   }
 }
-.card {
-    --width: 100%;
-    width: var(--width);
-    height: var(--width);
-    /*padding-top: var(--width);*/
-    border: 1px solid black;
-    margin: auto;
-    border-radius: 50%;
-    position: relative;
-    background-color: white;
-    -moz-box-shadow: 5px 5px 5px 0px rgba(0,0,0,0.4);
-    -webkit-box-shadow: 5px 5px 5px 0px rgba(0,0,0,0.4);
-    -o-box-shadow: 5px 5px 5px 0px rgba(0,0,0,0.4);
-    box-shadow: 5px 5px 5px 0px rgba(0,0,0,0.4);
-    filter:progid:DXImageTransform.Microsoft.Shadow(color=#656565, Direction=134, Strength=30);  
-}
+
 
 .symbol {
     position: absolute;
