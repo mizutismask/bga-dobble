@@ -116,6 +116,7 @@ define([
             //handle pattern
             switch (stateName) {
                 case "playerTurn":
+                    this.updateActionPhrase();
                     this.updateCountersIfPossible(args.args.counters);
                     switch (this.minigame) {
                         case this.TOWERING_INFERNO:
@@ -204,12 +205,15 @@ define([
         //
         onUpdateActionButtons: function (stateName, args) {
             //console.log("onUpdateActionButtons: " + stateName, args);
+           if(stateName=="playerTurn")
+                this.updateActionPhrase();
+
 
             if (this.isCurrentPlayerActive()) {
                 switch (stateName) {
                     case "playerTurn":
                         if (this.minigame == this.TRIPLET) {
-                            this.addActionButton( 'button_reset_selection', _('Cancel selection'), 'onCancelSelection' ); 
+                            this.addActionButton('button_reset_selection', _('Reset selection'), 'onCancelSelection');
                         }
                         break;
                     /*               
@@ -262,7 +266,7 @@ define([
                 "/" + this.game_name + "/" + this.game_name + "/" + action + ".html",
                 args, //
                 this,
-                (result) => {},
+                (result) => { },
                 handler
             );
             //}
@@ -338,7 +342,34 @@ define([
             return Object.fromEntries(Object.entries(obj).filter(([key, val]) => callback(val, key)));
         },
 
-     /*   setupZones: function( card_div, card_type_id, card_id ){
+        updateActionPhrase: function () {
+            if (this.isCurrentPlayerActive()) {
+                
+                var phraseDiv = "pagemaintitletext";
+                var phrase;
+                switch (this.minigame) {
+                    case this.TOWERING_INFERNO:
+                        phrase = _("Find the common symbol to get more cards than you opponents");
+                        break;
+                    case this.WELL:
+                        phrase = _("Find the common symbol to be the first to get rid of all yours cards");
+                        break;
+                    case this.POISONED_GIFT:
+                        phrase = _("Find the common symbol with the opponent of your choice");
+                        break;
+                    case this.HOT_POTATO:
+                        phrase = _("Find the common symbol with the opponent of your choice");
+                        break;
+                    case this.TRIPLET:
+                        phrase = _("Find the common symbol on 3 cards until it's not possible anymore");
+                        break;
+                        
+                }
+                dojo.byId(phraseDiv).innerHTML = phrase;
+            }
+        },
+                                
+        /*   setupZones: function( card_div, card_type_id, card_id ){
        // Note that "card_type_id" contains the type of the item, so you can do special actions depending on the item type
             console.log("card_id", card_id);
             
