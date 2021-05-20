@@ -160,7 +160,10 @@ class Dobble extends Table
         switch ($this->getMiniGame()) {
 
             case TRIPLET:
-
+                $remaining  = $this->deck->countCardInLocation(DECK_LOC_DECK);
+                $total = count($this->cards_description);
+                $done = $total - $remaining;
+                return $done *  100 / $total;
                 break;
             case WELL:
                 $cardsNbAtTheBeginning = floor((count($this->cards_description) - 1) / count($players));
