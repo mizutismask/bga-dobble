@@ -34,7 +34,7 @@ if (!defined('DECK_LOC_DECK')) {
     // constants for notifications
     define("NOTIF_CARDS_MOVE", "cardsMove");
     define("NOTIF_PLAYER_TURN", "playerTurn");
-    define("NOTIF_UPDATE_SCORE", "updateScore");
+    define("NOTIF_NEW_ROUND", "newRound");
     define("NOTIF_HAND_CHANGE", "handChange");
 
     // constants for game states
@@ -104,7 +104,7 @@ class Dobble extends Table
             $cards[] = array('type' => $name, 'type_arg' => $card["type"], 'nbr' => 1);
         }
         $this->deck->createCards($cards, DECK_LOC_DECK);
-        //$this->deck->shuffle(DECK_LOC_DECK);//todo
+        $this->deck->shuffle(DECK_LOC_DECK);
         $this->dealCards();
 
 
@@ -225,14 +225,17 @@ class Dobble extends Table
             case WELL:
                 $number = floor((count($this->cards_description) - 1) / count($players));
                 $this->dealCardsToAllPlayers($players, $number);
+                $this->setScoreForAllPlayers($players, $number * -1);
                 $this->discardRemainingCards();
                 break;
             case HOT_POTATO:
             case POISONED_GIFT:
                 $this->dealCardsToAllPlayers($players, 1);
+                $this->setScoreForAllPlayers($players, -1);
                 break;
             case TOWERING_INFERNO:
                 $this->dealCardsToAllPlayers($players, 1);
+                $this->setScoreForAllPlayers($players, 1);
                 break;
             default:
         }
@@ -242,6 +245,20 @@ class Dobble extends Table
     {
         foreach ($players as $player_id => $player) {
             $this->pickCardsAndNotifyPlayer($number, $player_id);
+        }
+    }
+
+    function incScoreForAllPlayers($players, $number)
+    {
+        foreach ($players as $player_id => $player) {
+            $this->incScore($player_id, $number);
+        }
+    }
+
+    function setScoreForAllPlayers($players, $number)
+    {
+        foreach ($players as $player_id => $player) {
+            $this->setScore($player_id, $number);
         }
     }
 
@@ -306,9 +323,9 @@ class Dobble extends Table
 
         $intersection = array_values(array_intersect($templateSymbolsArr, $mySymbolsArr));
         self::dump("**************************intersection", $intersection[0]);
-       // self::dump("**************************guess", $symbol, $this->symbols[$symbol]);
-       // self::dump("**************************guess number", $this->symbols[$symbol]);
-        return $intersection[0] === $symbol;// $intersection[0] === $this->symbols[$symbol];
+        // self::dump("**************************guess", $symbol, $this->symbols[$symbol]);
+        // self::dump("**************************guess number", $this->symbols[$symbol]);
+        return $intersection[0] === $symbol; // $intersection[0] === $this->symbols[$symbol];
     }
 
     function symbolFoundActions($player_id, $template, $myCard, $opponent_player_id = null, $card3 = null)
@@ -322,37 +339,48 @@ class Dobble extends Table
                 $this->deck->moveCard($template["id"], DECK_LOC_WON, $player_id);
                 $this->deck->moveCard($card3["id"], DECK_LOC_WON, $player_id);
                 $this->incScore($player_id, 3);
+
+                $scores = $this->getScoresByPlayer();
                 self::notifyAllPlayers(NOTIF_CARDS_MOVE, clienttranslate('${player_name} spotted the common symbol on three cards'), array(
                     'player_name' => $this->getPlayerName($player_id),
                     'cards' => [$template, $myCard],
                     'from' => 'pattern',
                     'to' => $player_id,
+                    'scores' => $scores,
                 ));
                 break;
             case WELL:
                 $this->deck->moveCard($myCard["id"], DECK_LOC_DECK);
                 $this->deck->insertCardOnExtremePosition($myCard["id"], DECK_LOC_DECK, true);
                 $this->incScore($player_id, 1);
+
+                $scores = $this->getScoresByPlayer();
                 self::notifyAllPlayers(NOTIF_CARDS_MOVE, clienttranslate('${player_name} spotted the common symbol'), array(
                     'player_name' => $this->getPlayerName($player_id),
                     'cards' => [$myCard],
                     'from' => $player_id,
                     'to' => 'pattern',
                     'newHand' => $this->getMyCard($player_id),
+                    'scores' => $scores,
                 ));
                 break;
             case HOT_POTATO:
                 //template here is the opponent card
+                $cardsNb = $this->deck->countCardInLocation(DECK_LOC_WON, $player_id)+1;
                 $this->deck->moveAllCardsInLocation(DECK_LOC_WON, DECK_LOC_WON, $player_id, $opponent_player_id);
                 $this->deck->moveCard($template["id"], DECK_LOC_WON, $opponent_player_id);
                 $this->deck->moveCard($myCard["id"], DECK_LOC_HAND, $opponent_player_id);
+                $this->incScore($player_id, $cardsNb);
+                $this->incScore($opponent_player_id, $cardsNb * -1);
 
+                $scores = $this->getScoresByPlayer();
                 self::notifyAllPlayers(NOTIF_CARDS_MOVE, clienttranslate('${player_name} spotted the common symbol with ${player_name2}'), array(
                     'player_name' => $this->getPlayerName($player_id),
                     'player_name2' => $this->getPlayerName($opponent_player_id),
                     'cards' => [$myCard],
                     'from' => $player_id,
                     'to' => $opponent_player_id,
+                    'scores' => $scores,
                 ));
                 break;
             case POISONED_GIFT:
@@ -360,23 +388,29 @@ class Dobble extends Table
                 $this->deck->moveCard($myCard["id"], DECK_LOC_WON, $opponent_player_id);
                 $this->deck->moveCard($template["id"], DECK_LOC_HAND, $opponent_player_id);
                 $this->incScore($opponent_player_id, -1);
+
+                $scores = $this->getScoresByPlayer();
                 self::notifyAllPlayers(NOTIF_CARDS_MOVE, clienttranslate('${player_name} spotted the common symbol with ${player_name2}'), array(
                     'player_name' => $this->getPlayerName($player_id),
                     'player_name2' => $this->getPlayerName($opponent_player_id),
                     'cards' => [$template],
                     'from' => 'pattern',
                     'to' => $opponent_player_id,
+                    'scores' => $scores,
                 ));
                 break;
             case TOWERING_INFERNO:
                 $this->deck->moveAllCardsInLocation(DECK_LOC_HAND, DECK_LOC_WON, $player_id, $player_id);
                 $this->deck->moveCard($template["id"], DECK_LOC_HAND, $player_id);
                 $this->incScore($player_id, 1);
+
+                $scores = $this->getScoresByPlayer();
                 self::notifyAllPlayers(NOTIF_CARDS_MOVE, clienttranslate('${player_name} spotted the common symbol'), array(
                     'player_name' => $this->getPlayerName($player_id),
                     'cards' => [$template],
                     'from' => 'pattern',
                     'to' => $player_id,
+                    'scores' => $scores,
                 ));
                 break;
             default:
@@ -395,12 +429,19 @@ class Dobble extends Table
         self::DbQuery($sql);
     }
 
-    function countCardsByLocationArgsIncludingNoCard($location){
-        $cardsByLocation= $this->deck->countCardsByLocationArgs($location);
+    function setScore($player_id, $value)
+    {
+        $sql = "UPDATE player set player_score=" . $value . " where player_id=" . $player_id;
+        self::DbQuery($sql);
+    }
+
+    function countCardsByLocationArgsIncludingNoCard($location)
+    {
+        $cardsByLocation = $this->deck->countCardsByLocationArgs($location);
         $players = self::loadPlayersBasicInfos();
         foreach ($players as $player_id => $player) {
-            if(!array_key_exists($player_id,$cardsByLocation)){
-                $cardsByLocation[$player_id]=0;
+            if (!array_key_exists($player_id, $cardsByLocation)) {
+                $cardsByLocation[$player_id] = 0;
             }
         }
         return $cardsByLocation;
@@ -714,6 +755,12 @@ class Dobble extends Table
         return $args;
     }
 
+    public function getScoresByPlayer()
+    {
+        $sql = "SELECT player_id id, player_score score FROM player ";
+        return  self::getCollectionFromDb($sql, true);
+    }
+
 
     //////////////////////////////////////////////////////////////////////////////
     //////////// Game state actions
@@ -767,28 +814,25 @@ class Dobble extends Table
         $players = self::loadPlayersBasicInfos();
         switch ($this->getMiniGame()) {
             case HOT_POTATO:
-                //update scores
-                foreach ($players as $player_id => $player) {
-                    //empty hands before count
-                    $this->deck->moveAllCardsInLocation(DECK_LOC_HAND, DECK_LOC_WON, $player_id, $player_id);
-                }
-                $nbByPlayer = $this->deck->countCardsByLocationArgs(DECK_LOC_WON);
-                foreach ($nbByPlayer as $player_id => $nb) {
-                    $this->incScore($player_id, $nb * -1); //-1 by won card
-                }
-
-                //discard used cards
-                $this->deck->moveAllCardsInLocation(DECK_LOC_WON, DECK_LOC_DISCARD);
-
-                //checks if it's the end of the game
                 $currentRound = self::getGameStateValue(GS_CURRENT_ROUND);
                 self::setGameStateValue(GS_CURRENT_ROUND, $currentRound + 1); //update the round to have a correct progression, means that the previous round is over
+                
+                //checks if it's the end of the game
                 if ($currentRound == $this->getRoundsNumber()) {
                     self::trace("*******************************TRANSITION_END_GAME");
                     $this->gamestate->nextState(TRANSITION_END_GAME);
                 } else {
-                    //prepare next round
+                    //prepare next round (we reshuffle because we need enough cards to make all the rounds)
+                    $this->deck->moveAllCardsInLocation(null, DECK_LOC_DECK);
+                    $this->deck->shuffle(DECK_LOC_DECK);
                     $this->dealCardsToAllPlayers($players, 1);
+                    $this->incScoreForAllPlayers($players, -1);
+
+                    self::notifyAllPlayers(NOTIF_NEW_ROUND, "", array(
+                        'roundNumber' =>  self::getGameStateValue(GS_CURRENT_ROUND),
+                        'scores' => $this->getScoresByPlayer(),
+                    ));
+
                     self::trace("*******************************TRANSITION_NEXT_TURN");
                     $this->gamestate->nextState(TRANSITION_NEXT_TURN);
                 }

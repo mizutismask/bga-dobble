@@ -549,6 +549,8 @@ define([
             //
             //evt from the stock
             dojo.subscribe("cardsMove", this, "notifCardsMove");
+            
+            dojo.subscribe('newRound', this, "notifNewRound");
         },
 
         // TODO: from this point and below, you can write your game notifications handling methods
@@ -559,13 +561,13 @@ define([
             var cards = notif.args.cards;
             var from = notif.args.from;
             var to = notif.args.to;
+            var scores = notif.args.scores;
+            for (const [id, score] of Object.entries(scores)) {
+                this.scoreCtrl[id].setValue(score);
+            }
 
             switch (this.minigame) {
                 case this.TOWERING_INFERNO:
-                    if (to) {
-                        this.scoreCtrl[to].incValue(1);
-                    }
-
                     for (var card of cards) {
                         if (from == "pattern") {
                             from = "pattern_pile-card-" + card.id;
@@ -578,10 +580,6 @@ define([
                     break;
                 case this.WELL:
                     var newHand = notif.args.newHand;
-                    if (from) {
-                        this.scoreCtrl[from].incValue(1);
-                    }
-
                     for (var card of cards) {
                         if (from == this.player_id) {
                             var fromDiv = "myhand-card-" + card.id;
@@ -597,11 +595,7 @@ define([
                     }
                     break;
                 case this.POISONED_GIFT:
-                    if (to) {
-                        this.scoreCtrl[to].incValue(-1);
-                    }
-
-                    for (var card of cards) {
+                   for (var card of cards) {
                         if (from == "pattern") {
                             from = "pattern_pile-card-" + card.id;
                         }
@@ -621,5 +615,15 @@ define([
                     break;
             }
         },
+
+        notifNewRound: function (notif) {
+            console.log("notifNewRound", notif);
+            var roundNumber = notif.args.roundNumber;
+            var scores = notif.args.scores;
+            console.log("round", roundNumber);
+            for (const [id, score] of Object.entries(scores)) {
+                this.scoreCtrl[id].setValue(score);
+            }
+        }
     });
 });
