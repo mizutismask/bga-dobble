@@ -65,10 +65,6 @@ define([
                 this.addCardsToStock(gamedatas.hand, this.playerHand);
             }
 
-            if (this.minigame == this.HOT_POTATO) {
-                this.playerHand.setSelectionMode(0);
-            }
-
             if (
                 this.minigame == this.WELL ||
                 this.minigame == this.TOWERING_INFERNO ||
@@ -78,9 +74,7 @@ define([
                 this.patternPile = this.createStock("pattern_pile");
                 this.addCardsToStock(gamedatas.pattern, this.patternPile);
             }
-            if (this.minigame == this.TRIPLET) {
-                this.patternPile.setSelectionMode(2);
-            }
+           
             dojo.subscribe("onChangeSelection", this, "onChooseSymbol");
 
             if (this.minigame == this.POISONED_GIFT || this.minigame == this.HOT_POTATO) {
@@ -116,7 +110,6 @@ define([
             //handle pattern
             switch (stateName) {
                 case "playerTurn":
-                    this.updateActionPhrase();
                     this.updateCountersIfPossible(args.args.counters);
                     switch (this.minigame) {
                         case this.TOWERING_INFERNO:
@@ -124,17 +117,15 @@ define([
                         case this.POISONED_GIFT:
                         case this.TRIPLET:
                             var patterns = args.args.pattern;
-                           this.patternPile.removeAll();
+                            this.patternPile.removeAll();
                             this.addCardsToStock(patterns, this.patternPile, false);
-                            if (!this.isCurrentPlayerActive()) {
-                                this.patternPile.setSelectionMode(0);
-                            }
                             break;
 
                         default:
                             break;
                     }
             }
+
             //handle hands
             switch (stateName) {
                 case "playerTurn":
@@ -147,9 +138,6 @@ define([
                                     this.addCardsToStock(cards, this.playerHands[player_id]);
                                 }
                             }
-                            if (!this.isCurrentPlayerActive()) {
-                                this.playerHands[player_id].setSelectionMode(0);
-                            }
                             break;
 
                         case this.HOT_POTATO:
@@ -160,11 +148,7 @@ define([
                                     playerStock.removeAll();
                                     this.addCardsToStock(cards, playerStock, false);
                                 }
-                                /* if (!this.isCurrentPlayerActive()) {
-                                    playerStock.setSelectionMode(0);
-                                }*/
                             }
-
                             var player = this.getUniqueOpponentWithCards();
                             if (player) {
                                 var playerStock = this.getPlayerStock(player);
@@ -184,20 +168,19 @@ define([
         onLeavingState: function (stateName) {
             console.log("Leaving state: " + stateName);
 
-            switch (stateName) {
-                /* Example:
-            
-            case 'myGameState':
-            
-                // Hide the HTML block we are displaying only during this game state
-                dojo.style( 'my_html_block_id', 'display', 'none' );
-                
-                break;
-           */
-
-                case "dummmy":
+            /*switch (stateName) {
+                case "playerTurn":
+                    if (this.playerHandIsDisplayed()) {
+                        this.playerHand.setSelectionMode(0);
+                    }
+                    if (this.patternIsDisplayed()) {
+                        this.patternPile.setSelectionMode(0);
+                    }
+                    if (this.opponentsHandsAreDisplayed()) {
+                        this.setSelectionModeOnHandStocks(0);
+                    }
                     break;
-            }
+            }*/
         },
 
         // onUpdateActionButtons: in this method you can manage "action buttons" that are displayed in the
@@ -205,45 +188,46 @@ define([
         //
         onUpdateActionButtons: function (stateName, args) {
             //console.log("onUpdateActionButtons: " + stateName, args);
-           if(stateName=="playerTurn")
+
+            if (stateName == "playerTurn") {
                 this.updateActionPhrase();
+            }
 
-
+            //enables usefull stocks
             if (this.isCurrentPlayerActive()) {
                 switch (stateName) {
                     case "playerTurn":
-                        if (this.minigame == this.TRIPLET) {
-                            this.addActionButton('button_reset_selection', _('Reset selection'), 'onCancelSelection');
+                        switch (this.minigame) {
+                            case this.TOWERING_INFERNO:
+                            case this.WELL:
+                                this.playerHand.setSelectionMode(1);
+                                this.patternPile.setSelectionMode(1);
+                                break;
+                            case this.TRIPLET:
+                                this.patternPile.setSelectionMode(2);
+                                this.addActionButton('button_reset_selection', _('Reset selection'), 'onCancelSelection');
+                                break;
+                            case this.POISONED_GIFT:
+                            case this.HOT_POTATO:
+                                this.setSelectionModeOnHandStocks(1);
+                                break;
                         }
                         break;
-                    /*               
-                 Example:
- 
-                 case 'myGameState':
-                    
-                    // Add 3 action buttons in the action status bar:
-                    
-                    this.addActionButton( 'button_1_id', _('Button 1 label'), 'onMyMethodToCall1' ); 
-                    this.addActionButton( 'button_2_id', _('Button 2 label'), 'onMyMethodToCall2' ); 
-                    this.addActionButton( 'button_3_id', _('Button 3 label'), 'onMyMethodToCall3' ); 
-                    break;
-*/
+
+                    default:
+                        break;
                 }
+            } else {
+                this.disableAllStocks();
             }
         },
 
         ///////////////////////////////////////////////////
         //// Utility methods
 
-        /*
-        
-            Here, you can defines some utility methods that you can use everywhere in your javascript
-            script.
-        
-        */
         createStock: function (divName) {
             var stock = new dobble.stock(this, divName);
-            stock.setSelectionMode(1);
+            stock.setSelectionMode(0);
             return stock;
         },
 
@@ -368,35 +352,39 @@ define([
                 dojo.byId(phraseDiv).innerHTML = phrase;
             }
         },
-                                
-        /*   setupZones: function( card_div, card_type_id, card_id ){
-       // Note that "card_type_id" contains the type of the item, so you can do special actions depending on the item type
-            console.log("card_id", card_id);
-            
-       // Add some custom HTML content INSIDE the Stock item:
-       var svgId="svg"+card_type_id;
-            if(!dojo.byId(svgId)){
-            var svg = this.format_block('jstpl_svg', {svgId: svgId});
-            dojo.query("#"+card_div.id).wrap(svg);
-            
-            var zones = this.cardsDescription[card_type_id].zones;
-            if (!zones) {
-                zones = {
-                    "0": "0,0 100,0 100,100 0,100", "1": "50,0 100,0 100,100 0,100", "2": "200,0 100,0 100,100 0,100", "3": "300,0 100,0 100,100 0,100",
-                    "4": "0,0 100,0 100,100 0,100", "5": "0,0 100,0 100,100 0,100", "6": "0,0 100,0 100,100 0,100", "7": "100 100, 200 200",};
+      
+        setSelectionModeOnHandStocks: function (selectionMode) {
+            for (var player_id in this.playerHands) {
+                var stock = this.playerHands[player_id];
+                stock.setSelectionMode(selectionMode);
             }
-            for (const i in zones) {
-                            var zoneContent = this.format_block('jstpl_svg_zone', {
-                    zoneId: svgId+"_polygone_"+i,
-                    polygonPoints: zones[i],
-                });
-                console.log(zoneContent);
-                dojo.place(zoneContent, svgId);
+        },
+
+        disableAllStocks: function () {
+            //disable selection
+            if (this.playerHandIsDisplayed()) {
+                this.playerHand.setSelectionMode(0);
             }
-                dojo.destroy(card_div.id);
+            if (this.patternIsDisplayed()) {
+                this.patternPile.setSelectionMode(0);
             }
-    },
-*/
+            if (this.opponentsHandsAreDisplayed()) {
+                this.setSelectionModeOnHandStocks(0);
+            }
+        },
+
+        playerHandIsDisplayed: function () {
+            return this.minigame == this.WELL || this.minigame == this.TOWERING_INFERNO || this.minigame == this.HOT_POTATO;
+        },
+
+        patternIsDisplayed: function () {
+            return this.minigame == this.WELL || this.minigame == this.TOWERING_INFERNO || this.minigame == this.POISONED_GIFT || this.minigame == this.TRIPLET;
+        },
+
+        opponentsHandsAreDisplayed: function () {
+            return this.minigame == this.POISONED_GIFT || this.minigame == this.HOT_POTATO;
+        },
+
         ///////////////////////////////////////////////////
         //// Player's action
 
@@ -500,7 +488,6 @@ define([
          */
         onSelectOpponentHand: function (control_name, item_id) {
             var clickedStock = null;
-            var clickedPlayerId = null;
             for (var player_id in this.playerHands) {
                 var stock = this.playerHands[player_id];
                 if (stock.control_name == control_name) {
@@ -633,6 +620,7 @@ define([
 
         notifSpotFailed: function (notif) {
             console.log("notifSpotFailed", notif);
+            //adds shake effect
             var cards = this.selectedCardDivs;
             if (cards) {
                 for (const card of cards) {
