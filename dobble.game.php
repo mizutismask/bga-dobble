@@ -140,6 +140,9 @@ class Dobble extends Table
         $result['minigame'] = $this->getMiniGame();
         $result['counters'] = $this->argCardsCounters();
         $result['cardsDescription'] = $this->cards_description;
+        if($this->getMiniGame()==HOT_POTATO){
+            $result[ 'roundNumber'] = self::getGameStateValue(GS_CURRENT_ROUND);
+        }
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
 
         return $result;

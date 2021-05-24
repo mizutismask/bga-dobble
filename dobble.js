@@ -91,6 +91,12 @@ define([
                     }
                 }
             }
+
+            if (this.minigame == this.HOT_POTATO) {
+                var divRound = this.format_block("jstpl_round", { roundText: _("Round"),roundNb: gamedatas.roundNumber });
+                dojo.place(divRound, "right-side-second-part","before");
+            }
+
             this.updateCountersIfPossible(gamedatas.counters);
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
@@ -611,6 +617,7 @@ define([
             for (const [id, score] of Object.entries(scores)) {
                 this.scoreCtrl[id].setValue(score);
             }
+            dojo.byId("roundNb").innerHTML = roundNumber;
         },
 
         notifSpotFailed: function (notif) {
