@@ -454,15 +454,10 @@ define([
                         break;
                     case this.POISONED_GIFT:
                     case this.HOT_POTATO:
-                        if (!this.getSelectedPlayer(divId)) {
-                            this.showMessage(_("You have to select a player first"), "error");
-                        } else {
-                            this.ajaxcallwrapper("chooseSymbolWithPlayer", {
-                                symbol: symbol,
-                                player_id: this.getSelectedPlayer(divId),
-                            });
-                        }
-
+                        this.ajaxcallwrapper("chooseSymbolWithPlayer", {
+                            symbol: symbol,
+                            player_id: this.getSelectedPlayer(divId),
+                        });
                         break;
                     case this.TRIPLET:
                         if (selected) {
