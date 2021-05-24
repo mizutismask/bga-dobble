@@ -14,13 +14,31 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
             this.div = div;
             this.setSelectionMode(1);
             this.divByCardMap = new Map();
+            this.emptyDiv = div+"-emptyCard";
+            
+            this.createEmptyCard();
+            
         },
         onButtonClick(event) {
             console.log("onButtonClick", event);
         },
 
+        createEmptyCard() {
+            var cardId = this.emptyDiv;
+            var divCard = this.game.format_block("jstpl_card", { cardId: cardId });
+            dojo.place(divCard, this.div);
+            dojo.setAttr(cardId, "data-card-id", -1);
+            dojo.setAttr(cardId, "data-card-type", "empty");
+            dojo.addClass( cardId,"card_size");
+        },
+
         addCards(cards, from = undefined, replaceContent = false) {
-            console.log("add cards on div", this.div,"from",from);
+            if (cards && cards.length && dojo.byId(this.emptyDiv)) {
+                console.log("destroy",this.emptyDiv);
+                dojo.destroy(this.emptyDiv);
+            }
+
+            console.log("add cards on div", this.div,"from",from, cards);
             for (var card of cards) {
                 if (from) {
                     this.game.attachToNewParent(from, this.div);
@@ -83,6 +101,8 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
         removeAll() {
             dojo.empty(this.div);
             this.divByCardMap = new Map();
+
+            this.createEmptyCard();
         },
 
         onClickZone(evt) {
