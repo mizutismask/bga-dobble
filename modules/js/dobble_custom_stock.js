@@ -29,7 +29,8 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
             dojo.place(divCard, this.div);
             dojo.setAttr(cardId, "data-card-id", -1);
             dojo.setAttr(cardId, "data-card-type", "empty");
-            dojo.addClass( cardId,"card_size");
+            dojo.addClass(cardId, "card_size");
+            dojo.addClass( cardId,"empty_card");
         },
 
         addCards(cards, from = undefined, replaceContent = false) {

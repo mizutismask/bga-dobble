@@ -194,6 +194,11 @@ html{
     filter:progid:DXImageTransform.Microsoft.Shadow(color=#656565, Direction=134, Strength=30);  
 }
 
+/*yellow f7d639 and violet 876998*/
+.empty_card{
+  background-color: #d9d4db;
+}
+
 @media only screen and (min-width: 1100px) {
   .minigame5 #pattern_pile{
     display: grid;
@@ -521,7 +526,6 @@ html{
   .symbol.symbol-57{
     background-position: 77.77% 100%;
 }
-/*yellow f7d639 and violet 876998*/
 
 @keyframes shake-slow {
 			20% { transform: translate(-30px); }
