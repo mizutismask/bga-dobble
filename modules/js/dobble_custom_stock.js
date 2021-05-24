@@ -20,24 +20,11 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
         },
 
         addCards(cards, from = undefined, replaceContent = false) {
-            console.log("add cards on div", this.div);
+            console.log("add cards on div", this.div,"from",from);
             for (var card of cards) {
                 if (from) {
-                    console.log("animate ", from);
-                    var animation = dojo.fx.slideTo({
-                        node: from,
-                        top: 150,
-                        left: 160,
-                        unit: "px",
-                    });
-                    // var animation = coreFx.fadeOut({ node: from });
-                    dojo.connect(animation, "onEnd", this, function () {
-                        console.log("setupCardAndZones");
-                        this.removeAll();
-                        this.setupCardAndZones(card);
-                    });
-                    console.log("animation.play");
-                    animation.play();
+                    this.game.attachToNewParent(from, this.div);
+                    this.game.slideToObjectPos( from, this.div,0,0 ).play();   	
                 } else {
                     this.setupCardAndZones(card);
                 }
@@ -49,7 +36,7 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
         },
 
         setupCardAndZones(card) {
-            var cardId = this.div + "-card-" + card.id; //todo card.id;
+            var cardId = "card-" + card.id;
             var divCard = this.game.format_block("jstpl_card", { cardId: cardId });
             dojo.place(divCard, this.div);
             dojo.setAttr(cardId, "data-card-id", card.id);

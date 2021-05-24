@@ -36,6 +36,7 @@ if (!defined('DECK_LOC_DECK')) {
     define("NOTIF_PLAYER_TURN", "playerTurn");
     define("NOTIF_NEW_ROUND", "newRound");
     define("NOTIF_HAND_CHANGE", "handChange");
+    define("NOTIF_SPOT_FAILED", "spotFailed");
 
     // constants for game states
     define("GS_CURRENT_ROUND", "currentRound");
@@ -366,7 +367,7 @@ class Dobble extends Table
                 break;
             case HOT_POTATO:
                 //template here is the opponent card
-                $cardsNb = $this->deck->countCardInLocation(DECK_LOC_WON, $player_id)+1;
+                $cardsNb = $this->deck->countCardInLocation(DECK_LOC_WON, $player_id) + 1;
                 $this->deck->moveAllCardsInLocation(DECK_LOC_WON, DECK_LOC_WON, $player_id, $opponent_player_id);
                 $this->deck->moveCard($template["id"], DECK_LOC_WON, $opponent_player_id);
                 $this->deck->moveCard($myCard["id"], DECK_LOC_HAND, $opponent_player_id);
@@ -421,6 +422,7 @@ class Dobble extends Table
     {
         self::incStat(1, "symbols_failed", $player_id);
         $this->gamestate->setPlayerNonMultiactive($player_id, TRANSITION_PLAYER_TURN); // deactivate player; if none left, reactivates everyone
+        self::notifyPlayer($player_id, NOTIF_SPOT_FAILED, '', array());
     }
 
     function incScore($player_id, $incValue)
@@ -816,7 +818,7 @@ class Dobble extends Table
             case HOT_POTATO:
                 $currentRound = self::getGameStateValue(GS_CURRENT_ROUND);
                 self::setGameStateValue(GS_CURRENT_ROUND, $currentRound + 1); //update the round to have a correct progression, means that the previous round is over
-                
+
                 //checks if it's the end of the game
                 if ($currentRound == $this->getRoundsNumber()) {
                     self::trace("*******************************TRANSITION_END_GAME");

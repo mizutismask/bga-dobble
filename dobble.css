@@ -521,7 +521,21 @@ html{
   .symbol.symbol-57{
     background-position: 77.77% 100%;
 }
-/*yellow f7d639 and violet 876998
+/*yellow f7d639 and violet 876998*/
 
+@keyframes shake-slow {
+			20% { transform: translate(-30px); }
+			40% { transform: translate(15px); }
+			60% { transform: translate(-15px); }
+			80% { transform: translate(8px); }
+			100% { origin-transform: translate(0px); }
+}
 
-
+.shake {
+  display: inherit;
+  transform-origin: center center; 
+  animation-name: shake-slow;
+  animation-duration: 0.4s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: 1; 
+}

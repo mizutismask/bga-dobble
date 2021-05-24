@@ -124,7 +124,7 @@ define([
                         case this.POISONED_GIFT:
                         case this.TRIPLET:
                             var patterns = args.args.pattern;
-                            this.patternPile.removeAll();
+                           this.patternPile.removeAll();
                             this.addCardsToStock(patterns, this.patternPile, false);
                             if (!this.isCurrentPlayerActive()) {
                                 this.patternPile.setSelectionMode(0);
@@ -314,7 +314,7 @@ define([
                 fromDiv = "player_hand_stock_" + playerId;
             }
             if (card) {
-                fromDiv += "-card-" + card.id;
+                fromDiv = "card-" + card.id;
             }
             console.log("fromDiv ", fromDiv);
             return fromDiv;
@@ -448,7 +448,10 @@ define([
             var symbol = dojo.getAttr(evt.currentTarget.id, "data-symbol");
             console.log("evt.currentTarget.id", evt.currentTarget.id);
             console.log("onChooseSymbol ", symbol);
-
+            
+            //store selected divs to shake in case of error
+            this.selectedCardDivs = dojo.query(".card > .stockitem_selected").map((div) => div.id);
+           
             // Preventing default browser reaction
             dojo.stopEvent(evt);
 
@@ -551,6 +554,8 @@ define([
             dojo.subscribe("cardsMove", this, "notifCardsMove");
             
             dojo.subscribe('newRound', this, "notifNewRound");
+            dojo.subscribe('spotFailed', this, "notifSpotFailed");
+            
         },
 
         // TODO: from this point and below, you can write your game notifications handling methods
@@ -570,7 +575,7 @@ define([
                 case this.TOWERING_INFERNO:
                     for (var card of cards) {
                         if (from == "pattern") {
-                            from = "pattern_pile-card-" + card.id;
+                            from = "card-" + card.id;
                         }
                         if (to == this.player_id) {
                             this.playerHand.removeAll();
@@ -582,7 +587,7 @@ define([
                     var newHand = notif.args.newHand;
                     for (var card of cards) {
                         if (from == this.player_id) {
-                            var fromDiv = "myhand-card-" + card.id;
+                            var fromDiv = "card-" + card.id;
 
                             this.patternPile.removeAll();
                             this.patternPile.addCard(card, fromDiv);
@@ -597,7 +602,7 @@ define([
                 case this.POISONED_GIFT:
                    for (var card of cards) {
                         if (from == "pattern") {
-                            from = "pattern_pile-card-" + card.id;
+                            from = "card-" + card.id;
                         }
 
                         this.playerHands[to].removeAll();
@@ -623,6 +628,16 @@ define([
             console.log("round", roundNumber);
             for (const [id, score] of Object.entries(scores)) {
                 this.scoreCtrl[id].setValue(score);
+            }
+        },
+
+        notifSpotFailed: function (notif) {
+            console.log("notifSpotFailed", notif);
+            var cards = this.selectedCardDivs;
+            if (cards) {
+                for (const card of cards) {
+                    dojo.addClass(card, "shake");
+                }
             }
         }
     });
