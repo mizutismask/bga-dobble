@@ -311,6 +311,7 @@ define([
         },
 
         stockContentIsDifferentFromHand: function (playerStock, cardsFromHand) {
+            
             if (playerStock.count() != cardsFromHand.length) return true;
 
             for (const card of cardsFromHand) {
@@ -543,6 +544,9 @@ define([
             
             dojo.subscribe('newRound', this, "notifNewRound");
             dojo.subscribe('spotFailed', this, "notifSpotFailed");
+
+            this.notifqueue.setSynchronous( 'cardsMove', 1000 );//carefull, card move must be finished before new round changes cards
+            this.notifqueue.setSynchronous( 'newRound', 800 );
             
         },
 

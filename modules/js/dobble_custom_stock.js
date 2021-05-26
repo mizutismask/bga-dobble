@@ -35,15 +35,18 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
 
         addCards(cards, from = undefined, replaceContent = false) {
             if (cards && cards.length && dojo.byId(this.emptyDiv)) {
-                console.log("destroy",this.emptyDiv);
                 dojo.destroy(this.emptyDiv);
             }
 
             console.log("add cards on div", this.div,"from",from, cards);
             for (var card of cards) {
                 if (from) {
+                    //change the parent because the object needs to exist during animation, so the previous stock can not delete it
                     this.game.attachToNewParent(from, this.div);
-                    this.game.slideToObjectPos( from, this.div,0,0 ).play();   	
+                    //animates the src object
+                    var animation_id = this.game.slideToObjectPos(from, this.div, 0, 0);
+                    dojo.connect(animation_id, 'onEnd', dojo.hitch(this, 'resetCardAfterSlide', from,card));//changes the slided object by the real one
+                    animation_id.play();
                 } else {
                     this.setupCardAndZones(card);
                 }
@@ -54,6 +57,12 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
             }
         },
 
+        // this will be called after the animation ends
+        resetCardAfterSlide: function(from,card) {
+            dojo.destroy(from);//destroys the clone made by attachToNewParent who does not respond to clicks
+            this.setupCardAndZones(card);//recreate a working card
+        },
+        
         setupCardAndZones(card) {
             var cardId = "card-" + card.id;
             var divCard = this.game.format_block("jstpl_card", { cardId: cardId });
@@ -66,7 +75,7 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
 
             console.log("card", card);
             var zones = this.game.cardsDescription[card.type].zones;
-            console.log("desc", this.game.cardsDescription[card.type]);
+            //console.log("desc", this.game.cardsDescription[card.type]);
 
             for (const i in zones) {
                 var z = zones[i];
