@@ -208,9 +208,13 @@ html {
     max-width: 100vmin;
   }
 
-  .minigame3 .card_size {
+  .minigame4 .card_size, .minigame3 .card_size {
     width: var(--minigame3-card-width);
     padding-top: var(--minigame3-card-width);
+  }
+
+  .minigame4 #pattern_pile {
+    min-width: var(--minigame3-4-card-width);
   }
 }
 
