@@ -69,7 +69,10 @@ class view_dobble_dobble extends game_view
     $this->page->begin_block($template, "myHand");
 
     if ($miniGame == WELL || $miniGame == TOWERING_INFERNO || $miniGame == HOT_POTATO) {
-      $this->page->insert_block("myHand", array("PLAYER_ID" => $current_player_id));
+      $this->page->insert_block("myHand", array(
+        "PLAYER_ID" => $current_player_id,
+        "PLAYER_COLOR" => $players[$current_player_id]['player_color'],
+      ));
     }
 
     if ($miniGame == WELL || $miniGame == TOWERING_INFERNO || $miniGame == POISONED_GIFT || $miniGame == TRIPLET) {

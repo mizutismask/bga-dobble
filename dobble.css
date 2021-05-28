@@ -82,6 +82,12 @@ html{
   flex-wrap: wrap;
 }
 
+#pile-description{
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5em;
+}
+
 .stockitem_selected {
 	/*border: 4px solid #876998 ! important;
     /border-radius: 50%;*/
@@ -107,6 +113,7 @@ html{
     color: #876998;
     font-size: x-large;
     font-weight: bold;
+    display: inline;
 }
 
 .dbl_counter_prefix{
