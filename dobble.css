@@ -69,12 +69,17 @@
 html{
   background: url('img/fond.jpg');
 }
-#opponents_wrapper
+#piles
 { 
     display: inline-flex;
     flex-wrap: wrap;
     column-gap: 5px;
     width: 100%;
+}
+
+#players_wrap{
+  display: contents;
+  flex-wrap: wrap;
 }
 
 .stockitem_selected {

@@ -51,7 +51,7 @@ define([
             this.cardsDescription = gamedatas.cardsDescription;
             this.minigame = parseInt(gamedatas.minigame);
             // Setting up player boards
-            dojo.addClass("mainLine", "minigame" + this.minigame);
+            dojo.addClass("piles", "minigame" + this.minigame);
             console.log("minigame ", this.minigame);
 
             // TODO: Set up your game interface here, according to "gamedatas"
