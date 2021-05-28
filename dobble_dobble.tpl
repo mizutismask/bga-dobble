@@ -27,7 +27,7 @@
 
 <div id="piles">
     <!-- BEGIN pattern -->
-    <div id="pattern_pile_wrap" class="whiteblock">
+    <div id="pattern_pile_wrap" class="dbl_whiteblock whiteblock">
         <div id="pattern_pile">
         </div>
         <div id="pile-description">
@@ -42,7 +42,7 @@
 
     <div id="players_wrap">
         <!-- BEGIN myHand -->
-        <div id="myhand_wrap" class="whiteblock">
+        <div id="myhand_wrap" class="dbl_whiteblock whiteblock">
             <div id="myhand">
             </div>
             <div id="pile-description">
@@ -58,7 +58,7 @@
         <!-- END myHand -->
 
         <!-- BEGIN player -->
-        <div id="player_hand_{PLAYER_ID}" class="whiteblock">
+        <div id="player_hand_{PLAYER_ID}" class="dbl_whiteblock whiteblock">
             <div class="playerHand" id="player_hand_stock_{PLAYER_ID}">
             </div>
             <div id="pile-description">
