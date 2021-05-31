@@ -58,7 +58,8 @@ define([
             if (
                 this.minigame == this.WELL ||
                 this.minigame == this.TOWERING_INFERNO ||
-                this.minigame == this.HOT_POTATO
+                this.minigame == this.HOT_POTATO||
+                this.minigame == this.POISONED_GIFT 
             ) {
                 //---------- Player hand setup
                 this.playerHand = this.createStock("myhand");
@@ -83,7 +84,6 @@ define([
                 for (var player_id of gamedatas.playerorder) {
                     if (player_id != this.player_id) {
                         playerHand = this.createStock("player_hand_stock_" + player_id);
-                        //playerHand.setSelectionMode(1);
                         this.addCardsToStock(gamedatas.pattern, playerHand);
 
                         dojo.connect(playerHand, "onChangeSelection", this, "onSelectOpponentHand");
@@ -91,6 +91,11 @@ define([
                     }
                 }
             }
+
+           /* if (this.minigame == this.POISONED_GIFT) {
+                this.playerHand = this.createStock("myhand");
+                this.addCardsToStock(gamedatas.hand, this.playerHand);
+            }*/
 
             if (this.minigame == this.HOT_POTATO) {
                 var divRound = this.format_block("jstpl_round", { roundText: _("Round"),roundNb: gamedatas.roundNumber });
@@ -596,10 +601,9 @@ define([
                         if (from == "pattern") {
                             from = "card-" + card.id;
                         }
-                       if (this.playerHands[to]) {
-                           this.playerHands[to].removeAll();
-                           this.playerHands[to].addCard(card, from);
-                        }
+                        var toStock = this.getPlayerStock(to);
+                        toStock.removeAll();
+                        toStock.addCard(card, from);
                     }
                     break;
                 case this.HOT_POTATO:

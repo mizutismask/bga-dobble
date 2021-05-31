@@ -93,6 +93,14 @@ class view_dobble_dobble extends game_view
       }
     }
 
+    //player hand setup after opponents hands since it's not usefull except for info
+    if ($miniGame == POISONED_GIFT) {
+      $this->page->insert_block("myHand", array(
+        "PLAYER_ID" => $current_player_id,
+        "PLAYER_COLOR" => $players[$current_player_id]['player_color'],
+      ));
+    }
+
 
     /*********** Do not change anything below this line  ************/
   }
