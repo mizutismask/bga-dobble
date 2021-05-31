@@ -220,7 +220,7 @@ html {
   }
 
   .minigame4 #pattern_pile {
-    min-width: var(--minigame3-4-card-width);
+    min-width: var(--minigame3-card-width);
   }
 }
 
