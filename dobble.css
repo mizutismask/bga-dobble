@@ -93,7 +93,6 @@ html {
   width: 100%;
 }
 
-
 #players_wrap {
   display: contents;
   flex-wrap: wrap;
@@ -113,16 +112,6 @@ html {
   filter: sepia(90%);
 }
 
-.stockitem {
-  border: 1px solid black;
-  border-radius: 50%;
-  -moz-box-shadow: 5px 5px 5px 0px rgba(0, 0, 0, 0.4);
-  -webkit-box-shadow: 5px 5px 5px 0px rgba(0, 0, 0, 0.4);
-  -o-box-shadow: 5px 5px 5px 0px rgba(0, 0, 0, 0.4);
-  box-shadow: 5px 5px 5px 0px rgba(0, 0, 0, 0.4);
-  filter: progid:DXImageTransform.Microsoft.Shadow(color=#656565, Direction=134, Strength=30);
-}
-
 .stockitem_unselectable {
   cursor: none;
 }
@@ -138,12 +127,12 @@ html {
   margin-right: -6px;
 }
 
-.card_size {
+.dbl_card_size {
   width: var(--classic-card-width);
   padding-top: var(--classic-card-width);
 }
 
-.minigame5 .card_size {
+.minigame5 .dbl_card_size {
   width: var(--minigame5-card-width);
   padding-top: var(--minigame5-card-width);
 }
@@ -168,18 +157,18 @@ html {
   grid-column: 1 / 1;
 }
 
-.minigame3 .card_size {
+.minigame3 .dbl_card_size {
   width: var(--mobile-minigame3-4-card-width);
   padding-top: var(--mobile-minigame3-4-card-width);
 }
 
-.minigame4 .card_size {
+.minigame4 .dbl_card_size {
   width: var(--mobile-minigame3-4-card-width);
   padding-top: var(--mobile-minigame3-4-card-width);
 }
 
 .card {
-  border: 1px solid black;
+  border: 2px solid rgb(85, 85, 85);
   border-radius: 50%;
   position: relative;
   background-color: white;
@@ -190,26 +179,36 @@ html {
   filter: progid:DXImageTransform.Microsoft.Shadow(color=#656565, Direction=134, Strength=30);
 }
 
+#myhand_wrap .card,
+.minigame4 #pattern_pile .card{
+  border: 2px solid #886a95;
+  -moz-box-shadow: 5px 5px 5px 0px rgba(136, 106, 149, 1);
+  -webkit-box-shadow: 5px 5px 5px 0px rgba(136, 106, 149, 1);
+  -o-box-shadow: 5px 5px 5px 0px rgba(136, 106, 149, 1);
+  box-shadow: 5px 5px 5px 0px rgba(136, 106, 149, 1);
+  filter: progid:DXImageTransform.Microsoft.Shadow(color=#886a95, Direction=134, Strength=30);
+}
 /*yellow f7d639 and violet 876998*/
-.empty_card {
+.dbl_empty_card {
   background-color: #d9d4db;
 }
 
-.roundNbWrapper {
+.dbl_roundNb {
   color: #876998;
   text-align: center;
   font-weight: bolder;
   margin-top: 1em;
 }
 
-@media only screen and (min-device-width : 768px){
+@media only screen and (min-device-width: 768px) {
   .minigame5 #pattern_pile {
     display: grid;
     grid-template-columns: repeat(auto-fit, 25vmin);
     max-width: 100vmin;
   }
 
-  .minigame4 .card_size, .minigame3 .card_size {
+  .minigame4 .dbl_card_size,
+  .minigame3 .dbl_card_size {
     width: var(--minigame3-card-width);
     padding-top: var(--minigame3-card-width);
   }
