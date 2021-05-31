@@ -596,9 +596,10 @@ define([
                         if (from == "pattern") {
                             from = "card-" + card.id;
                         }
-
-                        this.playerHands[to].removeAll();
-                        this.playerHands[to].addCard(card, from);
+                       if (this.playerHands[to]) {
+                           this.playerHands[to].removeAll();
+                           this.playerHands[to].addCard(card, from);
+                        }
                     }
                     break;
                 case this.HOT_POTATO:
