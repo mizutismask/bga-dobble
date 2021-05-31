@@ -251,7 +251,7 @@ define([
             }
             args.lock = true;
 
-            //if (this.checkAction(action)) {
+            if (this.checkAction("playCard")) {
             this.ajaxcall(
                 "/" + this.game_name + "/" + this.game_name + "/" + action + ".html",
                 args, //
@@ -259,7 +259,7 @@ define([
                 (result) => { },
                 handler
             );
-            //}
+            }
         },
 
         getSelectedPlayer: function (clickedStockDiv) {

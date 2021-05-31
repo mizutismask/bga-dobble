@@ -694,6 +694,9 @@ class Dobble extends Table
 
     function chooseSymbolWithTriplet($symbol, $card1Id, $card2Id, $card3Id)
     {
+        // Check that this is the player's turn and that it is a "possible action" at this game state (see states.inc.php)
+        self::checkAction('playCard');
+
         if ($this->getMiniGame() == TRIPLET) {
             $player_id = self::getCurrentPlayerId();
             $card1 = $this->deck->getCard($card1Id);
