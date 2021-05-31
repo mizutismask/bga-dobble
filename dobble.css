@@ -188,6 +188,12 @@ html {
   box-shadow: 5px 5px 5px 0px rgba(136, 106, 149, 1);
   filter: progid:DXImageTransform.Microsoft.Shadow(color=#886a95, Direction=134, Strength=30);
 }
+
+/*player hand setup after opponents hands since it's not usefull except for info */
+.minigame4 #myhand_wrap{
+  order: 9;
+}
+
 /*yellow f7d639 and violet 876998*/
 .dbl_empty_card {
   background-color: #d9d4db;

@@ -92,11 +92,6 @@ define([
                 }
             }
 
-           /* if (this.minigame == this.POISONED_GIFT) {
-                this.playerHand = this.createStock("myhand");
-                this.addCardsToStock(gamedatas.hand, this.playerHand);
-            }*/
-
             if (this.minigame == this.HOT_POTATO) {
                 var divRound = this.format_block("jstpl_round", { roundText: _("Round"),roundNb: gamedatas.roundNumber });
                 dojo.place(divRound, "right-side-second-part","before");
