@@ -14,10 +14,34 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
             this.div = div;
             this.setSelectionMode(1);
             this.divByCardMap = new Map();
-            this.emptyDiv = div+"-emptyCard";
-            
+            this.emptyDiv = div + "-emptyCard";
+
             this.createEmptyCard();
-            
+
+
+            // Options for the observer (which mutations to observe)
+            const config = { attributes: false, childList: true, subtree: false };
+
+            // Callback function to execute when mutations are observed
+            const callback = function (mutationsList, observer) {
+                for (const mutation of mutationsList) {
+                    if (mutation.type === 'childList' && mutation.removedNodes.length>0) {
+                            for (const removed of mutation.removedNodes) {
+                                //console.log("mutation", mutation, removed);
+                                if (dojo.hasClass(removed, "card")) {
+                                    console.log('A child card has been removed from', div ,removed);
+
+                                }
+                            }
+                    }
+                }
+            };
+
+            // Create an observer instance linked to the callback function
+            this.observer = new MutationObserver(callback);
+
+            // Start observing the target node for configured mutations
+            this.observer.observe($(div), config);
         },
         onButtonClick(event) {
             console.log("onButtonClick", event);
@@ -30,7 +54,7 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
             dojo.setAttr(cardId, "data-card-id", -1);
             dojo.setAttr(cardId, "data-card-type", "empty");
             dojo.addClass(cardId, "dbl_card_size");
-            dojo.addClass( cardId,"dbl_empty_card");
+            dojo.addClass(cardId, "dbl_empty_card");
         },
 
         addCards(cards, from = undefined, replaceContent = false) {
@@ -38,14 +62,14 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
                 dojo.destroy(this.emptyDiv);
             }
 
-            console.log("add cards on div", this.div,"from",from, cards);
+            console.log("add cards on div", this.div, "from", from, cards);
             for (var card of cards) {
                 if (from) {
                     //change the parent because the object needs to exist during animation, so the previous stock can not delete it
                     this.game.attachToNewParent(from, this.div);
                     //animates the src object
                     var animation_id = this.game.slideToObjectPos(from, this.div, 0, 0);
-                    dojo.connect(animation_id, 'onEnd', dojo.hitch(this, 'resetCardAfterSlide', from,card));//changes the slided object by the real one
+                    dojo.connect(animation_id, 'onEnd', dojo.hitch(this, 'resetCardAfterSlide', from, card));//changes the slided object by the real one
                     animation_id.play();
                 } else {
                     this.setupCardAndZones(card);
@@ -58,22 +82,22 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
         },
 
         // this will be called after the animation ends
-        resetCardAfterSlide: function(from,card) {
+        resetCardAfterSlide: function (from, card) {
             dojo.destroy(from);//destroys the clone made by attachToNewParent who does not respond to clicks
             this.setupCardAndZones(card);//recreate a working card
         },
-        
+
         setupCardAndZones(card) {
             var cardId = "card-" + card.id;
             var divCard = this.game.format_block("jstpl_card", { cardId: cardId });
             dojo.place(divCard, this.div);
             dojo.setAttr(cardId, "data-card-id", card.id);
             dojo.setAttr(cardId, "data-card-type", card.type);
-            dojo.addClass( cardId,"dbl_card_size");
+            dojo.addClass(cardId, "dbl_card_size");
 
             this.divByCardMap.set(card, cardId);
 
-            console.log("card", card);
+            console.log("setupCardAndZones", card);
             var zones = this.game.cardsDescription[card.type].zones;
             //console.log("desc", this.game.cardsDescription[card.type]);
 
@@ -137,8 +161,8 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
         },
 
         /**
-    Returns a list of card ids.
-    */
+        Returns a list of card ids.
+        */
         getSelectedItems() {
             var selectedCardDivs = dojo.query(".card > .stockitem_selected");
             console.log("selectedCardDivs", selectedCardDivs);
