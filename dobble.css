@@ -73,7 +73,7 @@
 .dbl_whiteblock {
   margin-top: 0px !important;
   border-radius: 8px;
-  background: rgba(184,224,103,0.9);
+  background: rgba(184, 224, 103, 0.9);
 }
 
 #pattern_pile {
@@ -114,7 +114,7 @@ html {
   align-items: baseline;
 }
 
-.pile-description div{
+.pile-description div {
   border-radius: 8px;
   padding: 0px 6px 0px 6px;
   background-color: whitesmoke;
@@ -209,6 +209,10 @@ html {
   order: 9;
 }
 
+.minigame5 .card_selected {
+  transform: scale(0.9);
+}
+
 /*yellow f7d639 and violet 876998*/
 .dbl_empty_card {
   background-color: #d9d4db;
@@ -233,7 +237,7 @@ html {
 }
 
 .dbl_hand_eye {
-  background-image: url('img/dobbleye.png');
+  background-image: url("img/dobbleye.png");
   width: 60px;
   height: 60px;
   background-size: 100%;
@@ -242,12 +246,12 @@ html {
   left: 72px;
 }
 
-.dbl_happy{
+.dbl_happy {
   top: -50px !important;
 }
 
 /* No hand on any phone or tablet. */
-@media only screen and (hover: none) and (pointer: coarse){
+@media only screen and (hover: none) and (pointer: coarse) {
   #dbl_dobble_hand {
     display: none;
   }

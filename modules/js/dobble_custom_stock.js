@@ -151,6 +151,7 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
                 dojo.query("#" + evt.currentTarget.parentElement.id + " .symbol").removeClass("stockitem_selected");
             }
             dojo.toggleClass(evt.currentTarget.id, "stockitem_selected");
+            dojo.toggleClass(evt.currentTarget.parentNode.id, "card_selected");
 
             console.log("onClickZone ", symbol);
             dojo.publish("onChangeSelection", [evt, newSelection, this.div]);
@@ -172,6 +173,7 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
 
         unselectAll() {
             dojo.query(this.getSymbolsQuery()).removeClass("stockitem_selected");
+            dojo.query(".card").removeClass("card_selected");
         },
 
         count() {

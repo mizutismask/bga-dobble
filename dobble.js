@@ -213,7 +213,7 @@ define([
                                 break;
                             case this.TRIPLET:
                                 this.patternPile.setSelectionMode(2);
-                                this.addActionButton('button_reset_selection', _('Reset selection'), 'onCancelSelection');
+                                this.addActionButton('button_reset_selection', _('Reset selection'), 'onResetSelection');
                                 break;
                             case this.POISONED_GIFT:
                             case this.HOT_POTATO:
@@ -535,8 +535,9 @@ define([
             }
         },
 
-        onCancelSelection: function (control_name) {
+        onResetSelection: function (control_name) {
             dojo.query(".symbol").removeClass("stockitem_selected");
+            dojo.query(".card").removeClass("card_selected");
         },
 
         ///////////////////////////////////////////////////
