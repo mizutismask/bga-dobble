@@ -27,11 +27,13 @@
 
 <div id="piles">
     <!-- BEGIN pattern -->
-    <div id="pattern_pile_wrap" class="dbl_whiteblock whiteblock">
+    <div id="pattern_pile_wrap" class="dbl_whiteblock whiteblock dbl_hand_wrap">
         <div id="pattern_pile">
         </div>
-        <div id="pile-description">
-            <h3 class="dbl_block_title">{PLAYING_ZONE}</h3>
+        <div class="pile-description">
+            <div>
+                <h3 class="dbl_block_title">{PLAYING_ZONE}</h3>
+            </div>
             <div class="dbl_cards_count_wrapper">
                 <span class="dbl_counter_prefix">x</span>
                 <span id="cards_count_pattern" class="dbl_cards_counter dbl_cards_count"></span>
@@ -42,10 +44,10 @@
 
     <div id="players_wrap">
         <!-- BEGIN myHand -->
-        <div id="myhand_wrap" class="dbl_whiteblock whiteblock">
+        <div id="myhand_wrap" class="dbl_whiteblock whiteblock dbl_hand_wrap">
             <div id="myhand">
             </div>
-            <div id="pile-description">
+            <div class="pile-description">
                 <div style="color:#{PLAYER_COLOR}">
                     <h3 class="dbl_block_title">{MY_HAND}</h3>
                 </div>
@@ -58,10 +60,10 @@
         <!-- END myHand -->
 
         <!-- BEGIN player -->
-        <div id="player_hand_{PLAYER_ID}" class="dbl_whiteblock whiteblock">
+        <div id="player_hand_{PLAYER_ID}" class="dbl_whiteblock whiteblock dbl_hand_wrap">
             <div class="playerHand" id="player_hand_stock_{PLAYER_ID}">
             </div>
-            <div id="pile-description">
+            <div class="pile-description">
                 <div style="color:#{PLAYER_COLOR}">
                     <h3 class="dbl_block_title">{PLAYER_NAME}</h3>
                 </div>

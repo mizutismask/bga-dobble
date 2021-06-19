@@ -72,6 +72,8 @@
 
 .dbl_whiteblock {
   margin-top: 0px !important;
+  border-radius: 8px;
+  background: rgba(184,224,103,0.9);
 }
 
 #pattern_pile {
@@ -83,7 +85,7 @@
 }
 
 html {
-  background: url("img/fond.jpg");
+  background: url("img/background.png");
 }
 
 #piles {
@@ -93,16 +95,28 @@ html {
   width: 100%;
 }
 
+.dbl_hand_wrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
 #players_wrap {
   display: contents;
   flex-wrap: wrap;
 }
 
-#pile-description {
+.pile-description {
   display: flex;
   justify-content: space-between;
   margin-top: 0.5em;
   align-items: baseline;
+}
+
+.pile-description div{
+  border-radius: 8px;
+  padding: 0px 6px 0px 6px;
+  background-color: whitesmoke;
 }
 
 .stockitem_selected {
@@ -180,7 +194,7 @@ html {
 }
 
 #myhand_wrap .card,
-.minigame4 #pattern_pile .card{
+.minigame4 #pattern_pile .card {
   border: 2px solid #886a95;
   -moz-box-shadow: 5px 5px 5px 0px rgba(136, 106, 149, 1);
   -webkit-box-shadow: 5px 5px 5px 0px rgba(136, 106, 149, 1);
@@ -190,7 +204,7 @@ html {
 }
 
 /*player hand setup after opponents hands since it's not usefull except for info */
-.minigame4 #myhand_wrap{
+.minigame4 #myhand_wrap {
   order: 9;
 }
 
