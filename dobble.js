@@ -58,8 +58,8 @@ define([
             if (
                 this.minigame == this.WELL ||
                 this.minigame == this.TOWERING_INFERNO ||
-                this.minigame == this.HOT_POTATO||
-                this.minigame == this.POISONED_GIFT 
+                this.minigame == this.HOT_POTATO ||
+                this.minigame == this.POISONED_GIFT
             ) {
                 //---------- Player hand setup
                 this.playerHand = this.createStock("myhand");
@@ -75,7 +75,7 @@ define([
                 this.patternPile = this.createStock("pattern_pile");
                 this.addCardsToStock(gamedatas.pattern, this.patternPile);
             }
-           
+
             dojo.subscribe("onChangeSelection", this, "onChooseSymbol");
 
             if (this.minigame == this.POISONED_GIFT || this.minigame == this.HOT_POTATO) {
@@ -93,9 +93,11 @@ define([
             }
 
             if (this.minigame == this.HOT_POTATO) {
-                var divRound = this.format_block("jstpl_round", { roundText: _("Round"),roundNb: gamedatas.roundNumber });
-                dojo.place(divRound, "right-side-second-part","before");
+                var divRound = this.format_block("jstpl_round", { roundText: _("Round"), roundNb: gamedatas.roundNumber });
+                dojo.place(divRound, "right-side-second-part", "before");
             }
+
+            this.setupDobbleHand();
 
             this.updateCountersIfPossible(gamedatas.counters);
             // Setup game notifications to handle (see "setupNotifications" method below)
@@ -252,13 +254,13 @@ define([
             args.lock = true;
 
             if (this.checkAction("playCard")) {
-            this.ajaxcall(
-                "/" + this.game_name + "/" + this.game_name + "/" + action + ".html",
-                args, //
-                this,
-                (result) => { },
-                handler
-            );
+                this.ajaxcall(
+                    "/" + this.game_name + "/" + this.game_name + "/" + action + ".html",
+                    args, //
+                    this,
+                    (result) => { },
+                    handler
+                );
             }
         },
 
@@ -311,7 +313,7 @@ define([
         },
 
         stockContentIsDifferentFromHand: function (playerStock, cardsFromHand) {
-            
+
             if (playerStock.count() != cardsFromHand.length) return true;
 
             for (const card of cardsFromHand) {
@@ -335,7 +337,7 @@ define([
 
         updateActionPhrase: function () {
             if (this.isCurrentPlayerActive()) {
-                
+
                 var phraseDiv = "pagemaintitletext";
                 var phrase;
                 switch (this.minigame) {
@@ -346,7 +348,7 @@ define([
                         phrase = _("Find the common symbol to be the first to get rid of all yours cards");
                         break;
                     case this.POISONED_GIFT:
-                        phrase = _("Find the common symbol with the opponent of your choice");
+                        phrase = _("Find the common symbol with the opponent of your choice and the central pile");
                         break;
                     case this.HOT_POTATO:
                         phrase = _("Find the common symbol with the opponent of your choice");
@@ -354,12 +356,12 @@ define([
                     case this.TRIPLET:
                         phrase = _("Find the common symbol on 3 cards until it's not possible anymore");
                         break;
-                        
+
                 }
                 dojo.byId(phraseDiv).innerHTML = phrase;
             }
         },
-      
+
         setSelectionModeOnHandStocks: function (selectionMode) {
             for (var player_id in this.playerHands) {
                 var stock = this.playerHands[player_id];
@@ -392,6 +394,30 @@ define([
             return this.minigame == this.POISONED_GIFT || this.minigame == this.HOT_POTATO;
         },
 
+        setupDobbleHand: function () {
+            if (this.minigame == this.WELL || this.minigame == this.TOWERING_INFERNO) {
+                let eye = document.querySelector(".dbl_hand_eye");
+                let eyeBoundingRect = eye.getBoundingClientRect();
+                let eyeCenter = {
+                    x: eyeBoundingRect.left + eyeBoundingRect.width / 2,
+                    y: eyeBoundingRect.top + eyeBoundingRect.height / 2
+                };
+                
+                document.addEventListener("mousemove", e => {
+                    let angle = 60 + Math.atan2(e.pageX - eyeCenter.x, - (e.pageY - eyeCenter.y)) * (180 / Math.PI);
+                    eye.style.transform = `rotate(${angle}deg)`;
+                })
+            }
+        },
+
+        animateDobbleHand: function () {
+            let dobble = document.getElementById("dbl_dobble_hand");
+            console.log("animate hand", dobble);
+            dobble.classList.add("dbl_happy");
+            window.setTimeout(() => {
+                dobble.classList.remove("dbl_happy");
+            }, 250);
+        },
         ///////////////////////////////////////////////////
         //// Player's action
 
@@ -443,10 +469,10 @@ define([
             var symbol = dojo.getAttr(evt.currentTarget.id, "data-symbol");
             console.log("evt.currentTarget.id", evt.currentTarget.id);
             console.log("onChooseSymbol ", symbol);
-            
+
             //store selected divs to shake in case of error
             this.selectedCardDivs = dojo.query(".card > .stockitem_selected").map((div) => div.id);
-           
+
             // Preventing default browser reaction
             dojo.stopEvent(evt);
 
@@ -541,13 +567,13 @@ define([
             //
             //evt from the stock
             dojo.subscribe("cardsMove", this, "notifCardsMove");
-            
+
             dojo.subscribe('newRound', this, "notifNewRound");
             dojo.subscribe('spotFailed', this, "notifSpotFailed");
 
-            this.notifqueue.setSynchronous( 'cardsMove', 1000 );//carefull, card move must be finished before new round changes cards
-            this.notifqueue.setSynchronous( 'newRound', 800 );
-            
+            this.notifqueue.setSynchronous('cardsMove', 1000);//carefull, card move must be finished before new round changes cards
+            this.notifqueue.setSynchronous('newRound', 800);
+
         },
 
         // TODO: from this point and below, you can write your game notifications handling methods
@@ -570,6 +596,7 @@ define([
                             from = "card-" + card.id;
                         }
                         if (to == this.player_id) {
+                            this.animateDobbleHand();
                             this.playerHand.removeAll();
                             this.playerHand.addCard(card, from);
                         }
@@ -579,10 +606,12 @@ define([
                     var newHand = notif.args.newHand;
                     for (var card of cards) {
                         if (from == this.player_id) {
+                            this.animateDobbleHand();
                             var fromDiv = "card-" + card.id;
 
                             this.patternPile.removeAll();
                             this.patternPile.addCard(card, fromDiv);
+
                         }
                     }
                     if (from == this.player_id && newHand) {
@@ -592,7 +621,7 @@ define([
                     }
                     break;
                 case this.POISONED_GIFT:
-                   for (var card of cards) {
+                    for (var card of cards) {
                         if (from == "pattern") {
                             from = "card-" + card.id;
                         }

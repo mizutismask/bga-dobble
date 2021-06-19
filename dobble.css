@@ -93,6 +93,7 @@ html {
   flex-wrap: wrap;
   column-gap: 5px;
   width: 100%;
+  justify-content: center;
 }
 
 .dbl_hand_wrap {
@@ -218,6 +219,38 @@ html {
   text-align: center;
   font-weight: bolder;
   margin-top: 1em;
+}
+
+#dbl_dobble_hand {
+  background-image: url("img/dobbleguy.png");
+  width: 224px;
+  height: 255px;
+  background-size: 100%;
+  position: relative;
+  top: 0;
+  transition: top 250ms ease-in-out;
+  align-self: center;
+}
+
+.dbl_hand_eye {
+  background-image: url('img/dobbleye.png');
+  width: 60px;
+  height: 60px;
+  background-size: 100%;
+  position: absolute;
+  top: 118px;
+  left: 72px;
+}
+
+.dbl_happy{
+  top: -50px !important;
+}
+
+/* No hand on any phone or tablet. */
+@media only screen and (hover: none) and (pointer: coarse){
+  #dbl_dobble_hand {
+    display: none;
+  }
 }
 
 @media only screen and (min-device-width: 768px) {

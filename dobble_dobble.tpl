@@ -42,6 +42,12 @@
     </div>
     <!-- END pattern -->
 
+    <!-- BEGIN dobbleHand -->
+    <div id="dbl_dobble_hand">
+        <div class="dbl_hand_eye"></div>
+    </div>
+    <!-- END dobbleHand -->
+
     <div id="players_wrap">
         <!-- BEGIN myHand -->
         <div id="myhand_wrap" class="dbl_whiteblock whiteblock dbl_hand_wrap">

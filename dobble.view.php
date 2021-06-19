@@ -66,6 +66,7 @@ class view_dobble_dobble extends game_view
     //declare blocks
     $this->page->begin_block($template, "player");
     $this->page->begin_block($template, "pattern");
+    $this->page->begin_block($template, "dobbleHand");
     $this->page->begin_block($template, "myHand");
 
     if ($miniGame == WELL || $miniGame == TOWERING_INFERNO || $miniGame == HOT_POTATO || $miniGame == POISONED_GIFT) {
@@ -77,6 +78,10 @@ class view_dobble_dobble extends game_view
 
     if ($miniGame == WELL || $miniGame == TOWERING_INFERNO || $miniGame == POISONED_GIFT || $miniGame == TRIPLET) {
       $this->page->insert_block("pattern", array());
+    }
+
+    if ($miniGame == WELL || $miniGame == TOWERING_INFERNO) {
+      $this->page->insert_block("dobbleHand", array());
     }
 
     if ($miniGame == POISONED_GIFT || $miniGame == HOT_POTATO) {
