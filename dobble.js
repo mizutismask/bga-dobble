@@ -101,7 +101,7 @@ define([
 
             this.setupDobbleHand();
 
-           // dojo.query("h3").lettering();
+            // dojo.query("h3").lettering();
 
             this.updateCountersIfPossible(gamedatas.counters);
             // Setup game notifications to handle (see "setupNotifications" method below)
@@ -429,9 +429,9 @@ define([
                 var pilesToRound;
                 if (this.minigame == this.POISONED_GIFT) {
                     dojo.addClass("pattern_pile_wrap", "circularPattern");
-                    pilesToRound=".dbl_hand_wrap:not(#pattern_pile_wrap)";
+                    pilesToRound = ".dbl_hand_wrap:not(#pattern_pile_wrap)";
                 } else {
-                    pilesToRound=".dbl_hand_wrap:not(#myhand_wrap)";
+                    pilesToRound = ".dbl_hand_wrap:not(#myhand_wrap)";
                 }
                 dojo.query(pilesToRound).forEach(function (node, i, listItems) {
                     var offsetAngle = 360 / listItems.length;
@@ -440,6 +440,15 @@ define([
                 });
             }
         },
+
+        /*
+        * Play a given sound that should be first added in the tpl file
+        */
+        playSound(sound, playNextMoveSound = true) {
+            playSound(sound);
+            playNextMoveSound && this.disableNextMoveSound();
+        },
+
         ///////////////////////////////////////////////////
         //// Player's action
 
@@ -619,6 +628,7 @@ define([
                             from = "card-" + card.id;
                         }
                         if (to == this.player_id) {
+                            this.playSound("matchSuccess", false);
                             this.animateDobbleHand();
                             this.playerHand.removeAll();
                             this.playerHand.addCard(card, from);
@@ -629,6 +639,7 @@ define([
                     var newHand = notif.args.newHand;
                     for (var card of cards) {
                         if (from == this.player_id) {
+                            this.playSound("matchSuccess", false);
                             this.animateDobbleHand();
                             var fromDiv = "card-" + card.id;
 
@@ -678,6 +689,7 @@ define([
 
         notifSpotFailed: function (notif) {
             console.log("notifSpotFailed", notif);
+            this.playSound("matchFailure", false);
             //adds shake effect
             var cards = this.selectedCardDivs;
             if (cards) {
