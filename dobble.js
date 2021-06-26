@@ -90,6 +90,8 @@ define([
                         this.playerHands[player_id] = playerHand;
                     }
                 }
+
+                this.layoutHandsInCircle();
             }
 
             if (this.minigame == this.HOT_POTATO) {
@@ -98,6 +100,8 @@ define([
             }
 
             this.setupDobbleHand();
+
+           // dojo.query("h3").lettering();
 
             this.updateCountersIfPossible(gamedatas.counters);
             // Setup game notifications to handle (see "setupNotifications" method below)
@@ -402,7 +406,7 @@ define([
                     x: eyeBoundingRect.left + eyeBoundingRect.width / 2,
                     y: eyeBoundingRect.top + eyeBoundingRect.height / 2
                 };
-                
+
                 document.addEventListener("mousemove", e => {
                     let angle = 60 + Math.atan2(e.pageX - eyeCenter.x, - (e.pageY - eyeCenter.y)) * (180 / Math.PI);
                     eye.style.transform = `rotate(${angle}deg)`;
@@ -417,6 +421,24 @@ define([
             window.setTimeout(() => {
                 dobble.classList.remove("dbl_happy");
             }, 250);
+        },
+
+        layoutHandsInCircle: function () {
+            if ($("piles").offsetWidth > 990) {
+                dojo.addClass("players_wrap", "circularLayout");
+                var pilesToRound;
+                if (this.minigame == this.POISONED_GIFT) {
+                    dojo.addClass("pattern_pile_wrap", "circularPattern");
+                    pilesToRound=".dbl_hand_wrap:not(#pattern_pile_wrap)";
+                } else {
+                    pilesToRound=".dbl_hand_wrap:not(#myhand_wrap)";
+                }
+                dojo.query(pilesToRound).forEach(function (node, i, listItems) {
+                    var offsetAngle = 360 / listItems.length;
+                    var rotateAngle = offsetAngle * i;
+                    dojo.style(node, "transform", "rotate(" + rotateAngle + "deg) translate(0, -350px) rotate(-" + rotateAngle + "deg)")
+                });
+            }
         },
         ///////////////////////////////////////////////////
         //// Player's action

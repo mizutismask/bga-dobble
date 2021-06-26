@@ -41,7 +41,7 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
             this.observer = new MutationObserver(callback);
 
             // Start observing the target node for configured mutations
-            this.observer.observe($(div), config);
+            //this.observer.observe($(div), config);
         },
         onButtonClick(event) {
             console.log("onButtonClick", event);

@@ -57,6 +57,7 @@
                 <div style="color:#{PLAYER_COLOR}">
                     <h3 class="dbl_block_title">{MY_HAND}</h3>
                 </div>
+            
                 <div class="dbl_cards_count_wrapper">
                     <span class="dbl_counter_prefix">x</span>
                     <span id="cards_count_{PLAYER_ID}" class="dbl_cards_counter dbl_cards_count"></span>

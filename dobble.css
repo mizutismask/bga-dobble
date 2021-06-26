@@ -102,6 +102,36 @@ html {
   justify-content: flex-end;
 }
 
+.circularLayout .dbl_hand_wrap {
+  position: absolute;
+  top: 40%;
+  left: 40%;
+}
+
+.circularLayout {
+  position: relative !important;
+  height: 101vh;
+  width: 100%;
+  display: block !important;
+}
+
+.circularLayout .pile-description, .circularPattern .pile-description {
+  justify-content: space-evenly;
+  font-size: large;
+}
+
+.circularLayout .dbl_whiteblock {
+  background: none;
+}
+
+/* minigame 4 only */
+.circularPattern {
+  position: absolute;
+  top: 40%;
+  left: 40%;
+  background: none;
+}
+
 #players_wrap {
   display: contents;
   flex-wrap: wrap;
@@ -111,7 +141,7 @@ html {
   display: flex;
   justify-content: space-between;
   margin-top: 0.5em;
-  align-items: baseline;
+  align-items: center;
 }
 
 .pile-description div {
