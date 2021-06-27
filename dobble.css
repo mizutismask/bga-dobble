@@ -104,8 +104,8 @@ html {
 
 .circularLayout .dbl_hand_wrap {
   position: absolute;
-  top: 40%;
-  left: 40%;
+  top: 33%;
+  left: 38%;
 }
 
 .circularLayout {
@@ -124,11 +124,11 @@ html {
   background: none;
 }
 
-/* minigame 4 only */
+/* minigame 3 only */
 .circularPattern {
   position: absolute;
-  top: 40%;
-  left: 40%;
+  top: 33%;
+  left: 38%;
   background: none;
 }
 

@@ -90,7 +90,7 @@ define([
                     }
                 }
 
-                this.layoutHandsInCircle();
+                this.layoutHandsInCircle(Object.keys(gamedatas.players).length);
             }
 
             if (this.minigame == this.HOT_POTATO) {
@@ -433,8 +433,8 @@ define([
             }, 250);
         },
 
-        layoutHandsInCircle: function () {
-            if ($("piles").offsetWidth > 990) {
+        layoutHandsInCircle: function (playerCount) {
+            if (playerCount>2 && $("piles").offsetWidth > 990) {
                 dojo.addClass("players_wrap", "circularLayout");
                 var pilesToRound;
                 if (this.minigame == this.POISONED_GIFT) {
@@ -446,7 +446,8 @@ define([
                 dojo.query(pilesToRound).forEach(function (node, i, listItems) {
                     var offsetAngle = 360 / listItems.length;
                     var rotateAngle = offsetAngle * i;
-                    dojo.style(node, "transform", "rotate(" + rotateAngle + "deg) translate(0, -350px) rotate(-" + rotateAngle + "deg)")
+                    var translation = Math.max(300, 47 * (playerCount-1));//the more players, the more we need to have space between piles and the center, we need 300px min.
+                    dojo.style(node, "transform", "rotate(" + rotateAngle + "deg) translate(0, -"+translation+"px) rotate(-" + rotateAngle + "deg)")
                 });
             }
         },
