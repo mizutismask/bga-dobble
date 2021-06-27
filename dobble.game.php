@@ -140,8 +140,8 @@ class Dobble extends Table
         $result['minigame'] = $this->getMiniGame();
         $result['counters'] = $this->argCardsCounters();
         $result['cardsDescription'] = $this->cards_description;
-        if($this->getMiniGame()==HOT_POTATO){
-            $result[ 'roundNumber'] = self::getGameStateValue(GS_CURRENT_ROUND);
+        if ($this->getMiniGame() == HOT_POTATO) {
+            $result['roundNumber'] = self::getGameStateValue(GS_CURRENT_ROUND);
         }
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
 
@@ -583,14 +583,17 @@ class Dobble extends Table
         $counters = array();
         for ($i = 0; $i < ($this->getPlayersNumber()); $i++) {
             $counters['cards_count_' . $players[$i]] = array('counter_name' => 'cards_count_' . $players[$i], 'counter_value' => 0);
+            $counters['player_board_cards_count_' . $players[$i]] = array('counter_name' => 'player_board_cards_count_' . $players[$i], 'counter_value' => 0);
         }
         $cards_in_hand = $this->deck->countCardsByLocationArgs(DECK_LOC_HAND);
         $cards_won = $this->deck->countCardsByLocationArgs(DECK_LOC_WON);
         foreach ($cards_in_hand as $player_id => $cards_nbr) {
             $counters['cards_count_' . $player_id]['counter_value'] = $cards_nbr;
+            $counters['player_board_cards_count_' . $player_id]['counter_value'] = $cards_nbr;
         }
         foreach ($cards_won as $player_id => $cards_won_nb) {
             $counters['cards_count_' . $player_id]['counter_value'] += $cards_won_nb;
+            $counters['player_board_cards_count_' . $player_id]['counter_value'] += $cards_won_nb;
         }
 
         if ($this->getMiniGame() != HOT_POTATO) {

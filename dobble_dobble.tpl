@@ -98,9 +98,13 @@
 
 // Example:
 //var jstpl_some_game_item='<div class="my_game_item" id="my_game_item_${MY_ITEM_ID}"></div>';
+
 var jstpl_card='<div id="${cardId}" class="card"></div>'
 var jstpl_card_zone='<div id="${zoneId}" class="symbol ${symbolClass}" style="top:${top}%; left:${left}%; transform:rotate(${rotation}deg); width:${size}%; height:${size}%;" ></div>'
-var jstpl_round='<div class="dbl_roundNb">${roundText} <span id="roundNb">${roundNb}</span></div>'
+var jstpl_round='<div class="dbl_roundNb player-board">${roundText} <span id="roundNb">${roundNb}</span></div>'
+
+var jstpl_cards_icon = '<div id= "cards_panel_${id}"> \
+    <div id="cards_icon_${id}" class="dbl_cards_icon"></div><span id="player_board_cards_count_${id}" class="cards_count"></span></div>';
 //
 </script>  
 

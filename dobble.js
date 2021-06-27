@@ -102,6 +102,17 @@ define([
 
             // dojo.query("h3").lettering();
 
+            //cards counts
+            for (var player_id in gamedatas.players) {
+                var player_board_div = $('player_board_' + player_id);
+
+                dojo.place(this.format_block('jstpl_cards_icon', {
+                    id: player_id,
+                }), player_board_div);
+                var el = 'cards_icon_' + player_id;
+                this.addTooltipHtml(el, _('Number of cards in the pile'));
+            }
+
             this.updateCountersIfPossible(gamedatas.counters);
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
