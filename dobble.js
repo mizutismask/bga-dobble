@@ -58,8 +58,7 @@ define([
             if (
                 this.minigame == this.WELL ||
                 this.minigame == this.TOWERING_INFERNO ||
-                this.minigame == this.HOT_POTATO ||
-                this.minigame == this.POISONED_GIFT
+                this.minigame == this.HOT_POTATO
             ) {
                 //---------- Player hand setup
                 this.playerHand = this.createStock("myhand");

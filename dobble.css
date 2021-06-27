@@ -234,11 +234,6 @@ html {
   filter: progid:DXImageTransform.Microsoft.Shadow(color=#886a95, Direction=134, Strength=30);
 }
 
-/*player hand setup after opponents hands since it's not usefull except for info */
-.minigame4 #myhand_wrap {
-  order: 9;
-}
-
 .minigame5 .card_selected {
   transform: scale(0.9);
 }
