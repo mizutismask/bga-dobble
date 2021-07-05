@@ -296,6 +296,7 @@ class Dobble extends Table
         return self::getGameStateValue('rounds_number');
     }
 
+    /** Add a "symbols" property, which is an array of all symbols in the card. */
     function enhanceCards($cards)
     {
         $enhanced = $cards;
@@ -459,14 +460,14 @@ class Dobble extends Table
         switch ($this->getMiniGame()) {
 
             case TRIPLET:
-                return $this->enhanceCards($this->deck->getCardsOnTop(9, DECK_LOC_DECK));
+                return $this->deck->getCardsOnTop(9, DECK_LOC_DECK);
                 break;
             case HOT_POTATO:
                 return [];
             case POISONED_GIFT:
             case WELL:
             case TOWERING_INFERNO:
-                return $this->enhanceCards([$this->deck->getCardOnTop(DECK_LOC_DECK)]);
+                return [$this->deck->getCardOnTop(DECK_LOC_DECK)];
                 break;
             default:
         }
@@ -499,9 +500,7 @@ class Dobble extends Table
         foreach ($players as $player_id => $player) {
             $card = $this->getMyCard($player_id);
             if ($card) {
-                $hands[$player_id] = $this->enhanceCards(
-                    [$card]
-                );
+                $hands[$player_id] = [$card];
             }
         }
         return $hands;
@@ -756,13 +755,10 @@ class Dobble extends Table
                 break;
             case TRIPLET:
                 $args['pattern'] = $this->getPatternCards(); //pattern are the 9 cards
-                //no possible symbols, symbols are displayed on selection
                 break;
             default:
-                $possibleSymbols = $this->getPatternCards();
                 $args['pattern'] = $this->getPatternCards();
-                $args['possibleSymbols'] = $possibleSymbols[0]["symbols"];
-                self::dump("**************************possibleSymbols", $possibleSymbols);
+                
         }
         $args['counters'] = $this->argCardsCounters();
         return $args;
