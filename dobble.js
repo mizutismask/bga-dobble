@@ -1,7 +1,7 @@
 /**
  *------
  * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
- * Dobble implementation : © <Your name here> <Your email address here>
+ * Dobble implementation : © Séverine Kamycki severinek@gmail.com
  *
  * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
@@ -49,12 +49,12 @@ define([
         */
 
         setup: function (gamedatas) {
+            console.log("minigame ", this.minigame);
             console.log("gamedatas ", gamedatas);
             this.cardsDescription = gamedatas.cardsDescription;
             this.minigame = parseInt(gamedatas.minigame);
             // Setting up player boards
             dojo.addClass("piles", "minigame" + this.minigame);
-            console.log("minigame ", this.minigame);
 
             // TODO: Set up your game interface here, according to "gamedatas"
             if (
@@ -120,7 +120,7 @@ define([
             this.setupNotifications();
 
             this.highlightWinners(gamedatas.scores);
-            console.log("Ending game setup");
+            //console.log("Ending game setup");
         },
 
         ///////////////////////////////////////////////////
@@ -191,21 +191,7 @@ define([
         //                 You can use this method to perform some user interface changes at this moment.
         //
         onLeavingState: function (stateName) {
-            console.log("Leaving state: " + stateName);
-
-            /*switch (stateName) {
-                case "playerTurn":
-                    if (this.playerHandIsDisplayed()) {
-                        this.playerHand.setSelectionMode(0);
-                    }
-                    if (this.patternIsDisplayed()) {
-                        this.patternPile.setSelectionMode(0);
-                    }
-                    if (this.opponentsHandsAreDisplayed()) {
-                        this.setSelectionModeOnHandStocks(0);
-                    }
-                    break;
-            }*/
+            //console.log("Leaving state: " + stateName);
         },
 
         // onUpdateActionButtons: in this method you can manage "action buttons" that are displayed in the
@@ -429,7 +415,6 @@ define([
 
         animateDobbleHand: function () {
             let dobble = document.getElementById("dbl_dobble_hand");
-            console.log("animate hand", dobble);
             dobble.classList.add("dbl_happy");
             window.setTimeout(() => {
                 dobble.classList.remove("dbl_happy");
@@ -471,17 +456,16 @@ define([
         },
 
         highlightWinners(scores) {
-            console.log(scores);
             //ties are possible
             var winners = new Array();
             var max;
             for (const [id, score] of Object.entries(scores)) {
-                
+
                 var scoreAsNumber = parseInt(score);
                 if (max == undefined) {
                     max = scoreAsNumber;
                 }
-                
+
                 if (scoreAsNumber > max) {
                     max = scoreAsNumber;
                     winners = [id];
@@ -489,7 +473,7 @@ define([
                 else if (scoreAsNumber == max) {
                     winners.push(id);
                 }
-                
+
             }
             dojo.query(".dbl_winner").removeClass("dbl_winner");
             for (const player of winners) {
@@ -509,40 +493,6 @@ define([
             Most of the time, these methods:
             _ check the action is possible at this game state.
             _ make a call to the game server
-        
-        */
-
-        /* Example:
-        
-        onMyMethodToCall1: function( evt )
-        {
-            console.log( 'onMyMethodToCall1' );
-            
-            // Preventing default browser reaction
-            dojo.stopEvent( evt );
-
-            // Check that this action is possible (see "possibleactions" in states.inc.php)
-            if( ! this.checkAction( 'myAction' ) )
-            {   return; }
-
-            this.ajaxcall( "/dobble/dobble/myAction.html", { 
-                                                                    lock: true, 
-                                                                    myArgument1: arg1, 
-                                                                    myArgument2: arg2,
-                                                                    ...
-                                                                 }, 
-                         this, function( result ) {
-                            
-                            // What to do after the server call if it succeeded
-                            // (most of the time: nothing)
-                            
-                         }, function( is_error) {
-
-                            // What to do after the server call in anyway (success or failure)
-                            // (most of the time: nothing)
-
-                         } );        
-        },        
         
         */
         onChooseSymbol: function (evt, selected = false, divId) {
@@ -633,7 +583,7 @@ define([
         
         */
         setupNotifications: function () {
-            console.log("notifications subscriptions setup");
+            //console.log("notifications subscriptions setup");
 
             // TODO: here, associate your game notifications with local methods
 
@@ -735,13 +685,13 @@ define([
         },
 
         notifNewRound: function (notif) {
-            console.log("notifNewRound", notif);
+            //console.log("notifNewRound", notif);
             this.updateScores(notif.args.scores);
             dojo.byId("roundNb").innerHTML = notif.args.roundNumber;
         },
 
         notifSpotFailed: function (notif) {
-            console.log("notifSpotFailed", notif);
+            //console.log("notifSpotFailed", notif);
             this.playSound("matchFailure", false);
             //adds shake effect
             var cards = this.selectedCardDivs;

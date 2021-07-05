@@ -3,7 +3,7 @@
 /**
  *------
  * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
- * Dobble implementation : © <Your name here> <Your email address here>
+ * Dobble implementation : © Séverine Kamycki severinek@gmail.com
  * 
  * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
@@ -179,7 +179,6 @@ class Dobble extends Table
             case HOT_POTATO:
                 $currentRound = self::getGameStateValue(GS_CURRENT_ROUND);
                 $total = $this->getRoundsNumber();
-                self::dump("*******currentRound", $currentRound);
 
                 return ($currentRound - 1) *  100 / $total; //the round is started, but not over yet
 
@@ -244,7 +243,6 @@ class Dobble extends Table
                 break;
             default:
         }
-        self::trace("**************************cards dealt");
     }
     function dealCardsToAllPlayers($players, $number)
     {
@@ -304,15 +302,11 @@ class Dobble extends Table
             $type = $this->cards_description[$card["type"]]["type"];
 
             $symbols = str_split($type, 2);
-            //self::dump("**************************symbols", $symbols);
             foreach ($symbols as $i => $s) {
                 $name = array_search($s, $this->symbols);
-                //self::dump("**************************name", $name);
                 $card["symbols"][] = $name;
-                //self::dump("**************************card", $card);
             }
         }
-        //self::dump("**************************cards", $enhanced);
         return $enhanced;
     }
 
@@ -321,17 +315,11 @@ class Dobble extends Table
         $templateSymbols = $this->cards_description[$template["type"]]["type"];
         $mySymbols = $this->cards_description[$mine["type"]]["type"];
 
-        self::dump("**************************template", $template);
-        self::dump("**************************mine", $mine);
-
         $templateSymbolsArr = str_split($templateSymbols, 2);
         $mySymbolsArr = str_split($mySymbols, 2);
 
         $intersection = array_values(array_intersect($templateSymbolsArr, $mySymbolsArr));
-        self::dump("**************************intersection", $intersection[0]);
-        // self::dump("**************************guess", $symbol, $this->symbols[$symbol]);
-        // self::dump("**************************guess number", $this->symbols[$symbol]);
-        return $intersection[0] === $symbol; // $intersection[0] === $this->symbols[$symbol];
+        return $intersection[0] === $symbol;
     }
 
     function symbolFoundActions($player_id, $template, $myCard, $opponent_player_id = null, $card3 = null)
@@ -784,7 +772,6 @@ class Dobble extends Table
 
     function stNextTurn()
     {
-        self::trace("*********************stNextTurn");
         $this->giveExtraTimeToEveryone();
         switch ($this->getMiniGame()) {
 
@@ -819,7 +806,6 @@ class Dobble extends Table
 
     function stNextRound()
     {
-        self::trace("**********************stNextRound");
         $players = self::loadPlayersBasicInfos();
         switch ($this->getMiniGame()) {
             case HOT_POTATO:
@@ -828,7 +814,6 @@ class Dobble extends Table
 
                 //checks if it's the end of the game
                 if ($currentRound == $this->getRoundsNumber()) {
-                    self::trace("*******************************TRANSITION_END_GAME");
                     $this->gamestate->nextState(TRANSITION_END_GAME);
                 } else {
                     //prepare next round (we reshuffle because we need enough cards to make all the rounds)
@@ -842,7 +827,6 @@ class Dobble extends Table
                         'scores' => $this->getScoresByPlayer(),
                     ));
 
-                    self::trace("*******************************TRANSITION_NEXT_TURN");
                     $this->gamestate->nextState(TRANSITION_NEXT_TURN);
                 }
                 break;
