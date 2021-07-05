@@ -115,7 +115,8 @@ html {
   display: block !important;
 }
 
-.circularLayout .pile-description, .circularPattern .pile-description {
+.circularLayout .pile-description,
+.circularPattern .pile-description {
   justify-content: space-evenly;
   font-size: large;
 }
@@ -275,6 +276,10 @@ html {
   top: -50px !important;
 }
 
+.dbl_winner {
+  box-shadow: 2px 12px 26px 13px greenyellow;
+  border-radius: 50%;
+}
 
 .dbl_cards_icon {
   width: 30px;

@@ -117,6 +117,7 @@ define([
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
 
+            this.highlightWinners(gamedatas.scores);
             console.log("Ending game setup");
         },
 
@@ -434,7 +435,7 @@ define([
         },
 
         layoutHandsInCircle: function (playerCount) {
-            if (playerCount>2 && $("piles").offsetWidth > 990) {
+            if (playerCount > 2 && $("piles").offsetWidth > 990) {
                 dojo.addClass("players_wrap", "circularLayout");
                 var pilesToRound;
                 if (this.minigame == this.POISONED_GIFT) {
@@ -446,8 +447,8 @@ define([
                 dojo.query(pilesToRound).forEach(function (node, i, listItems) {
                     var offsetAngle = 360 / listItems.length;
                     var rotateAngle = offsetAngle * i;
-                    var translation = Math.max(300, 47 * (playerCount-1));//the more players, the more we need to have space between piles and the center, we need 300px min.
-                    dojo.style(node, "transform", "rotate(" + rotateAngle + "deg) translate(0, -"+translation+"px) rotate(-" + rotateAngle + "deg)")
+                    var translation = Math.max(300, 47 * (playerCount - 1));//the more players, the more we need to have space between piles and the center, we need 300px min.
+                    dojo.style(node, "transform", "rotate(" + rotateAngle + "deg) translate(0, -" + translation + "px) rotate(-" + rotateAngle + "deg)")
                 });
             }
         },
@@ -458,6 +459,41 @@ define([
         playSound(sound, playNextMoveSound = true) {
             playSound(sound);
             playNextMoveSound && this.disableNextMoveSound();
+        },
+
+        updateScores(scores) {
+            for (const [id, score] of Object.entries(scores)) {
+                this.scoreCtrl[id].setValue(score);
+            }
+            this.highlightWinners(scores);
+        },
+
+        highlightWinners(scores) {
+            console.log(scores);
+            //ties are possible
+            var winners = new Array();
+            var max;
+            for (const [id, score] of Object.entries(scores)) {
+                
+                var scoreAsNumber = parseInt(score);
+                if (max == undefined) {
+                    max = scoreAsNumber;
+                }
+                
+                if (scoreAsNumber > max) {
+                    max = scoreAsNumber;
+                    winners = [id];
+                }
+                else if (scoreAsNumber == max) {
+                    winners.push(id);
+                }
+                
+            }
+            dojo.query(".dbl_winner").removeClass("dbl_winner");
+            for (const player of winners) {
+                //dojo.query("#player_hand_" + player +" h3").addClass("dbl_winner");//on names
+                dojo.query("#player_hand_stock_" + player).addClass("dbl_winner");//on piles
+            }
         },
 
         ///////////////////////////////////////////////////
@@ -627,10 +663,7 @@ define([
             var cards = notif.args.cards;
             var from = notif.args.from;
             var to = notif.args.to;
-            var scores = notif.args.scores;
-            for (const [id, score] of Object.entries(scores)) {
-                this.scoreCtrl[id].setValue(score);
-            }
+            this.updateScores(notif.args.scores);
 
             switch (this.minigame) {
                 case this.TOWERING_INFERNO:
@@ -689,13 +722,8 @@ define([
 
         notifNewRound: function (notif) {
             console.log("notifNewRound", notif);
-            var roundNumber = notif.args.roundNumber;
-            var scores = notif.args.scores;
-            console.log("round", roundNumber);
-            for (const [id, score] of Object.entries(scores)) {
-                this.scoreCtrl[id].setValue(score);
-            }
-            dojo.byId("roundNb").innerHTML = roundNumber;
+            this.updateScores(notif.args.scores);
+            dojo.byId("roundNb").innerHTML = notif.args.roundNumber;
         },
 
         notifSpotFailed: function (notif) {
