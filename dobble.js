@@ -82,7 +82,7 @@ define([
             if (this.minigame == this.POISONED_GIFT || this.minigame == this.HOT_POTATO) {
                 this.playerHands = [];
 
-                for (var player_id of gamedatas.playerorder) {
+                for (var player_id of Object.keys(gamedatas.players)) {
                     if (player_id != this.player_id) {
                         playerHand = this.createStock("player_hand_stock_" + player_id);
                         this.addCardsToStock(gamedatas.pattern, playerHand);

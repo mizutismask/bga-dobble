@@ -218,6 +218,15 @@ html {
   filter: progid:DXImageTransform.Microsoft.Shadow(color=#886a95, Direction=134, Strength=30);
 }
 
+.spectatorMode #myhand_wrap{
+  display: none;
+}
+
+.spectatorMode #dbl_dobble_hand{
+  display: none;
+}
+
+
 .minigame5 .card_selected {
   transform: scale(0.9);
 }

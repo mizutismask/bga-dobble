@@ -69,10 +69,12 @@ class view_dobble_dobble extends game_view
     $this->page->begin_block($template, "dobbleHand");
     $this->page->begin_block($template, "myHand");
 
+    $isSpectator= key_exists($current_player_id, $players);
+
     if ($miniGame == WELL || $miniGame == TOWERING_INFERNO || $miniGame == HOT_POTATO) {
       $this->page->insert_block("myHand", array(
         "PLAYER_ID" => $current_player_id,
-        "PLAYER_COLOR" => $players[$current_player_id]['player_color'],
+        "PLAYER_COLOR" => $isSpectator ? $players[$current_player_id]['player_color'] : "black",
       ));
     }
 
@@ -83,11 +85,11 @@ class view_dobble_dobble extends game_view
     if ($miniGame == WELL || $miniGame == TOWERING_INFERNO) {
       $this->page->insert_block("dobbleHand", array());
     }
-
-    if ($miniGame == POISONED_GIFT || $miniGame == HOT_POTATO) {
+//||($isSpectator&&($miniGame == WELL || $miniGame == TOWERING_INFERNO) 
+    if (($miniGame == POISONED_GIFT || $miniGame == HOT_POTATO)) {
 
       foreach ($players_in_order  as $player_id) {
-        if (key_exists($current_player_id, $players) && $current_player_id != $player_id) {
+        if ($current_player_id != $player_id) {
           $this->page->insert_block("player", array(
             "PLAYER_ID" => $player_id,
             "PLAYER_NAME" => $players[$player_id]['player_name'],
