@@ -400,6 +400,7 @@ class Dobble extends Table
                     'player_name2' => $this->getPlayerName($opponent_player_id),
                     'cards' => [$template],
                     'from' => 'pattern',
+                    'fromPlayerId' => $player_id,
                     'to' => $opponent_player_id,
                     'scores' => $scores,
                 ));

@@ -31,6 +31,8 @@ define([
             this.TRIPLET = 5;
 
             this.DIV_PATTERN = "pattern_pile";
+
+            this.SUCCESS_SOUND = "matchSuccess";
         },
 
         /*
@@ -659,7 +661,7 @@ define([
 
         notifCardsMove: function (notif) {
             console.log("notifCardsMove", notif);
-            //$player_id = notif.args.player_id;
+            var fromPlayerId = notif.args.fromPlayerId;
             var cards = notif.args.cards;
             var from = notif.args.from;
             var to = notif.args.to;
@@ -672,7 +674,7 @@ define([
                             from = "card-" + card.id;
                         }
                         if (to == this.player_id) {
-                            this.playSound("matchSuccess", false);
+                            this.playSound(this.SUCCESS_SOUND, false);
                             this.animateDobbleHand();
                             this.playerHand.removeAll();
                             this.playerHand.addCard(card, from);
@@ -683,7 +685,7 @@ define([
                     var newHand = notif.args.newHand;
                     for (var card of cards) {
                         if (from == this.player_id) {
-                            this.playSound("matchSuccess", false);
+                            this.playSound(this.SUCCESS_SOUND, false);
                             this.animateDobbleHand();
                             var fromDiv = "card-" + card.id;
 
@@ -706,6 +708,10 @@ define([
                         var toStock = this.getPlayerStock(to);
                         toStock.removeAll();
                         toStock.addCard(card, from);
+
+                    }
+                    if (fromPlayerId == this.player_id) {
+                        this.playSound(this.SUCCESS_SOUND, false);
                     }
                     break;
                 case this.HOT_POTATO:
@@ -714,7 +720,15 @@ define([
                         this.getPlayerStock(to).addCard(card, this.getStockDiv(from, card));
                         this.getPlayerStock(from).removeAll();
                     }
+                    if (from == this.player_id) {
+                        this.playSound(this.SUCCESS_SOUND, false);
+                    }
                     break;
+                case this.TRIPLET: {
+                    if (to == this.player_id) {
+                        this.playSound(this.SUCCESS_SOUND, false);
+                    }
+                }
                 default:
                     break;
             }
