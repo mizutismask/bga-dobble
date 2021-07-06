@@ -154,7 +154,7 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
             dojo.toggleClass(evt.currentTarget.parentNode.id, "card_selected");
 
             console.log("onClickZone ", symbol);
-            dojo.publish("onChangeSelection", [evt, newSelection, this.div]);
+            dojo.publish("onChangeSelection", [evt, newSelection, this.div, dojo.getAttr(evt.currentTarget.parentNode, "data-card-id")]);
         },
 
         selectItem(cardId) {
@@ -169,6 +169,12 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
             console.log("selectedCardDivs", selectedCardDivs);
             var selectedCardIds = selectedCardDivs.map((div) => dojo.getAttr(div.parentElement.id, "data-card-id"));
             return selectedCardIds;
+        },
+
+        getCardId() {
+            var cardDivs = dojo.query("#"+this.div+" .card");
+            var selectedCardIds = cardDivs.map((div) => dojo.getAttr(div.id, "data-card-id"));
+            return selectedCardIds.pop();
         },
 
         unselectAll() {

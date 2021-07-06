@@ -48,9 +48,10 @@ class action_dobble extends APP_GameAction
     // Retrieve arguments
     // Note: these arguments correspond to what has been sent through the javascript "ajaxcall" method
     $symbol = self::getArg("symbol", AT_alphanum, true);
+    $cardId = self::getArg("cardId", AT_alphanum, true);
 
     // Then, call the appropriate method in your game logic, like "playCard" or "myAction"
-    $this->game->chooseSymbol($symbol);
+    $this->game->chooseSymbol($symbol,$cardId);
 
     self::ajaxResponse();
   }
@@ -63,8 +64,11 @@ class action_dobble extends APP_GameAction
     // Note: these arguments correspond to what has been sent through the javascript "ajaxcall" method
     $symbol = self::getArg("symbol", AT_alphanum, true);
     $player_id = self::getArg("player_id", AT_posint, true);
+    $opponentCardId = self::getArg("opponentCardId", AT_alphanum, true);
+    $patternCardId = self::getArg("patternCardId", AT_alphanum, true);
+    
     // Then, call the appropriate method in your game logic, like "playCard" or "myAction"
-    $this->game->chooseSymbolWithPlayer($symbol, $player_id);
+    $this->game->chooseSymbolWithPlayer($symbol, $player_id,$opponentCardId,$patternCardId);
 
     self::ajaxResponse();
   }

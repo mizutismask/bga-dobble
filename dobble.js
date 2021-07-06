@@ -495,7 +495,7 @@ define([
             _ make a call to the game server
         
         */
-        onChooseSymbol: function (evt, selected = false, divId) {
+        onChooseSymbol: function (evt, selected = false, divId, cardId) {
             var symbol = dojo.getAttr(evt.currentTarget.id, "data-symbol");
             console.log("evt.currentTarget.id", evt.currentTarget.id);
             console.log("onChooseSymbol ", symbol);
@@ -513,13 +513,23 @@ define([
                     case this.WELL:
                         this.ajaxcallwrapper("chooseSymbol", {
                             symbol: symbol,
+                            cardId: this.patternPile.getCardId(),
                         });
                         break;
                     case this.POISONED_GIFT:
+                        this.ajaxcallwrapper("chooseSymbolWithPlayer", {
+                            symbol: symbol,
+                            player_id: this.getSelectedPlayer(divId),
+                            opponentCardId: cardId,
+                            patternCardId: this.patternPile.getCardId(),
+                        });
+                        break;
                     case this.HOT_POTATO:
                         this.ajaxcallwrapper("chooseSymbolWithPlayer", {
                             symbol: symbol,
                             player_id: this.getSelectedPlayer(divId),
+                            opponentCardId: cardId,
+                            patternCardId: this.playerHand.getCardId(),
                         });
                         break;
                     case this.TRIPLET:

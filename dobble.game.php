@@ -613,7 +613,7 @@ class Dobble extends Table
     */
 
 
-    function chooseSymbol($symbol)
+    function chooseSymbol($symbol, $patternCardId)
     {
         // Check that this is the player's turn and that it is a "possible action" at this game state (see states.inc.php)
         self::checkAction('playCard');
@@ -623,6 +623,9 @@ class Dobble extends Table
             case WELL:
             case TOWERING_INFERNO:
                 $template = $this->getPatternCards()[0];
+                if ($template["id"] != $patternCardId) {
+                    throw new BgaUserException(self::_("Too late!"));
+                }
                 $mine = $this->getMyCard($player_id);
                 if ($this->isSymboleCommon($symbol, $template, $mine)) {
                     $this->symbolFoundActions($player_id, $template, $mine, $symbol);
@@ -642,7 +645,7 @@ class Dobble extends Table
 
     }
 
-    function chooseSymbolWithPlayer($symbol, $opponent_player_id)
+    function chooseSymbolWithPlayer($symbol, $opponent_player_id, $opponentCardId, $patternCardId)
     {
         // Check that this is the player's turn and that it is a "possible action" at this game state (see states.inc.php)
         self::checkAction('playCard');
@@ -652,6 +655,9 @@ class Dobble extends Table
             case HOT_POTATO:
                 $myCard = $this->getMyCard($player_id);
                 $opponentCard = $this->getMyCard($opponent_player_id);
+                if ($opponentCard["id"] != $opponentCardId || $myCard["id"] != $patternCardId) {
+                    throw new BgaUserException(self::_("Too late!"));
+                }
                 if ($this->isSymboleCommon($symbol, $myCard, $opponentCard)) {
                     $this->symbolFoundActions($player_id, $opponentCard, $myCard, $symbol, $opponent_player_id);
 
@@ -671,6 +677,9 @@ class Dobble extends Table
             case POISONED_GIFT:
                 $template = $this->getPatternCards()[0];
                 $opponentCard = $this->getMyCard($opponent_player_id);
+                if ($opponentCard["id"] != $opponentCardId || $template["id"] != $patternCardId) {
+                    throw new BgaUserException(self::_("Too late!"));
+                }
                 if ($this->isSymboleCommon($symbol, $template, $opponentCard)) {
                     $this->symbolFoundActions($player_id, $template, $opponentCard, $symbol, $opponent_player_id);
                     $this->gamestate->nextState(TRANSITION_NEXT_TURN);
@@ -699,6 +708,14 @@ class Dobble extends Table
             $card1 = $this->deck->getCard($card1Id);
             $card2 = $this->deck->getCard($card2Id);
             $card3 = $this->deck->getCard($card3Id);
+
+            $cardsStillInTop9 = array_filter($this->getPatternCards(), function ($card)  use ($card1, $card2,$card3) {
+                return $card["id"] == $card1["id"]||$card["id"] == $card2["id"]||$card["id"] == $card3["id"];
+            });
+            if (count($cardsStillInTop9)!=3) {
+                throw new BgaUserException(self::_("Too late!"));
+            }
+
             if ($this->isSymboleCommon($symbol, $card1, $card2) && $this->isSymboleCommon($symbol, $card2, $card3)) {
                 $this->symbolFoundActions($player_id, $card1, $card2, $symbol, null, $card3);
                 $this->gamestate->nextState(TRANSITION_NEXT_TURN);
