@@ -322,7 +322,7 @@ class Dobble extends Table
         return $intersection[0] === $symbol;
     }
 
-    function symbolFoundActions($player_id, $template, $myCard, $opponent_player_id = null, $card3 = null)
+    function symbolFoundActions($player_id, $template, $myCard, $symbol, $opponent_player_id = null, $card3 = null)
     {
         self::incStat(1, "symbols_spotted", $player_id);
 
@@ -335,8 +335,9 @@ class Dobble extends Table
                 $this->incScore($player_id, 3);
 
                 $scores = $this->getScoresByPlayer();
-                self::notifyAllPlayers(NOTIF_CARDS_MOVE, clienttranslate('${player_name} spotted the common symbol on three cards'), array(
+                self::notifyAllPlayers(NOTIF_CARDS_MOVE, clienttranslate('${player_name} spotted ${symbolName} on three cards'), array(
                     'player_name' => $this->getPlayerName($player_id),
+                    'symbolName' => $this->symbolsNames[$symbol],
                     'cards' => [$template, $myCard],
                     'from' => 'pattern',
                     'to' => $player_id,
@@ -349,8 +350,9 @@ class Dobble extends Table
                 $this->incScore($player_id, 1);
 
                 $scores = $this->getScoresByPlayer();
-                self::notifyAllPlayers(NOTIF_CARDS_MOVE, clienttranslate('${player_name} spotted the common symbol'), array(
+                self::notifyAllPlayers(NOTIF_CARDS_MOVE, clienttranslate('${player_name} spotted ${symbolName}'), array(
                     'player_name' => $this->getPlayerName($player_id),
+                    'symbolName' => $this->symbolsNames[$symbol],
                     'cards' => [$myCard],
                     'from' => $player_id,
                     'to' => 'pattern',
@@ -368,8 +370,9 @@ class Dobble extends Table
                 $this->incScore($opponent_player_id, $cardsNb * -1);
 
                 $scores = $this->getScoresByPlayer();
-                self::notifyAllPlayers(NOTIF_CARDS_MOVE, clienttranslate('${player_name} spotted the common symbol with ${player_name2}'), array(
+                self::notifyAllPlayers(NOTIF_CARDS_MOVE, clienttranslate('${player_name} spotted ${symbolName} on ${player_name2}\'s card'), array(
                     'player_name' => $this->getPlayerName($player_id),
+                    'symbolName' => $this->symbolsNames[$symbol],
                     'player_name2' => $this->getPlayerName($opponent_player_id),
                     'cards' => [$myCard],
                     'from' => $player_id,
@@ -384,8 +387,9 @@ class Dobble extends Table
                 $this->incScore($opponent_player_id, -1);
 
                 $scores = $this->getScoresByPlayer();
-                self::notifyAllPlayers(NOTIF_CARDS_MOVE, clienttranslate('${player_name} spotted the common symbol with ${player_name2}'), array(
+                self::notifyAllPlayers(NOTIF_CARDS_MOVE, clienttranslate('${player_name} spotted ${symbolName} on ${player_name2}\'s card'), array(
                     'player_name' => $this->getPlayerName($player_id),
+                    'symbolName' => $this->symbolsNames[$symbol],
                     'player_name2' => $this->getPlayerName($opponent_player_id),
                     'cards' => [$template],
                     'from' => 'pattern',
@@ -400,8 +404,9 @@ class Dobble extends Table
                 $this->incScore($player_id, 1);
 
                 $scores = $this->getScoresByPlayer();
-                self::notifyAllPlayers(NOTIF_CARDS_MOVE, clienttranslate('${player_name} spotted the common symbol'), array(
+                self::notifyAllPlayers(NOTIF_CARDS_MOVE, clienttranslate('${player_name} spotted ${symbolName}'), array(
                     'player_name' => $this->getPlayerName($player_id),
+                    'symbolName' => $this->symbolsNames[$symbol],
                     'cards' => [$template],
                     'from' => 'pattern',
                     'to' => $player_id,
@@ -620,7 +625,7 @@ class Dobble extends Table
                 $template = $this->getPatternCards()[0];
                 $mine = $this->getMyCard($player_id);
                 if ($this->isSymboleCommon($symbol, $template, $mine)) {
-                    $this->symbolFoundActions($player_id, $template, $mine);
+                    $this->symbolFoundActions($player_id, $template, $mine, $symbol);
 
                     $this->gamestate->nextState(TRANSITION_NEXT_TURN);
                 } else {
@@ -648,7 +653,7 @@ class Dobble extends Table
                 $myCard = $this->getMyCard($player_id);
                 $opponentCard = $this->getMyCard($opponent_player_id);
                 if ($this->isSymboleCommon($symbol, $myCard, $opponentCard)) {
-                    $this->symbolFoundActions($player_id, $opponentCard, $myCard, $opponent_player_id);
+                    $this->symbolFoundActions($player_id, $opponentCard, $myCard, $symbol, $opponent_player_id);
 
                     if ($this->onlyOnePlayerHasAHand()) {
                         $this->gamestate->nextState(TRANSITION_NEXT_ROUND);
@@ -667,7 +672,7 @@ class Dobble extends Table
                 $template = $this->getPatternCards()[0];
                 $opponentCard = $this->getMyCard($opponent_player_id);
                 if ($this->isSymboleCommon($symbol, $template, $opponentCard)) {
-                    $this->symbolFoundActions($player_id, $template, $opponentCard, $opponent_player_id);
+                    $this->symbolFoundActions($player_id, $template, $opponentCard, $symbol, $opponent_player_id);
                     $this->gamestate->nextState(TRANSITION_NEXT_TURN);
                 } else {
                     $this->symbolNotFoundActions($player_id);
@@ -695,7 +700,7 @@ class Dobble extends Table
             $card2 = $this->deck->getCard($card2Id);
             $card3 = $this->deck->getCard($card3Id);
             if ($this->isSymboleCommon($symbol, $card1, $card2) && $this->isSymboleCommon($symbol, $card2, $card3)) {
-                $this->symbolFoundActions($player_id, $card1, $card2, null, $card3);
+                $this->symbolFoundActions($player_id, $card1, $card2, $symbol, null, $card3);
                 $this->gamestate->nextState(TRANSITION_NEXT_TURN);
             } else {
                 $this->symbolNotFoundActions($player_id);
@@ -746,7 +751,6 @@ class Dobble extends Table
                 break;
             default:
                 $args['pattern'] = $this->getPatternCards();
-                
         }
         $args['counters'] = $this->argCardsCounters();
         return $args;

@@ -19,78 +19,184 @@
  * are available everywhere in your game logic code.
  *
  */
+if (!defined("ANCHOR")) {
+  define("ANCHOR", "00");
+  define("APPLE", "01");
+  define("BABY_BOTTLE", "02");
+  define("BIRD", "03");
+  define("BOMB", "04");
+  define("BULB", "05");
+  define("CACTUS", "06");
+  define("CAMPFIRE", "07");
+  define("CANDLE", "08");
+  define("CAR", "09");
+  define("CARROT", "10");
+  define("CAT", "11");
+  define("CHEESE", "12");
+  define("CLOCK", "13");
+  define("CLOVER", "14");
+  define("CLOWN", "15");
+  define("DINOSAUR", "16");
+  define("DOBBLE", "17");
+  define("DOG", "18");
+  define("DOLPHIN", "19");
+  define("DRAGON", "20");
+  define("DROP", "21");
+  define("EXCLAMATION", "22");
+  define("EYE", "23");
+  define("FLOWER", "24");
+  define("FORBIDDEN", "25");
+  define("GHOST", "26");
+  define("HAMMER", "27");
+  define("HEART", "28");
+  define("ICECUBE", "29");
+  define("IGLOO", "30");
+  define("INTERROGATION", "31");
+  define("JUMPER", "32");
+  define("KEY", "33");
+  define("LADYBUG", "34");
+  define("LIGHTNING", "35");
+  define("MAN", "36");
+  define("MAPPLE", "37");
+  define("MOON", "38");
+  define("MOUTH", "39");
+  define("PADLOCK", "40");
+  define("PENCIL", "41");
+  define("SCISSORS", "42");
+  define("SKULL", "43");
+  define("SNOWFLAKE", "44");
+  define("SNOWMAN", "45");
+  define("SPIDER", "46");
+  define("STAIN", "47");
+  define("SUN", "48");
+  define("SUNGLASSES", "49");
+  define("TARGET", "50");
+  define("TREBLE_KEY", "51");
+  define("TREE", "52");
+  define("TURTLE", "53");
+  define("WEB", "54");
+  define("YIN_YANG", "55");
+  define("ZEBRA", "56");
+}
 
-
-/*
-
-Example:
-
-$this->card_types = array(
-    1 => array( "card_name" => ...,
-                ...
-              )
-);
-
-
-*/
 $this->symbols = [
-  "ANCHOR" => "00",
-  "APPLE" => "01",
-  "BABY_BOTTLE" => "02",
-  "BIRD" => "03",
-  "BOMB" => "04",
-  "BULB" => "05",
-  "CACTUS" => "06",
-  "CAMPFIRE" => "07",
-  "CANDLE" => "08",
-  "CAR" => "09",
-  "CARROT" => "10",
-  "CAT" => "11",
-  "CHEESE" => "12",
-  "CLOCK" => "13",
-  "CLOVER" => "14",
-  "CLOWN" => "15",
-  "DINOSAUR" => "16",
-  "DOBBLE" => "17",
-  "DOG" => "18",
-  "DOLPHIN" => "19",
-  "DRAGON" => "20",
-  "DROP" => "21",
-  "EXCLAMATION" => "22",
-  "EYE" => "23",
-  "FLOWER" => "24",
-  "FORBIDDEN" => "25",
-  "GHOST" => "26",
-  "HAMMER" => "27",
-  "HEART" => "28",
-  "ICECUBE" => "29",
-  "IGLOO" => "30",
-  "INTERROGATION" => "31",
-  "JUMPER" => "32",
-  "KEY" => "33",
-  "LADYBUG" => "34",
-  "LIGHTNING" => "35",
-  "MAN" => "36",
-  "MAPPLE" => "37",
-  "MOON" => "38",
-  "MOUTH" => "39",
-  "PADLOCK" => "40",
-  "PENCIL" => "41",
-  "SCISSORS" => "42",
-  "SKULL" => "43",
-  "SNOWFLAKE" => "44",
-  "SNOWMAN" => "45",
-  "SPIDER" => "46",
-  "STAIN" => "47",
-  "SUN" => "48",
-  "SUNGLASSES" => "49",
-  "TARGET" => "50",
-  "TREBLE_KEY" => "51",
-  "TREE" => "52",
-  "TURTLE" => "53",
-  "WEB" => "54",
-  "YIN_YANG" => "55",
-  "ZEBRA" => "56",
+  "ANCHOR" => ANCHOR,
+  "APPLE" => APPLE,
+  "BABY_BOTTLE" => BABY_BOTTLE,
+  "BIRD" => BIRD,
+  "BOMB" => BOMB,
+  "BULB" => BULB,
+  "CACTUS" => CACTUS,
+  "CAMPFIRE" => CAMPFIRE,
+  "CANDLE" => CANDLE,
+  "CAR" => CAR,
+  "CARROT" => CARROT,
+  "CAT" => CAT,
+  "CHEESE" => CHEESE,
+  "CLOCK" => CLOCK,
+  "CLOVER" => CLOVER,
+  "CLOWN" => CLOWN,
+  "DINOSAUR" => DINOSAUR,
+  "DOBBLE" => DOBBLE,
+  "DOG" => DOG,
+  "DOLPHIN" => DOLPHIN,
+  "DRAGON" => DRAGON,
+  "DROP" => DROP,
+  "EXCLAMATION" => EXCLAMATION,
+  "EYE" => EYE,
+  "FLOWER" => FLOWER,
+  "FORBIDDEN" => FORBIDDEN,
+  "GHOST" => GHOST,
+  "HAMMER" => HAMMER,
+  "HEART" => HEART,
+  "ICECUBE" => ICECUBE,
+  "IGLOO" => IGLOO,
+  "INTERROGATION" => INTERROGATION,
+  "JUMPER" => JUMPER,
+  "KEY" => KEY,
+  "LADYBUG" => LADYBUG,
+  "LIGHTNING" => LIGHTNING,
+  "MAN" => MAN,
+  "MAPPLE" => MAPPLE,
+  "MOON" => MOON,
+  "MOUTH" => MOUTH,
+  "PADLOCK" => PADLOCK,
+  "PENCIL" => PENCIL,
+  "SCISSORS" => SCISSORS,
+  "SKULL" => SKULL,
+  "SNOWFLAKE" => SNOWFLAKE,
+  "SNOWMAN" => SNOWMAN,
+  "SPIDER" => SPIDER,
+  "STAIN" => STAIN,
+  "SUN" => SUN,
+  "SUNGLASSES" => SUNGLASSES,
+  "TARGET" => TARGET,
+  "TREBLE_KEY" => TREBLE_KEY,
+  "TREE" => TREE,
+  "TURTLE" => TURTLE,
+  "WEB" => WEB,
+  "YIN_YANG" => YIN_YANG,
+  "ZEBRA" => ZEBRA,
+];
+
+$this->symbolsNames = [
+  ANCHOR => clienttranslate('Anchor'),
+  APPLE => clienttranslate('Apple'),
+  BABY_BOTTLE => clienttranslate('Baby bottle'),
+  BIRD => clienttranslate('Bird'),
+  BOMB => clienttranslate('Bomb'),
+  BULB => clienttranslate('Bulb'),
+  CACTUS => clienttranslate('Cactus'),
+  CAMPFIRE => clienttranslate('Campfire'),
+  CANDLE => clienttranslate('Candle'),
+  CAR => clienttranslate('Car'),
+  CARROT => clienttranslate('Carrot'),
+  CAT => clienttranslate('Cat'),
+  CHEESE => clienttranslate('Cheese'),
+  CLOCK => clienttranslate('Clock'),
+  CLOVER => clienttranslate('Clover'),
+  CLOWN => clienttranslate('Clown'),
+  DINOSAUR => clienttranslate('Dinosaur'),
+  DOBBLE => clienttranslate('Dobble'),
+  DOG => clienttranslate('Dog'),
+  DOLPHIN => clienttranslate('Dolphin'),
+  DRAGON => clienttranslate('Dragon'),
+  DROP => clienttranslate('Drop'),
+  EXCLAMATION => clienttranslate('Exclamation point'),
+  EYE => clienttranslate('Eye'),
+  FLOWER => clienttranslate('Flower'),
+  FORBIDDEN => clienttranslate('Forbidden'),
+  GHOST => clienttranslate('Ghost'),
+  HAMMER => clienttranslate('Hammer'),
+  HEART => clienttranslate('Heart'),
+  ICECUBE => clienttranslate('Icecube'),
+  IGLOO => clienttranslate('Igloo'),
+  INTERROGATION => clienttranslate('Interrogation point'),
+  JUMPER => clienttranslate('Jumper'),
+  KEY => clienttranslate('Key'),
+  LADYBUG => clienttranslate('Ladybug'),
+  LIGHTNING => clienttranslate('Lightning'),
+  MAN => clienttranslate('Man'),
+  MAPPLE => clienttranslate('Mapple'),
+  MOON => clienttranslate('Moon'),
+  MOUTH => clienttranslate('Mouth'),
+  PADLOCK => clienttranslate('Padlock'),
+  PENCIL => clienttranslate('Pencil'),
+  SCISSORS => clienttranslate('Scissors'),
+  SKULL => clienttranslate('Skull'),
+  SNOWFLAKE => clienttranslate('Snowflake'),
+  SNOWMAN => clienttranslate('Snowman'),
+  SPIDER => clienttranslate('Spider'),
+  STAIN => clienttranslate('Stain'),
+  SUN => clienttranslate('Sun'),
+  SUNGLASSES => clienttranslate('Sunglasses'),
+  TARGET => clienttranslate('Target'),
+  TREBLE_KEY => clienttranslate('Treble key'),
+  TREE => clienttranslate('Tree'),
+  TURTLE => clienttranslate('Turtle'),
+  WEB => clienttranslate('Web'),
+  YIN_YANG => clienttranslate('Yin Yang'),
+  ZEBRA => clienttranslate('Zebra'),
 ];
 
 $this->cards_description = array(
