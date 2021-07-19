@@ -51,11 +51,12 @@
 //    !! It is not a good idea to modify this file when a game is running !!
 
 if (!defined('STATE_PLAYER_TURN')) { // ensure this block is only invoked once, since it is included multiple times
-    define("STATE_PLAYER_TURN", 2);
-    define("STATE_NEXT_TURN", 3);
-    define("STATE_NEXT_ROUND", 4);
+    define("STATE_GET_READY", 2);
+    define("STATE_PLAYER_TURN", 3);
+    define("STATE_NEXT_TURN", 4);
+    define("STATE_NEXT_ROUND", 5);
 
-    //define("TRANSITION_PLAYER_TURN", "playerTurn");
+    define("TRANSITION_COUNTDOWN", "countdown");
     define("TRANSITION_NEXT_TURN", "nextTurn");
     define("TRANSITION_NEXT_ROUND", "nextRound");
     define("TRANSITION_END_GAME", "endGame");
@@ -73,6 +74,16 @@ $machinestates = array(
     ),
 
     // Note: ID=2 => your first state
+    STATE_GET_READY => array(
+        "name" => "getReady",
+        "description" => clienttranslate('Wait until everyone is ready'),
+        "descriptionmyturn" => clienttranslate('Are you ready?'),
+        "type" => "multipleactiveplayer",
+        "possibleactions" => array("ready"),
+        "transitions" => array(
+            TRANSITION_PLAYER_TURN => STATE_PLAYER_TURN,
+        )
+    ),
 
     STATE_PLAYER_TURN => array(
         "name" => "playerTurn",

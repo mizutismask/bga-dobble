@@ -108,6 +108,7 @@ class Dobble extends Table
         $this->deck->shuffle(DECK_LOC_DECK);
         $this->dealCards();
 
+        $this->st_multiPlayerAllActive();
 
         /************ End of the game initialization *****/
     }
@@ -709,10 +710,10 @@ class Dobble extends Table
             $card2 = $this->deck->getCard($card2Id);
             $card3 = $this->deck->getCard($card3Id);
 
-            $cardsStillInTop9 = array_filter($this->getPatternCards(), function ($card)  use ($card1, $card2,$card3) {
-                return $card["id"] == $card1["id"]||$card["id"] == $card2["id"]||$card["id"] == $card3["id"];
+            $cardsStillInTop9 = array_filter($this->getPatternCards(), function ($card)  use ($card1, $card2, $card3) {
+                return $card["id"] == $card1["id"] || $card["id"] == $card2["id"] || $card["id"] == $card3["id"];
             });
-            if (count($cardsStillInTop9)!=3) {
+            if (count($cardsStillInTop9) != 3) {
                 throw new BgaUserException(self::_("Too late!"));
             }
 
@@ -727,6 +728,13 @@ class Dobble extends Table
             }
         }
     }
+
+    function ready(){
+        self::checkAction('ready');
+        $player_id = self::getCurrentPlayerId();
+        $this->gamestate->setPlayerNonMultiactive($player_id, TRANSITION_PLAYER_TURN); // deactivate player; wait for others     
+    }
+
 
     //////////////////////////////////////////////////////////////////////////////
     //////////// Game state arguments
@@ -866,6 +874,10 @@ class Dobble extends Table
         }
     }
 
+    function st_multiPlayerAllActive()
+    {
+            $this->gamestate->setAllPlayersMultiactive();
+    }
 
     //////////////////////////////////////////////////////////////////////////////
     //////////// Zombie

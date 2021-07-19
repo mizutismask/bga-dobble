@@ -134,7 +134,7 @@ define([
 
             //handle pattern
             switch (stateName) {
-                case "playerTurn":
+              case "playerTurn":
                     this.updateCountersIfPossible(args.args.counters);
                     switch (this.minigame) {
                         case this.TOWERING_INFERNO:
@@ -203,10 +203,13 @@ define([
             if (stateName == "playerTurn") {
                 this.updateActionPhrase();
             }
-
+            
             //enables usefull stocks
             if (this.isCurrentPlayerActive()) {
                 switch (stateName) {
+                    case "getReady":
+                        this.addActionButton('button_ready', _('Ready!'), 'onReady');
+                        break;
                     case "playerTurn":
                         switch (this.minigame) {
                             case this.TOWERING_INFERNO:
@@ -250,13 +253,13 @@ define([
             return typeNumber < 10 ? "0" + typeNumber : typeNumber;
         },
 
-        ajaxcallwrapper: function (action, args, handler) {
+        ajaxcallwrapper: function (action, args,move="playCard",handler) {
             if (!args) {
                 args = [];
             }
             args.lock = true;
 
-            if (this.checkAction("playCard")) {
+            if (this.checkAction(move)) {
                 this.ajaxcall(
                     "/" + this.game_name + "/" + this.game_name + "/" + action + ".html",
                     args, //
@@ -580,6 +583,11 @@ define([
             dojo.query(".card").removeClass("card_selected");
         },
 
+        onReady: function (control_name) {
+            this.ajaxcallwrapper("ready", { },"ready");
+        },
+
+
         ///////////////////////////////////////////////////
         //// Reaction to cometD notifications
 
@@ -710,6 +718,6 @@ define([
                     dojo.addClass(card, "shake");
                 }
             }
-        }
+        },
     });
 });

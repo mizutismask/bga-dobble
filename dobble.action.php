@@ -85,4 +85,13 @@ class action_dobble extends APP_GameAction
 
     self::ajaxResponse();
   }
+
+  public function ready()
+  {
+    self::setAjaxMode();
+
+    $this->game->ready();
+
+    self::ajaxResponse();
+  }
 }
