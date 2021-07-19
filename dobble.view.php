@@ -68,8 +68,9 @@ class view_dobble_dobble extends game_view
     $this->page->begin_block($template, "pattern");
     $this->page->begin_block($template, "dobbleHand");
     $this->page->begin_block($template, "myHand");
+    $this->page->begin_block($template, "roPiles");
 
-    $isSpectator= key_exists($current_player_id, $players);
+    $isSpectator = key_exists($current_player_id, $players);
 
     if ($miniGame == WELL || $miniGame == TOWERING_INFERNO || $miniGame == HOT_POTATO) {
       $this->page->insert_block("myHand", array(
@@ -84,9 +85,10 @@ class view_dobble_dobble extends game_view
 
     if ($miniGame == WELL || $miniGame == TOWERING_INFERNO) {
       $this->page->insert_block("dobbleHand", array());
+      $this->page->insert_block("roPiles", array());
     }
-//||($isSpectator&&($miniGame == WELL || $miniGame == TOWERING_INFERNO) 
-    if (($miniGame == POISONED_GIFT || $miniGame == HOT_POTATO)) {
+
+    if (($miniGame != TRIPLET)) {
 
       foreach ($players_in_order  as $player_id) {
         if ($current_player_id != $player_id) {
@@ -95,6 +97,7 @@ class view_dobble_dobble extends game_view
             "PLAYER_NAME" => $players[$player_id]['player_name'],
             "PLAYER_COLOR" => $players[$player_id]['player_color'],
             "PLAYER_NAME" => $players[$player_id]['player_name'],
+            "CLASS_NAME" => $miniGame == WELL || $miniGame == TOWERING_INFERNO?"dbl_read_only":"",
           ));
         }
       }

@@ -64,7 +64,6 @@ define([
             ) {
                 //---------- Player hand setup
                 this.playerHand = this.createStock("myhand");
-                this.addCardsToStock(gamedatas.hand, this.playerHand);
             }
 
             if (
@@ -79,15 +78,16 @@ define([
 
             dojo.subscribe("onChangeSelection", this, "onChooseSymbol");
 
-            if (this.minigame == this.POISONED_GIFT || this.minigame == this.HOT_POTATO) {
+            if (this.minigame != this.TRIPLET) {
                 this.playerHands = [];
 
                 for (var player_id of Object.keys(gamedatas.players)) {
                     if (player_id != this.player_id) {
                         playerHand = this.createStock("player_hand_stock_" + player_id);
-                        this.addCardsToStock(gamedatas.pattern, playerHand);
 
-                        dojo.connect(playerHand, "onChangeSelection", this, "onSelectOpponentHand");
+                        if ( this.minigame != this.WELL && this.minigame != this.TOWERING_INFERNO) {
+                            dojo.connect(playerHand, "onChangeSelection", this, "onSelectOpponentHand");
+                        }
                         this.playerHands[player_id] = playerHand;
                     }
                 }
@@ -98,6 +98,11 @@ define([
             if (this.minigame == this.HOT_POTATO) {
                 var divRound = this.format_block("jstpl_round", { roundText: _("Round"), roundNb: gamedatas.roundNumber });
                 dojo.place(divRound, "right-side-second-part", "before");
+            }
+
+            if (this.minigame == this.WELL||this.minigame == this.TOWERING_INFERNO) {
+                dojo.query(".dbl_read_only").forEach(function (node, i, listItems) {
+                    dojo.place(node, "read_only_piles");  });
             }
 
             this.setupDobbleHand();
@@ -134,7 +139,7 @@ define([
 
             //handle pattern
             switch (stateName) {
-              case "playerTurn":
+                case "playerTurn":
                     this.updateCountersIfPossible(args.args.counters);
                     switch (this.minigame) {
                         case this.TOWERING_INFERNO:
@@ -155,12 +160,22 @@ define([
             switch (stateName) {
                 case "playerTurn":
                     switch (this.minigame) {
+                        case this.WELL:
+                        case this.TOWERING_INFERNO:
+                            var hands = args.args.hands;
+                            for (const [player_id, cards] of Object.entries(hands)) {
+                                    var playerStock = this.getPlayerStock(player_id);
+                                    playerStock.removeAll();
+                                    this.addCardsToStock(cards, playerStock);
+                            }
+                            break;
                         case this.POISONED_GIFT:
                             var hands = args.args.hands;
                             for (const [player_id, cards] of Object.entries(hands)) {
                                 if (player_id != this.player_id) {
-                                    this.playerHands[player_id].removeAll();
-                                    this.addCardsToStock(cards, this.playerHands[player_id]);
+                                    var playerStock = this.getPlayerStock(player_id);
+                                    playerStock.removeAll();
+                                    this.addCardsToStock(cards, playerStock);
                                 }
                             }
                             break;
@@ -203,7 +218,7 @@ define([
             if (stateName == "playerTurn") {
                 this.updateActionPhrase();
             }
-            
+
             //enables usefull stocks
             if (this.isCurrentPlayerActive()) {
                 switch (stateName) {
@@ -253,7 +268,7 @@ define([
             return typeNumber < 10 ? "0" + typeNumber : typeNumber;
         },
 
-        ajaxcallwrapper: function (action, args,move="playCard",handler) {
+        ajaxcallwrapper: function (action, args, move = "playCard", handler) {
             if (!args) {
                 args = [];
             }
@@ -425,13 +440,13 @@ define([
         },
 
         layoutHandsInCircle: function (playerCount) {
-            if (playerCount > 2 && $("piles").offsetWidth > 990) {
+            if ((this.minigame == this.POISONED_GIFT || this.minigame == this.HOT_POTATO)&&playerCount > 2 && $("piles").offsetWidth > 990) {
                 dojo.addClass("players_wrap", "circularLayout");
                 var pilesToRound;
                 if (this.minigame == this.POISONED_GIFT) {
                     dojo.addClass("pattern_pile_wrap", "circularPattern");
                     pilesToRound = ".dbl_hand_wrap:not(#pattern_pile_wrap)";
-                } else {
+                } else {//hot potato
                     pilesToRound = ".dbl_hand_wrap:not(#myhand_wrap)";
                 }
                 dojo.query(pilesToRound).forEach(function (node, i, listItems) {
@@ -482,6 +497,9 @@ define([
             for (const player of winners) {
                 //dojo.query("#player_hand_" + player +" h3").addClass("dbl_winner");//on names
                 dojo.query("#player_hand_stock_" + player).addClass("dbl_winner");//on piles
+                if (player == this.player_id) {
+                    dojo.query("#myhand").addClass("dbl_winner");
+                }
             }
         },
 
@@ -584,7 +602,7 @@ define([
         },
 
         onReady: function (control_name) {
-            this.ajaxcallwrapper("ready", { },"ready");
+            this.ajaxcallwrapper("ready", {}, "ready");
         },
 
 
@@ -644,9 +662,11 @@ define([
                         if (to == this.player_id) {
                             this.playSound(this.SUCCESS_SOUND, false);
                             this.animateDobbleHand();
-                            this.playerHand.removeAll();
-                            this.playerHand.addCard(card, from);
+                            
                         }
+                        var toStock = this.getPlayerStock(to);
+                        toStock.removeAll();
+                        toStock.addCard(card, from);
                     }
                     break;
                 case this.WELL:
@@ -654,13 +674,11 @@ define([
                     for (var card of cards) {
                         if (from == this.player_id) {
                             this.playSound(this.SUCCESS_SOUND, false);
-                            this.animateDobbleHand();
-                            var fromDiv = "card-" + card.id;
-
-                            this.patternPile.removeAll();
-                            this.patternPile.addCard(card, fromDiv);
-
+                            this.animateDobbleHand();  
                         }
+                        var fromDiv = "card-" + card.id;
+                        this.patternPile.removeAll();
+                        this.patternPile.addCard(card, fromDiv);
                     }
                     if (from == this.player_id && newHand) {
                         //display the card under my pile

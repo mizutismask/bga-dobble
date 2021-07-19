@@ -66,8 +66,10 @@
         </div>
         <!-- END myHand -->
 
+        
+
         <!-- BEGIN player -->
-        <div id="player_hand_{PLAYER_ID}" class="dbl_whiteblock whiteblock dbl_hand_wrap">
+        <div id="player_hand_{PLAYER_ID}" class="dbl_whiteblock whiteblock dbl_hand_wrap {CLASS_NAME}">
             <div class="playerHand" id="player_hand_stock_{PLAYER_ID}">
             </div>
             <div class="pile-description">
@@ -84,7 +86,12 @@
     </div>
 
    
+   
 </div>
+
+<!-- BEGIN roPiles -->
+<div id="read_only_piles"></div>
+<!-- END roPiles -->
 
 <audio id="audiosrc_matchSuccess" src="{GAMETHEMEURL}/sound/matchSuccess.mp3" autobuffer></audio>
 <audio id="audiosrc_o_matchSuccess" src="{GAMETHEMEURL}/sound/matchSuccess.ogg" autobuffer></audio>

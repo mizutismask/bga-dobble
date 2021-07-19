@@ -132,11 +132,6 @@ class Dobble extends Table
         // Note: you can retrieve some extra field you added for "player" table in "dbmodel.sql" if you need it.
         $sql = "SELECT player_id id, player_score score FROM player ";
         $result['players'] = self::getCollectionFromDb($sql);
-        $result['hand'] = [];
-        $myCard = $this->getMyCard($current_player_id);
-        if ($myCard) {
-            $result['hand'][] = $myCard;
-        }
         $result['pattern'] = $this->getPatternCards();
         $result['minigame'] = $this->getMiniGame();
         $result['counters'] = $this->argCardsCounters();

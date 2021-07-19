@@ -51,6 +51,7 @@
   --minigame5-card-width: 23vmin;
   --mobile-minigame3-4-card-width: 32vmin;
   --minigame3-card-width: 22vmin;
+  --readOnly-card-width: 15vh;
 }
 
 .dbl_whiteblock {
@@ -108,7 +109,7 @@ html {
   background: none;
 }
 
-/* minigame 3 only */
+/* minigame 3/4 only */
 .circularPattern {
   position: absolute;
   top: 33%;
@@ -119,6 +120,14 @@ html {
 #players_wrap {
   display: contents;
   flex-wrap: wrap;
+}
+
+#read_only_piles{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 5px;
+  justify-content: center;
 }
 
 .pile-description {
@@ -164,6 +173,11 @@ html {
 .minigame5 .dbl_card_size {
   width: var(--minigame5-card-width);
   padding-top: var(--minigame5-card-width);
+}
+
+.dbl_read_only .dbl_card_size {
+  width: var(--readOnly-card-width);
+  padding-top: var(--readOnly-card-width);
 }
 
 .minigame5 #pattern_pile {
@@ -218,14 +232,17 @@ html {
   filter: progid:DXImageTransform.Microsoft.Shadow(color=#886a95, Direction=134, Strength=30);
 }
 
-.spectatorMode #myhand_wrap{
+.spectatorMode #myhand_wrap {
   display: none;
 }
 
-.spectatorMode #dbl_dobble_hand{
+.spectatorMode #dbl_dobble_hand {
   display: none;
 }
 
+.gamestate_getReady #piles, .gamestate_getReady #read_only_piles {
+  display: none;
+}
 
 .minigame5 .card_selected {
   transform: scale(0.9);
