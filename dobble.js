@@ -85,7 +85,7 @@ define([
                     if (player_id != this.player_id) {
                         playerHand = this.createStock("player_hand_stock_" + player_id);
 
-                        if ( this.minigame != this.WELL && this.minigame != this.TOWERING_INFERNO) {
+                        if (this.minigame != this.WELL && this.minigame != this.TOWERING_INFERNO) {
                             dojo.connect(playerHand, "onChangeSelection", this, "onSelectOpponentHand");
                         }
                         this.playerHands[player_id] = playerHand;
@@ -100,9 +100,10 @@ define([
                 dojo.place(divRound, "right-side-second-part", "before");
             }
 
-            if (this.minigame == this.WELL||this.minigame == this.TOWERING_INFERNO) {
+            if (this.minigame == this.WELL || this.minigame == this.TOWERING_INFERNO) {
                 dojo.query(".dbl_read_only").forEach(function (node, i, listItems) {
-                    dojo.place(node, "read_only_piles");  });
+                    dojo.place(node, "read_only_piles");
+                });
             }
 
             this.setupDobbleHand();
@@ -164,9 +165,9 @@ define([
                         case this.TOWERING_INFERNO:
                             var hands = args.args.hands;
                             for (const [player_id, cards] of Object.entries(hands)) {
-                                    var playerStock = this.getPlayerStock(player_id);
-                                    playerStock.removeAll();
-                                    this.addCardsToStock(cards, playerStock);
+                                var playerStock = this.getPlayerStock(player_id);
+                                playerStock.removeAll();
+                                this.addCardsToStock(cards, playerStock);
                             }
                             break;
                         case this.POISONED_GIFT:
@@ -440,7 +441,7 @@ define([
         },
 
         layoutHandsInCircle: function (playerCount) {
-            if ((this.minigame == this.POISONED_GIFT || this.minigame == this.HOT_POTATO)&&playerCount > 2 && $("piles").offsetWidth > 990) {
+            if ((this.minigame == this.POISONED_GIFT || this.minigame == this.HOT_POTATO) && playerCount > 2 && $("piles").offsetWidth > 990) {
                 dojo.addClass("players_wrap", "circularLayout");
                 var pilesToRound;
                 if (this.minigame == this.POISONED_GIFT) {
@@ -638,7 +639,7 @@ define([
             dojo.subscribe('newRound', this, "notifNewRound");
             dojo.subscribe('spotFailed', this, "notifSpotFailed");
 
-            this.notifqueue.setSynchronous('cardsMove', 1000);//carefull, card move must be finished before new round changes cards
+            this.notifqueue.setSynchronous('cardsMove', 2000);//carefull, card move must be finished before new round changes cards
             this.notifqueue.setSynchronous('newRound', 800);
 
         },
@@ -651,73 +652,91 @@ define([
             var cards = notif.args.cards;
             var from = notif.args.from;
             var to = notif.args.to;
+            var spottedCardIds = notif.args.spottedCardIds;
+            var spottedSymbol = notif.args.spottedSymbol;
+
             this.updateScores(notif.args.scores);
 
-            switch (this.minigame) {
-                case this.TOWERING_INFERNO:
-                    for (var card of cards) {
-                        if (from == "pattern") {
-                            from = "card-" + card.id;
+            //adds zoom in out effect
+            for (const cardId of spottedCardIds) {
+                var symbolDiv = "card-" + cardId + "-zone-" + spottedSymbol;
+                console.log("symbolDiv", symbolDiv);
+                dojo.addClass(symbolDiv, "zoom-in-out-effect");
+            }
+
+            //waits for the animation to be seen before removing cards
+            setTimeout(() => {
+                switch (this.minigame) {
+                    case this.TOWERING_INFERNO:
+                        for (var card of cards) {
+                            if (from == "pattern") {
+                                from = "card-" + card.id;
+                            }
+                            if (to == this.player_id) {
+                                this.playSound(this.SUCCESS_SOUND, false);
+                                this.animateDobbleHand();
+
+                            }
+                            var toStock = this.getPlayerStock(to);
+                            toStock.removeAll();
+                            toStock.addCard(card, from);
                         }
-                        if (to == this.player_id) {
+                        break;
+                    case this.WELL:
+                        var newHand = notif.args.newHand;
+                        for (var card of cards) {
+                            if (from == this.player_id) {
+                                this.playSound(this.SUCCESS_SOUND, false);
+                                this.animateDobbleHand();
+                            }
+                            var fromDiv = "card-" + card.id;
+                            this.patternPile.removeAll();
+                            this.patternPile.addCard(card, fromDiv);
+                        }
+                        if (from == this.player_id && newHand) {
+                            //display the card under my pile
+                            this.playerHand.removeAll();
+                            this.playerHand.addCard(newHand);
+                        }
+                        break;
+                    case this.POISONED_GIFT:
+                        for (var card of cards) {
+                            if (from == "pattern") {
+                                from = "card-" + card.id;
+                            }
+                            var toStock = this.getPlayerStock(to);
+                            toStock.removeAll();
+                            toStock.addCard(card, from);
+
+                        }
+                        if (fromPlayerId == this.player_id) {
                             this.playSound(this.SUCCESS_SOUND, false);
-                            this.animateDobbleHand();
-                            
                         }
-                        var toStock = this.getPlayerStock(to);
-                        toStock.removeAll();
-                        toStock.addCard(card, from);
-                    }
-                    break;
-                case this.WELL:
-                    var newHand = notif.args.newHand;
-                    for (var card of cards) {
+                        break;
+                    case this.HOT_POTATO:
+                        for (var card of cards) {
+                            this.getPlayerStock(to).removeAll();
+                            this.getPlayerStock(to).addCard(card, this.getStockDiv(from, card));
+                            this.getPlayerStock(from).removeAll();
+                        }
                         if (from == this.player_id) {
                             this.playSound(this.SUCCESS_SOUND, false);
-                            this.animateDobbleHand();  
                         }
-                        var fromDiv = "card-" + card.id;
-                        this.patternPile.removeAll();
-                        this.patternPile.addCard(card, fromDiv);
-                    }
-                    if (from == this.player_id && newHand) {
-                        //display the card under my pile
-                        this.playerHand.removeAll();
-                        this.playerHand.addCard(newHand);
-                    }
-                    break;
-                case this.POISONED_GIFT:
-                    for (var card of cards) {
-                        if (from == "pattern") {
-                            from = "card-" + card.id;
+                        break;
+                    case this.TRIPLET: {
+                        if (to == this.player_id) {
+                            this.playSound(this.SUCCESS_SOUND, false);
                         }
-                        var toStock = this.getPlayerStock(to);
-                        toStock.removeAll();
-                        toStock.addCard(card, from);
-
                     }
-                    if (fromPlayerId == this.player_id) {
-                        this.playSound(this.SUCCESS_SOUND, false);
-                    }
-                    break;
-                case this.HOT_POTATO:
-                    for (var card of cards) {
-                        this.getPlayerStock(to).removeAll();
-                        this.getPlayerStock(to).addCard(card, this.getStockDiv(from, card));
-                        this.getPlayerStock(from).removeAll();
-                    }
-                    if (from == this.player_id) {
-                        this.playSound(this.SUCCESS_SOUND, false);
-                    }
-                    break;
-                case this.TRIPLET: {
-                    if (to == this.player_id) {
-                        this.playSound(this.SUCCESS_SOUND, false);
-                    }
+                    default:
+                        break;
                 }
-                default:
-                    break;
-            }
+                //removes animation to get the symbols in the right angle after move without clipping
+                for (const cardId of spottedCardIds) {
+                    var symbolDiv = "#card-" + cardId + "-zone-" + spottedSymbol;
+                    dojo.query(symbolDiv).removeClass("zoom-in-out-effect");
+                }
+            }, 1000);
         },
 
         notifNewRound: function (notif) {

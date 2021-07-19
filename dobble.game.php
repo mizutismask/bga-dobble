@@ -338,6 +338,8 @@ class Dobble extends Table
                     'from' => 'pattern',
                     'to' => $player_id,
                     'scores' => $scores,
+                    'spottedCardIds' => [$myCard["id"],$template["id"],$card3["id"]],
+                    'spottedSymbol' => $symbol,
                 ));
                 break;
             case WELL:
@@ -354,6 +356,8 @@ class Dobble extends Table
                     'to' => 'pattern',
                     'newHand' => $this->getMyCard($player_id),
                     'scores' => $scores,
+                    'spottedCardIds' => [$myCard["id"],$template["id"]],
+                    'spottedSymbol' => $symbol,
                 ));
                 break;
             case HOT_POTATO:
@@ -374,6 +378,8 @@ class Dobble extends Table
                     'from' => $player_id,
                     'to' => $opponent_player_id,
                     'scores' => $scores,
+                    'spottedCardIds' => [$myCard["id"],$template["id"]],
+                    'spottedSymbol' => $symbol,
                 ));
                 break;
             case POISONED_GIFT:
@@ -392,6 +398,8 @@ class Dobble extends Table
                     'fromPlayerId' => $player_id,
                     'to' => $opponent_player_id,
                     'scores' => $scores,
+                    'spottedCardIds' => [$myCard["id"],$template["id"]],
+                    'spottedSymbol' => $symbol,
                 ));
                 break;
             case TOWERING_INFERNO:
@@ -407,6 +415,8 @@ class Dobble extends Table
                     'from' => 'pattern',
                     'to' => $player_id,
                     'scores' => $scores,
+                    'spottedCardIds' => [$myCard["id"],$template["id"]],
+                    'spottedSymbol' => $symbol,
                 ));
                 break;
             default:

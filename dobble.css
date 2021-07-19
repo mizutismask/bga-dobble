@@ -1168,3 +1168,19 @@ html {
   animation-timing-function: ease-in-out;
   animation-iteration-count: 1;
 }
+
+@keyframes zoom-in-zoom-out {
+  0% {
+    transform: scale(1, 1);
+  }
+  50% {
+    transform: scale(1.5, 1.5);
+  }
+  100% {
+    transform: scale(1, 1);
+  }
+}
+
+.zoom-in-out-effect {
+  animation: zoom-in-zoom-out 0.3s ease 2;
+}
