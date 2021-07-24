@@ -88,34 +88,38 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
         },
 
         setupCardAndZones(card) {
-            var cardId = "card-" + card.id;
-            var divCard = this.game.format_block("jstpl_card", { cardId: cardId });
-            dojo.place(divCard, this.div);
-            dojo.setAttr(cardId, "data-card-id", card.id);
-            dojo.setAttr(cardId, "data-card-type", card.type);
-            dojo.addClass(cardId, "dbl_card_size");
+            if(card!=undefined){
+                var cardId = "card-" + card.id;
+                var divCard = this.game.format_block("jstpl_card", { cardId: cardId });
+                dojo.place(divCard, this.div);
+                dojo.setAttr(cardId, "data-card-id", card.id);
+                dojo.setAttr(cardId, "data-card-type", card.type);
+                dojo.addClass(cardId, "dbl_card_size");
 
-            this.divByCardMap.set(card, cardId);
+                this.divByCardMap.set(card, cardId);
 
-            console.log("setupCardAndZones", card);
-            var zones = this.game.cardsDescription[card.type].zones;
-            //console.log("desc", this.game.cardsDescription[card.type]);
+                console.log("setupCardAndZones", card);
+                var zones = this.game.cardsDescription[card.type].zones;
+                //console.log("desc", this.game.cardsDescription[card.type]);
 
-            for (const i in zones) {
-                var z = zones[i];
-                var zoneId = cardId + "-zone-" + i;
-                var zoneContent = this.game.format_block("jstpl_card_zone", {
-                    zoneId: zoneId,
-                    top: z.top,
-                    left: z.left,
-                    rotation: z.rotation,
-                    symbolClass: "symbol-" + i,
-                    size: z.size,
-                });
-                dojo.place(zoneContent, cardId);
-                dojo.setAttr(zoneId, "data-symbol", i);
-                dojo.connect(dojo.byId(zoneId), "onclick", this, "onClickZone");
-            }
+                for (const i in zones) {
+                    var z = zones[i];
+                    var zoneId = cardId + "-zone-" + i;
+                    var zoneContent = this.game.format_block("jstpl_card_zone", {
+                        zoneId: zoneId,
+                        top: z.top,
+                        left: z.left,
+                        rotation: z.rotation,
+                        symbolClass: "symbol-" + i,
+                        size: z.size,
+                    });
+                    dojo.place(zoneContent, cardId);
+                    dojo.setAttr(zoneId, "data-symbol", i);
+                    dojo.connect(dojo.byId(zoneId), "onclick", this, "onClickZone");
+                }
+            } else {
+                this.createEmptyCard();
+        }
         },
 
         addCard(card, from, replaceContent) {
