@@ -9,7 +9,7 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
         //DobbleStock
         //class DobbleStock {
         constructor(game, div) {
-            console.log("game constructor");
+            console.log("dobble.stock constructor");
             this.game = game;
             this.div = div;
             this.setSelectionMode(1);
@@ -44,7 +44,7 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
             //this.observer.observe($(div), config);
         },
         onButtonClick(event) {
-            console.log("onButtonClick", event);
+            //console.log("onButtonClick", event);
         },
 
         createEmptyCard() {
@@ -62,7 +62,7 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
                 dojo.destroy(this.emptyDiv);
             }
 
-            console.log("add cards on div", this.div, "from", from, cards);
+            //console.log("add cards on div", this.div, "from", from, cards);
             for (var card of cards) {
                 if (from) {
                     //change the parent because the object needs to exist during animation, so the previous stock can not delete it
@@ -98,7 +98,7 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
 
                 this.divByCardMap.set(card, cardId);
 
-                console.log("setupCardAndZones", card);
+                //console.log("setupCardAndZones", card);
                 var zones = this.game.cardsDescription[card.type].zones;
                 //console.log("desc", this.game.cardsDescription[card.type]);
 
@@ -157,7 +157,7 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
             dojo.toggleClass(evt.currentTarget.id, "stockitem_selected");
             dojo.toggleClass(evt.currentTarget.parentNode.id, "card_selected");
 
-            console.log("onClickZone ", symbol);
+            //console.log("onClickZone ", symbol);
             dojo.publish("onChangeSelection", [evt, newSelection, this.div, dojo.getAttr(evt.currentTarget.parentNode, "data-card-id")]);
         },
 
@@ -170,7 +170,7 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
         */
         getSelectedItems() {
             var selectedCardDivs = dojo.query(".card > .stockitem_selected");
-            console.log("selectedCardDivs", selectedCardDivs);
+            //console.log("selectedCardDivs", selectedCardDivs);
             var selectedCardIds = selectedCardDivs.map((div) => dojo.getAttr(div.parentElement.id, "data-card-id"));
             return selectedCardIds;
         },
