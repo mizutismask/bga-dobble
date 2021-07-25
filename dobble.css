@@ -99,6 +99,10 @@ html {
   display: block !important;
 }
 
+.playerHand{
+  align-self: center;
+}
+
 .circularLayout .pile-description,
 .circularPattern .pile-description {
   justify-content: space-evenly;
