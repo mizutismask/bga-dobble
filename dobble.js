@@ -53,8 +53,9 @@ define([
             console.log("gamedatas ", gamedatas);
             this.cardsDescription = gamedatas.cardsDescription;
             this.minigame = parseInt(gamedatas.minigame);
-            // Setting up player boards
             dojo.addClass("piles", "minigame" + this.minigame);
+            this.players = gamedatas.players;
+            // Setting up player boards
 
             // TODO: Set up your game interface here, according to "gamedatas"
             if (
@@ -137,7 +138,6 @@ define([
         //
         onEnteringState: function (stateName, args) {
             console.log("Entering state: " + stateName, args);
-
             //handle pattern
             switch (stateName) {
                 case "playerTurn":
@@ -638,6 +638,8 @@ define([
 
             dojo.subscribe('newRound', this, "notifNewRound");
             dojo.subscribe('spotFailed', this, "notifSpotFailed");
+            dojo.subscribe('gameStateMultipleActiveUpdate', this, "notifDBLGameStateMultipleActiveUpdate");
+
 
             this.notifqueue.setSynchronous('cardsMove', 2000);//carefull, card move must be finished before new round changes cards
             this.notifqueue.setSynchronous('newRound', 800);
@@ -746,7 +748,6 @@ define([
         },
 
         notifSpotFailed: function (notif) {
-            //console.log("notifSpotFailed", notif);
             this.playSound("matchFailure", false);
             //adds shake effect
             var cards = this.selectedCardDivs;
@@ -755,6 +756,21 @@ define([
                     dojo.addClass(card, "shake");
                 }
             }
+        },
+
+        notifDBLGameStateMultipleActiveUpdate: function (notif) {
+            console.log("notifDBLGameStateMultipleActiveUpdate", notif);
+
+            for (var playerId of Object.keys(this.players)) {
+                var divId = "#player_" + playerId + "_sleepy";
+                if (!notif.args.includes(playerId)) {
+                    dojo.query(divId).addClass("dbl_sleep");
+                }
+                else {
+                    dojo.query(divId).removeClass("dbl_sleep");
+                }
+            }
+
         },
     });
 });

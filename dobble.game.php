@@ -338,7 +338,7 @@ class Dobble extends Table
                     'from' => 'pattern',
                     'to' => $player_id,
                     'scores' => $scores,
-                    'spottedCardIds' => [$myCard["id"],$template["id"],$card3["id"]],
+                    'spottedCardIds' => [$myCard["id"], $template["id"], $card3["id"]],
                     'spottedSymbol' => $symbol,
                 ));
                 break;
@@ -356,7 +356,7 @@ class Dobble extends Table
                     'to' => 'pattern',
                     'newHand' => $this->getMyCard($player_id),
                     'scores' => $scores,
-                    'spottedCardIds' => [$myCard["id"],$template["id"]],
+                    'spottedCardIds' => [$myCard["id"], $template["id"]],
                     'spottedSymbol' => $symbol,
                 ));
                 break;
@@ -378,7 +378,7 @@ class Dobble extends Table
                     'from' => $player_id,
                     'to' => $opponent_player_id,
                     'scores' => $scores,
-                    'spottedCardIds' => [$myCard["id"],$template["id"]],
+                    'spottedCardIds' => [$myCard["id"], $template["id"]],
                     'spottedSymbol' => $symbol,
                 ));
                 break;
@@ -398,7 +398,7 @@ class Dobble extends Table
                     'fromPlayerId' => $player_id,
                     'to' => $opponent_player_id,
                     'scores' => $scores,
-                    'spottedCardIds' => [$myCard["id"],$template["id"]],
+                    'spottedCardIds' => [$myCard["id"], $template["id"]],
                     'spottedSymbol' => $symbol,
                 ));
                 break;
@@ -415,7 +415,7 @@ class Dobble extends Table
                     'from' => 'pattern',
                     'to' => $player_id,
                     'scores' => $scores,
-                    'spottedCardIds' => [$myCard["id"],$template["id"]],
+                    'spottedCardIds' => [$myCard["id"], $template["id"]],
                     'spottedSymbol' => $symbol,
                 ));
                 break;
@@ -427,7 +427,7 @@ class Dobble extends Table
     {
         self::incStat(1, "symbols_failed", $player_id);
         $this->gamestate->setPlayerNonMultiactive($player_id, TRANSITION_PLAYER_TURN); // deactivate player; if none left, reactivates everyone
-        self::notifyPlayer($player_id, NOTIF_SPOT_FAILED, '', array());
+        self::notifyPlayer($player_id,NOTIF_SPOT_FAILED, '', array());
     }
 
     function incScore($player_id, $incValue)
@@ -734,7 +734,8 @@ class Dobble extends Table
         }
     }
 
-    function ready(){
+    function ready()
+    {
         self::checkAction('ready');
         $player_id = self::getCurrentPlayerId();
         $this->gamestate->setPlayerNonMultiactive($player_id, TRANSITION_PLAYER_TURN); // deactivate player; wait for others     
@@ -881,7 +882,7 @@ class Dobble extends Table
 
     function st_multiPlayerAllActive()
     {
-            $this->gamestate->setAllPlayersMultiactive();
+        $this->gamestate->setAllPlayersMultiactive();
     }
 
     //////////////////////////////////////////////////////////////////////////////
