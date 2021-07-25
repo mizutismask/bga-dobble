@@ -662,8 +662,10 @@ define([
             //adds zoom in out effect
             for (const cardId of spottedCardIds) {
                 var symbolDiv = "card-" + cardId + "-zone-" + spottedSymbol;
-                console.log("symbolDiv", symbolDiv);
-                dojo.addClass(symbolDiv, "zoom-in-out-effect");
+                if (dojo.byId(symbolDiv)) {
+                    console.log("symbolDiv", symbolDiv);
+                    dojo.addClass(symbolDiv, "zoom-in-out-effect");
+                }
             }
 
             //waits for the animation to be seen before removing cards
@@ -707,8 +709,14 @@ define([
                                 from = "card-" + card.id;
                             }
                             var toStock = this.getPlayerStock(to);
-                            toStock.removeAll();
-                            toStock.addCard(card, from);
+                            if (toStock) {
+                                toStock.removeAll();
+                                toStock.addCard(card, from);
+                            }
+                            else {
+                                //TODO mypile is not displayed,  card should be moved to playerboard
+                                
+                            }
 
                         }
                         if (fromPlayerId == this.player_id) {
