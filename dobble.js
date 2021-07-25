@@ -111,15 +111,29 @@ define([
 
             // dojo.query("h3").lettering();
 
-            //cards counts
+
             for (var player_id in gamedatas.players) {
                 var player_board_div = $('player_board_' + player_id);
-
-                dojo.place(this.format_block('jstpl_cards_icon', {
+                var dbl_player_board_div = "dbl_player_panel_" + player_id;
+               
+                //custom panel
+                dojo.place(this.format_block('jstpl_dbl_player_panel', {
                     id: player_id,
                 }), player_board_div);
+
+                //cards counts
+                dojo.place(this.format_block('jstpl_cards_icon', {
+                    id: player_id,
+                }), dbl_player_board_div);
                 var el = 'cards_icon_' + player_id;
                 this.addTooltipHtml(el, _('Number of cards in the pile'));
+                
+                //sleepy icon
+                dojo.place(this.format_block('jstpl_sleepy_icon', {
+                    id: player_id,
+                }), dbl_player_board_div);
+                var el = 'sleepy_panel_' + player_id;
+                this.addTooltipHtml(el, _('This player has failed to spot a symbol. He has to wait until the next card or until everyone fails.'));
             }
 
             this.updateCountersIfPossible(gamedatas.counters);
@@ -715,7 +729,7 @@ define([
                             }
                             else {
                                 //TODO mypile is not displayed,  card should be moved to playerboard
-                                
+
                             }
 
                         }
@@ -771,14 +785,16 @@ define([
 
             for (var playerId of Object.keys(this.players)) {
                 var divId = "#player_" + playerId + "_sleepy";
+                var playerPanelSleepy = "#sleepy_panel_"+playerId;
                 if (!notif.args.includes(playerId)) {
                     dojo.query(divId).addClass("dbl_sleep");
+                    dojo.query(playerPanelSleepy).addClass("dbl_sleepy_panel");
                 }
                 else {
                     dojo.query(divId).removeClass("dbl_sleep");
+                    dojo.query(playerPanelSleepy).removeClass("dbl_sleepy_panel");
                 }
             }
-
         },
     });
 });

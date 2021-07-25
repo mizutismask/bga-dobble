@@ -117,6 +117,8 @@ var jstpl_round='<div class="dbl_roundNb player-board">${roundText} <span id="ro
 
 var jstpl_cards_icon = '<div id= "cards_panel_${id}"> \
     <div id="cards_icon_${id}" class="dbl_cards_icon"></div><span id="player_board_cards_count_${id}" class="cards_count"></span></div>';
+var jstpl_sleepy_icon = '<span id="sleepy_panel_${id}"></span>';
+var jstpl_dbl_player_panel = '<div id="dbl_player_panel_${id}" class="dbl_player_panel"></div>';
 //
 </script>  
 
