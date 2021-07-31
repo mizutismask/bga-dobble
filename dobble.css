@@ -333,14 +333,15 @@ html {
   background: url("img/sleep.png") no-repeat;
   margin-left: 5px;
   margin-right: 5px;
+  align-self:flex-end;
 }
 
 .dbl_cards_icon {
-  width: 30px;
+  width: 23;
   height: 23px;
   background: url("img/handIcon.png");
   display: inline-block;
-  vertical-align: middle;
+  vertical-align: bottom;
   margin-right: 4px;
 }
 
