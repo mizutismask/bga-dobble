@@ -115,7 +115,7 @@ define([
             for (var player_id in gamedatas.players) {
                 var player_board_div = $('player_board_' + player_id);
                 var dbl_player_board_div = "dbl_player_panel_" + player_id;
-               
+
                 //custom panel
                 dojo.place(this.format_block('jstpl_dbl_player_panel', {
                     id: player_id,
@@ -127,7 +127,7 @@ define([
                 }), dbl_player_board_div);
                 var el = 'cards_icon_' + player_id;
                 this.addTooltipHtml(el, _('Number of cards in the pile'));
-                
+
                 //sleepy icon
                 dojo.place(this.format_block('jstpl_sleepy_icon', {
                     id: player_id,
@@ -509,9 +509,12 @@ define([
 
             }
             dojo.query(".dbl_winner").removeClass("dbl_winner");
+            dojo.query(".dbl_player_board_winner").removeClass("dbl_player_board_winner");
+            
             for (const player of winners) {
                 //dojo.query("#player_hand_" + player +" h3").addClass("dbl_winner");//on names
                 dojo.query("#player_hand_stock_" + player).addClass("dbl_winner");//on piles
+                dojo.query("#overall_player_board_" + player).addClass("dbl_player_board_winner");
                 if (player == this.player_id) {
                     dojo.query("#myhand").addClass("dbl_winner");
                 }
@@ -773,6 +776,7 @@ define([
             this.playSound("matchFailure", false);
             //adds shake effect
             var cards = this.selectedCardDivs;
+            console.log("selectedCardDivs", cards);
             if (cards) {
                 for (const card of cards) {
                     dojo.addClass(card, "shake");
@@ -785,7 +789,7 @@ define([
 
             for (var playerId of Object.keys(this.players)) {
                 var divId = "#player_" + playerId + "_sleepy";
-                var playerPanelSleepy = "#sleepy_panel_"+playerId;
+                var playerPanelSleepy = "#sleepy_panel_" + playerId;
                 if (!notif.args.includes(playerId)) {
                     dojo.query(divId).addClass("dbl_sleep");
                     dojo.query(playerPanelSleepy).addClass("dbl_sleepy_panel");

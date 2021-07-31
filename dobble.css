@@ -99,7 +99,7 @@ html {
   display: block !important;
 }
 
-.playerHand{
+.playerHand {
   align-self: center;
 }
 
@@ -231,7 +231,7 @@ html {
 
 #myhand_wrap .card,
 .minigame4 #pattern_pile .card {
-  border-style: solid ;
+  border-style: solid;
   border-width: 2px;
   border-color: #886a95 !important;
   -moz-box-shadow: 5px 5px 5px 0px rgba(136, 106, 149, 1);
@@ -264,7 +264,7 @@ html {
   border-style: dashed !important;
   border-width: 2px;
   border-color: seagreen;
-  box-shadow:none !important;
+  box-shadow: none !important;
 }
 
 .player-board {
@@ -308,26 +308,31 @@ html {
   border-radius: 50%;
 }
 
-.dbl_player_panel{
+.dbl_player_board_winner {
+  border:  solid 4px greenyellow !important;
+}
+
+.dbl_player_panel {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  gap:10px;
+  gap: 10px;
   padding: 7px 0px 7px 0px;
+  align-items: center;
 }
 
-.dbl_sleepy_panel{
-  width: 38px;
-  height: 23px;
-  background: url("img/sleep.png")no-repeat;
+.dbl_sleepy_panel {
+  width: 32px;
+  height: 19px;
+  background: url("img/sleep.png") no-repeat;
 }
 
-.dbl_sleep{
+.dbl_sleep {
   width: 38px;
   height: 23px;
-  background: url("img/sleep.png")no-repeat;
-  margin-left:5px;
-  margin-right:5px;
+  background: url("img/sleep.png") no-repeat;
+  margin-left: 5px;
+  margin-right: 5px;
 }
 
 .dbl_cards_icon {
