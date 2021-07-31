@@ -109,9 +109,6 @@ define([
 
             this.setupDobbleHand();
 
-            // dojo.query("h3").lettering();
-
-
             for (var player_id in gamedatas.players) {
                 var player_board_div = $('player_board_' + player_id);
                 var dbl_player_board_div = "dbl_player_panel_" + player_id;
@@ -126,14 +123,22 @@ define([
                     id: player_id,
                 }), dbl_player_board_div);
                 var el = 'cards_icon_' + player_id;
-                this.addTooltipHtml(el, _('Number of cards in the pile'));
+                var pileTooltip =_('Number of cards in the pile');
+                this.addTooltipHtml(el, pileTooltip);
+                this.addTooltipHtml("cards_count_"+ player_id ,pileTooltip);
 
                 //sleepy icon
                 dojo.place(this.format_block('jstpl_sleepy_icon', {
                     id: player_id,
                 }), dbl_player_board_div);
                 var el = 'sleepy_panel_' + player_id;
-                this.addTooltipHtml(el, _('This player has failed to spot a symbol. He has to wait until the next card or until everyone fails.'));
+                var sleepyTooltip = _('This player has failed to spot a symbol. He has to wait until the next card or until everyone fails.');
+                this.addTooltipHtml(el, sleepyTooltip);
+
+                //tooltip on sleepy icon on piles
+                var el = 'player_' + player_id+"_sleepy";
+                this.addTooltipHtml(el, sleepyTooltip);
+
             }
 
             this.updateCountersIfPossible(gamedatas.counters);

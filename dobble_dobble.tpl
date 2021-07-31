@@ -55,7 +55,7 @@
             </div>
             <div class="pile-description">
                 
-                <div style="color:#{PLAYER_COLOR}">
+                <div style="color:#{PLAYER_COLOR}" id="player_name_{PLAYER_ID}>
                     <h3 class="dbl_block_title">{MY_HAND}</h3>
                 </div>
                 <div id="player_{PLAYER_ID}_sleepy"></div>
@@ -76,7 +76,7 @@
             </div>
             <div class="pile-description">
                 
-                <div style="color:#{PLAYER_COLOR}">
+                <div style="color:#{PLAYER_COLOR}" id="player_name_{PLAYER_ID}">
                     <h3 class="dbl_block_title">{PLAYER_NAME}</h3>
                 </div>
                 <div id="player_{PLAYER_ID}_sleepy"></div>
