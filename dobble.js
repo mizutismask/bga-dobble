@@ -123,20 +123,20 @@ define([
                     id: player_id,
                 }), dbl_player_board_div);
                 var el = 'cards_icon_' + player_id;
-                var pileTooltip =_('Number of cards in the pile');
+                var pileTooltip = _('Number of cards in the pile');
                 this.addTooltipHtml(el, pileTooltip);
-                this.addTooltipHtml("cards_count_"+ player_id ,pileTooltip);
+                this.addTooltipHtml("cards_count_" + player_id, pileTooltip);
 
                 //sleepy icon
                 dojo.place(this.format_block('jstpl_sleepy_icon', {
                     id: player_id,
                 }), dbl_player_board_div);
                 var el = 'sleepy_panel_' + player_id;
-                var sleepyTooltip = _('This player has failed to spot a symbol. He has to wait until the next card or until everyone fails.');
+                var sleepyTooltip = _('This player has failed to spot a symbol. He has to wait until the next card or until everyone fail.');
                 this.addTooltipHtml(el, sleepyTooltip);
 
                 //tooltip on sleepy icon on piles
-                var el = 'player_' + player_id+"_sleepy";
+                var el = 'player_' + player_id + "_sleepy";
                 this.addTooltipHtml(el, sleepyTooltip);
 
             }
@@ -157,6 +157,7 @@ define([
         //
         onEnteringState: function (stateName, args) {
             console.log("Entering state: " + stateName, args);
+            this.currentState = stateName;
             //handle pattern
             switch (stateName) {
                 case "playerTurn":
@@ -515,7 +516,7 @@ define([
             }
             dojo.query(".dbl_winner").removeClass("dbl_winner");
             dojo.query(".dbl_player_board_winner").removeClass("dbl_player_board_winner");
-            
+
             for (const player of winners) {
                 //dojo.query("#player_hand_" + player +" h3").addClass("dbl_winner");//on names
                 dojo.query("#player_hand_stock_" + player).addClass("dbl_winner");//on piles
@@ -791,17 +792,18 @@ define([
 
         notifDBLGameStateMultipleActiveUpdate: function (notif) {
             console.log("notifDBLGameStateMultipleActiveUpdate", notif);
-
-            for (var playerId of Object.keys(this.players)) {
-                var divId = "#player_" + playerId + "_sleepy";
-                var playerPanelSleepy = "#sleepy_panel_" + playerId;
-                if (!notif.args.includes(playerId)) {
-                    dojo.query(divId).addClass("dbl_sleep");
-                    dojo.query(playerPanelSleepy).addClass("dbl_sleepy_panel");
-                }
-                else {
-                    dojo.query(divId).removeClass("dbl_sleep");
-                    dojo.query(playerPanelSleepy).removeClass("dbl_sleepy_panel");
+            if (this.currentState == "playerTurn") {
+                for (var playerId of Object.keys(this.players)) {
+                    var divId = "#player_" + playerId + "_sleepy";
+                    var playerPanelSleepy = "#sleepy_panel_" + playerId;
+                    if (!notif.args.includes(playerId)) {
+                        dojo.query(divId).addClass("dbl_sleep");
+                        dojo.query(playerPanelSleepy).addClass("dbl_sleepy_panel");
+                    }
+                    else {
+                        dojo.query(divId).removeClass("dbl_sleep");
+                        dojo.query(playerPanelSleepy).removeClass("dbl_sleepy_panel");
+                    }
                 }
             }
         },
