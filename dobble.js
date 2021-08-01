@@ -167,9 +167,24 @@ define([
                         case this.WELL:
                         case this.POISONED_GIFT:
                         case this.TRIPLET:
-                            var patterns = args.args.pattern;
+                            let patterns = args.args.pattern;
+                            let oldCards = this.patternPile.getCardIds();
+                            //new cards have to be inserted when the previous one were, we don't want them to shift
+                            let reorderedCards = [];
+                            let newCards = patterns.filter(c => !oldCards.includes(c.id.toString()));
+
+                            for (let i = 0; i < oldCards.length; i++) {
+                                const oldCardId = oldCards[i];
+                                let j = patterns.findIndex(c => c.id == oldCardId);
+                                if (j != -1) {
+                                    reorderedCards[i] = patterns[j];
+                                }
+                                else {
+                                    reorderedCards[i] = newCards.pop();
+                                }
+                            }
                             this.patternPile.removeAll();
-                            this.addCardsToStock(patterns, this.patternPile, false);
+                            this.addCardsToStock(reorderedCards, this.patternPile, false);
                             break;
 
                         default:

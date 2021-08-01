@@ -181,6 +181,12 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
             return selectedCardIds.pop();
         },
 
+        getCardIds() {
+            var cardDivs = dojo.query("#"+this.div+" .card");
+            var selectedCardIds = cardDivs.map((div) => dojo.getAttr(div.id, "data-card-id"));
+            return selectedCardIds;
+        },
+
         unselectAll() {
             dojo.query(this.getSymbolsQuery()).removeClass("stockitem_selected");
             dojo.query(".card").removeClass("card_selected");
