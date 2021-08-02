@@ -112,6 +112,7 @@
 //var jstpl_some_game_item='<div class="my_game_item" id="my_game_item_${MY_ITEM_ID}"></div>';
 
 var jstpl_card='<div id="${cardId}" class="card"></div>'
+var jstpl_empty_card='<div data-card-id="-1" data-card-type="empty" class="card dbl_card_size dbl_empty_card"></div>'
 var jstpl_card_zone='<div id="${zoneId}" class="symbol ${symbolClass}" style="top:${top}%; left:${left}%; transform:rotate(${rotation}deg); width:${size}%; height:${size}%;" ></div>'
 var jstpl_round='<div class="dbl_roundNb player-board">${roundText} <span id="roundNb">${roundNb}</span></div>'
 

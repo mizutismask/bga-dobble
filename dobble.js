@@ -169,22 +169,32 @@ define([
                         case this.TRIPLET:
                             let patterns = args.args.pattern;
                             let oldCards = this.patternPile.getCardIds();
-                            //new cards have to be inserted when the previous one were, we don't want them to shift
+                            //console.log("oldCards", oldCards);
                             let reorderedCards = [];
-                            let newCards = patterns.filter(c => !oldCards.includes(c.id.toString()));
+                            if (oldCards.length != 0) {
+                                //new cards have to be inserted when the previous one were, we don't want them to shift
+                                let newCards = patterns.filter(c => !oldCards.includes(c.id.toString()));
 
-                            for (let i = 0; i < oldCards.length; i++) {
-                                const oldCardId = oldCards[i];
-                                let j = patterns.findIndex(c => c.id == oldCardId);
-                                if (j != -1) {
-                                    reorderedCards[i] = patterns[j];
+                                for (let i = 0; i < oldCards.length; i++) {
+                                    const oldCardId = oldCards[i];
+                                    let j = patterns.findIndex(c => c.id == oldCardId);
+                                    if (j != -1) {
+                                        reorderedCards[i] = patterns[j];
+                                    }
+                                    else {
+                                        reorderedCards[i] = newCards.pop();
+                                    }
                                 }
-                                else {
-                                    reorderedCards[i] = newCards.pop();
-                                }
+                            } else {
+                                reorderedCards = patterns;
                             }
+                            //ensures there are always 9 elements
+                            for (let i = reorderedCards.length; i < 9; i++) {
+                                reorderedCards.push(undefined);//undefined makes an empty card
+                            }
+
                             this.patternPile.removeAll();
-                            this.addCardsToStock(reorderedCards, this.patternPile, false);
+                            this.addCardsToStock(reorderedCards, this.patternPile);
                             break;
 
                         default:
@@ -222,7 +232,7 @@ define([
                                 var playerStock = this.getPlayerStock(player_id);
                                 if (this.stockContentIsDifferentFromHand(playerStock, cards)) {
                                     playerStock.removeAll();
-                                    this.addCardsToStock(cards, playerStock, false);
+                                    this.addCardsToStock(cards, playerStock);
                                 }
                             }
                             var player = this.getUniqueOpponentWithCards();
@@ -296,8 +306,8 @@ define([
             return stock;
         },
 
-        addCardsToStock: function (cards, stock, replaceContent = false) {
-            stock.addCards(cards, replaceContent);
+        addCardsToStock: function (cards, stock) {
+            stock.addCards(cards);
         },
 
         getFormatedType: function (typeNumber) {

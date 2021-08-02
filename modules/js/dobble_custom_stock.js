@@ -14,7 +14,6 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
             this.div = div;
             this.setSelectionMode(1);
             this.divByCardMap = new Map();
-            this.emptyDiv = div + "-emptyCard";
 
             this.createEmptyCard();
 
@@ -25,14 +24,14 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
             // Callback function to execute when mutations are observed
             const callback = function (mutationsList, observer) {
                 for (const mutation of mutationsList) {
-                    if (mutation.type === 'childList' && mutation.removedNodes.length>0) {
-                            for (const removed of mutation.removedNodes) {
-                                //console.log("mutation", mutation, removed);
-                                if (dojo.hasClass(removed, "card")) {
-                                    console.log('A child card has been removed from', div ,removed);
+                    if (mutation.type === 'childList' && mutation.removedNodes.length > 0) {
+                        for (const removed of mutation.removedNodes) {
+                            //console.log("mutation", mutation, removed);
+                            if (dojo.hasClass(removed, "card")) {
+                                console.log('A child card has been removed from', div, removed);
 
-                                }
                             }
+                        }
                     }
                 }
             };
@@ -48,18 +47,18 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
         },
 
         createEmptyCard() {
-            var cardId = this.emptyDiv;
-            var divCard = this.game.format_block("jstpl_card", { cardId: cardId });
+            var divCard = this.game.format_block("jstpl_empty_card", {});
             dojo.place(divCard, this.div);
-            dojo.setAttr(cardId, "data-card-id", -1);
-            dojo.setAttr(cardId, "data-card-type", "empty");
-            dojo.addClass(cardId, "dbl_card_size");
-            dojo.addClass(cardId, "dbl_empty_card");
+            //style and data attributes in tpl
+            console.log("createEmptyCard");
         },
 
-        addCards(cards, from = undefined, replaceContent = false) {
-            if (cards && cards.length && dojo.byId(this.emptyDiv)) {
-                dojo.destroy(this.emptyDiv);
+        addCards(cards, from = undefined) {
+            let emptyQuery = "#" + this.div + " .dbl_empty_card";
+            if (cards && cards.length) {
+                dojo.query(emptyQuery).forEach(function (node, index, arr) {
+                    dojo.destroy(node);
+                });
             }
 
             //console.log("add cards on div", this.div, "from", from, cards);
@@ -88,7 +87,7 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
         },
 
         setupCardAndZones(card) {
-            if(card!=undefined){
+            if (card != undefined) {
                 var cardId = "card-" + card.id;
                 var divCard = this.game.format_block("jstpl_card", { cardId: cardId });
                 dojo.place(divCard, this.div);
@@ -98,9 +97,9 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
 
                 this.divByCardMap.set(card, cardId);
 
-                //console.log("setupCardAndZones", card);
+                console.log("setupCardAndZones", card);
                 var zones = this.game.cardsDescription[card.type].zones;
-                //console.log("desc", this.game.cardsDescription[card.type]);
+                console.log("desc", this.game.cardsDescription[card.type]);
 
                 for (const i in zones) {
                     var z = zones[i];
@@ -119,11 +118,11 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
                 }
             } else {
                 this.createEmptyCard();
-        }
+            }
         },
 
-        addCard(card, from, replaceContent) {
-            this.addCards([card], from, replaceContent);
+        addCard(card, from) {
+            this.addCards([card], from);
         },
 
         //same as classic stock
@@ -176,13 +175,18 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
         },
 
         getCardId() {
-            var cardDivs = dojo.query("#"+this.div+" .card");
+            var cardDivs = dojo.query("#" + this.div + " .card");
             var selectedCardIds = cardDivs.map((div) => dojo.getAttr(div.id, "data-card-id"));
             return selectedCardIds.pop();
         },
-
+        
         getCardIds() {
-            var cardDivs = dojo.query("#"+this.div+" .card");
+            var cardDivs = dojo.query("#" + this.div + " .card:not(.dbl_empty_card)");
+            //console.log("#" + this.div + ".card :not(.dbl_empty_card)");
+            //console.log("cardDivs", cardDivs);
+            //cardDivs.forEach(function (element) {
+            //    console.log("el",element);
+            //});
             var selectedCardIds = cardDivs.map((div) => dojo.getAttr(div.id, "data-card-id"));
             return selectedCardIds;
         },
