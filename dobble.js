@@ -162,12 +162,15 @@ define([
             switch (stateName) {
                 case "playerTurn":
                     this.updateCountersIfPossible(args.args.counters);
+                    let patterns = args.args.pattern;
                     switch (this.minigame) {
                         case this.TOWERING_INFERNO:
                         case this.WELL:
                         case this.POISONED_GIFT:
+                            this.patternPile.removeAll();
+                            this.addCardsToStock(patterns, this.patternPile);
+                            break;
                         case this.TRIPLET:
-                            let patterns = args.args.pattern;
                             let oldCards = this.patternPile.getCardIds();
                             //console.log("oldCards", oldCards);
                             let reorderedCards = [];
