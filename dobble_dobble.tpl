@@ -98,10 +98,10 @@
 <div id="read_only_piles"></div>
 <!-- END roPiles -->
 
-<audio id="audiosrc_matchSuccess" src="{GAMETHEMEURL}/sound/matchSuccess.mp3" autobuffer></audio>
-<audio id="audiosrc_o_matchSuccess" src="{GAMETHEMEURL}/sound/matchSuccess.ogg" autobuffer></audio>
-<audio id="audiosrc_matchFailure" src="{GAMETHEMEURL}/sound/matchFailure.mp3" autobuffer></audio>
-<audio id="audiosrc_o_matchFailure" src="{GAMETHEMEURL}/sound/matchFailure.ogg" autobuffer></audio>
+<audio id="audiosrc_matchSuccess" src="{GAMETHEMEURL}/img/sound/matchSuccess.mp3" autobuffer></audio>
+<audio id="audiosrc_o_matchSuccess" src="{GAMETHEMEURL}/img/sound/matchSuccess.ogg" autobuffer></audio>
+<audio id="audiosrc_matchFailure" src="{GAMETHEMEURL}/img/sound/matchFailure.mp3" autobuffer></audio>
+<audio id="audiosrc_o_matchFailure" src="{GAMETHEMEURL}/img/sound/matchFailure.ogg" autobuffer></audio>
 
 <script type="text/javascript">
 
