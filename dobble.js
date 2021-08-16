@@ -573,8 +573,8 @@ define([
             console.log("evt.currentTarget.id", evt.currentTarget.id);
             console.log("onChooseSymbol ", symbol);
 
-            //store selected divs to shake in case of error
-            this.selectedCardDivs = dojo.query(".card > .stockitem_selected").map((div) => div.id);
+            //store selected divs wrappers to shake in case of error
+            this.selectedCardDivs = dojo.query(".symbolWrapper > .stockitem_selected").map((div) => div.parentElement.id);
 
             // Preventing default browser reaction
             dojo.stopEvent(evt);
@@ -712,7 +712,7 @@ define([
 
             //adds zoom in out effect
             for (const cardId of spottedCardIds) {
-                var symbolDiv = "card-" + cardId + "-zone-" + spottedSymbol;
+                var symbolDiv = "card-" + cardId + "-zone-" + spottedSymbol + "_wrapper";
                 if (dojo.byId(symbolDiv)) {
                     console.log("symbolDiv", symbolDiv);
                     dojo.addClass(symbolDiv, "zoom-in-out-effect");
@@ -794,7 +794,7 @@ define([
                 }
                 //removes animation to get the symbols in the right angle after move without clipping
                 for (const cardId of spottedCardIds) {
-                    var symbolDiv = "#card-" + cardId + "-zone-" + spottedSymbol;
+                    var symbolDiv = "#card-" + cardId + "-zone-" + spottedSymbol + "_wrapper";
                     dojo.query(symbolDiv).removeClass("zoom-in-out-effect");
                 }
             }, 1000);
@@ -810,7 +810,7 @@ define([
             this.playSound("matchFailure", false);
             //adds shake effect
             var cards = this.selectedCardDivs;
-            console.log("selectedCardDivs", cards);
+            //console.log("selectedCardDivs", cards);
             if (cards) {
                 for (const card of cards) {
                     dojo.addClass(card, "shake");

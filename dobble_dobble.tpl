@@ -113,7 +113,7 @@
 
 var jstpl_card='<div id="${cardId}" class="card"></div>'
 var jstpl_empty_card='<div data-card-id="-1" data-card-type="empty" class="card dbl_card_size dbl_empty_card"></div>'
-var jstpl_card_zone='<div id="${zoneId}" class="symbol ${symbolClass}" style="top:${top}%; left:${left}%; transform:rotate(${rotation}deg); width:${size}%; height:${size}%;" ></div>'
+var jstpl_card_zone='<div id="${zoneId}_wrapper" class="symbolWrapper" style="position:absolute; top:${top}%; left:${left}%; width:${size}%; height:${size}%;"><div id="${zoneId}" class="symbol ${symbolClass}" style="top:0%; left:0%; width:100%; height:100%; transform:rotate(${rotation}deg);" ></div></div>'
 var jstpl_round='<div class="dbl_roundNb player-board">${roundText} <span id="roundNb">${roundNb}</span></div>'
 
 var jstpl_cards_icon = '<div id= "cards_panel_${id}"> \
