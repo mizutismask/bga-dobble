@@ -334,7 +334,7 @@ class Dobble extends Table
                 self::notifyAllPlayers(NOTIF_CARDS_MOVE, clienttranslate('${player_name} spotted ${symbolName} on three cards'), array(
                     'player_name' => $this->getPlayerName($player_id),
                     'symbolName' => $this->symbolsNames[$symbol],
-                    'cards' => [$template, $myCard],
+                    'cards' => [$template, $myCard, $card3],
                     'from' => 'pattern',
                     'to' => $player_id,
                     'scores' => $scores,
@@ -427,7 +427,7 @@ class Dobble extends Table
     {
         self::incStat(1, "symbols_failed", $player_id);
         $this->gamestate->setPlayerNonMultiactive($player_id, TRANSITION_PLAYER_TURN); // deactivate player; if none left, reactivates everyone
-        self::notifyPlayer($player_id,NOTIF_SPOT_FAILED, '', array());
+        self::notifyPlayer($player_id, NOTIF_SPOT_FAILED, '', array());
     }
 
     function incScore($player_id, $incValue)

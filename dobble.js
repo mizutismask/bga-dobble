@@ -788,6 +788,13 @@ define([
                         if (to == this.player_id) {
                             this.playSound(this.SUCCESS_SOUND, false);
                         }
+                        for (var card of cards) {
+                            var cardDiv = dojo.byId("card-"+card.id);
+                            var clone = dojo.clone(cardDiv);
+                            dojo.setAttr(clone, "id", cardDiv.id + "clone");
+
+                            this.slideTemporaryObject(clone,cardDiv.parentElement.id, cardDiv.id, 'overall_player_board_'+to ).play();
+                        }
                     }
                     default:
                         break;

@@ -151,13 +151,13 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
             var newSelection = !dojo.hasClass(evt.currentTarget.id, "stockitem_selected");
             if (newSelection) {
                 //deselect previous selection
-                dojo.query("#" + evt.currentTarget.parentElement.id + " .symbol").removeClass("stockitem_selected");
+                dojo.query("#" + evt.currentTarget.parentElement.parentElement.id + " .symbol").removeClass("stockitem_selected");
             }
             dojo.toggleClass(evt.currentTarget.id, "stockitem_selected");
-            dojo.toggleClass(evt.currentTarget.parentNode.id, "card_selected");
+            dojo.toggleClass(evt.currentTarget.parentNode.parentNode.id, "card_selected");
 
             //console.log("onClickZone ", symbol);
-            dojo.publish("onChangeSelection", [evt, newSelection, this.div, dojo.getAttr(evt.currentTarget.parentNode, "data-card-id")]);
+            dojo.publish("onChangeSelection", [evt, newSelection, this.div, dojo.getAttr(evt.currentTarget.parentNode.parentNode, "data-card-id")]);
         },
 
         selectItem(cardId) {
@@ -168,9 +168,9 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
         Returns a list of card ids.
         */
         getSelectedItems() {
-            var selectedCardDivs = dojo.query(".card > .stockitem_selected");
-            //console.log("selectedCardDivs", selectedCardDivs);
-            var selectedCardIds = selectedCardDivs.map((div) => dojo.getAttr(div.parentElement.id, "data-card-id"));
+            var selectedCardDivs = dojo.query(".card > .symbolWrapper > .stockitem_selected");
+            console.log("selectedCardDivs", selectedCardDivs);
+            var selectedCardIds = selectedCardDivs.map((div) => dojo.getAttr(div.parentElement.parentElement.id, "data-card-id"));
             return selectedCardIds;
         },
 
