@@ -180,12 +180,12 @@ define([
 
                                 for (let i = 0; i < oldCards.length; i++) {
                                     const oldCardId = oldCards[i];
-                                    let j = patterns.findIndex(c => c.id == oldCardId);
-                                    if (j != -1) {
-                                        reorderedCards[i] = patterns[j];
+                                    if (oldCardId == -1) {
+                                        reorderedCards[i] = newCards.pop();
                                     }
                                     else {
-                                        reorderedCards[i] = newCards.pop();
+                                        let j = patterns.findIndex(c => c.id == oldCardId);
+                                        reorderedCards[i] = patterns[j];
                                     }
                                 }
                             } else {
@@ -789,11 +789,12 @@ define([
                             this.playSound(this.SUCCESS_SOUND, false);
                         }
                         for (var card of cards) {
-                            var cardDiv = dojo.byId("card-"+card.id);
+                            var cardDiv = dojo.byId("card-" + card.id);
+                            var cardDivParentId = cardDiv.parentElement.parentElement.id;
                             var clone = dojo.clone(cardDiv);
                             dojo.setAttr(clone, "id", cardDiv.id + "clone");
-
-                            this.slideTemporaryObject(clone,cardDiv.parentElement.id, cardDiv.id, 'overall_player_board_'+to ).play();
+                            this.slideTemporaryObject(clone,cardDivParentId, cardDiv.id, 'overall_player_board_'+to ).play();
+                            this.patternPile.replaceWithEmpty(cardDiv);
                         }
                     }
                     default:

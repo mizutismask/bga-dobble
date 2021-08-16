@@ -142,6 +142,11 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
             this.createEmptyCard();
         },
 
+        replaceWithEmpty(divId) {
+            var divCard = this.game.format_block("jstpl_empty_card", {});
+            dojo.place(divCard, divId, "replace");
+        },
+
         onClickZone(evt) {
             if (this.selectionMode == 0) return;
             //gets the clicked symbol
@@ -181,13 +186,13 @@ define(["dojo", "dojo/_base/declare", "dojo/fx", "dojo/dom", "dojo/dom-geometry"
         },
         
         getCardIds() {
-            var cardDivs = dojo.query("#" + this.div + " .card:not(.dbl_empty_card)");
+            var cardDivs = dojo.query("#" + this.div + " .card");
             //console.log("#" + this.div + ".card :not(.dbl_empty_card)");
             //console.log("cardDivs", cardDivs);
             //cardDivs.forEach(function (element) {
             //    console.log("el",element);
             //});
-            var selectedCardIds = cardDivs.map((div) => dojo.getAttr(div.id, "data-card-id"));
+            var selectedCardIds = cardDivs.map((div) => div.getAttribute("data-card-id"));
             return selectedCardIds;
         },
 
