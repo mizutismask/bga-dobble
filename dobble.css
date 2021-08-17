@@ -66,6 +66,7 @@
 
 .minigame4 #pattern_pile {
   min-width: var(--mobile-minigame3-4-card-width);
+  min-height: var(--mobile-minigame3-4-card-width);
 }
 
 html {
@@ -367,6 +368,7 @@ html {
 
   .minigame4 #pattern_pile {
     min-width: var(--minigame3-card-width);
+    min-height: calc(var(--minigame3-card-width) + 0.5em);
   }
 }
 
