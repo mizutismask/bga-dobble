@@ -261,7 +261,7 @@ html {
 
 /*yellow f7d639 and violet 876998*/
 .dbl_empty_card {
-  background-color: inherit;
+  background-color: rgba(184, 224, 103, 0.9);
   border-style: dashed !important;
   border-width: 2px;
   border-color: seagreen;
@@ -270,6 +270,20 @@ html {
 
 .player-board {
   background-color: rgba(184, 224, 103, 0.9);
+}
+
+.dbl_winner {
+  box-shadow: 2px 12px 26px 13px greenyellow;
+  border-radius: 50%;
+  background-color: greenyellow;
+}
+
+.dbl_player_board_winner {
+  border:  solid 4px greenyellow !important;
+}
+
+.dbl_winner .dbl_empty_card {
+  background: inherit;
 }
 
 .dbl_roundNb {
@@ -304,14 +318,6 @@ html {
   top: -50px !important;
 }
 
-.dbl_winner {
-  box-shadow: 2px 12px 26px 13px greenyellow;
-  border-radius: 50%;
-}
-
-.dbl_player_board_winner {
-  border:  solid 4px greenyellow !important;
-}
 
 .dbl_player_panel {
   display: flex;
