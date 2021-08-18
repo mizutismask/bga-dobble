@@ -719,7 +719,7 @@ define([
                     //applies the same rotation to the animation so that symbol does not rotate to 0 deg before animating
                     let rotation = dojo.getAttr(symbolDiv, "data-rotation");
                     document.documentElement.style.setProperty('--animatedSymbolRotation' + i, 'rotate(' + rotation + 'deg)');
-                    dojo.addClass(symbolDiv, "zoom-in-out-effect"+i);
+                    dojo.addClass(symbolDiv, "zoom-in-out-effect" + i);
                 }
                 i++;
             }
@@ -837,7 +837,8 @@ define([
                 for (var playerId of Object.keys(this.players)) {
                     var divId = "#player_" + playerId + "_sleepy";
                     var playerPanelSleepy = "#sleepy_panel_" + playerId;
-                    if (!notif.args.includes(playerId)) {
+                    if ((this.minigame != this.HOT_POTATO && !notif.args.includes(playerId))
+                        || this.minigame == this.HOT_POTATO && !notif.args.includes(playerId) && dojo.byId("cards_count_" + playerId).innerHTML != 0) {
                         dojo.query(divId).addClass("dbl_sleep");
                         dojo.query(playerPanelSleepy).addClass("dbl_sleepy_panel");
                     }
