@@ -711,12 +711,17 @@ define([
             this.updateScores(notif.args.scores);
 
             //adds zoom in out effect
+            let i = 1;
             for (const cardId of spottedCardIds) {
                 var symbolDiv = "card-" + cardId + "-zone-" + spottedSymbol;
                 if (dojo.byId(symbolDiv)) {
-                    console.log("symbolDiv", symbolDiv);
-                    dojo.addClass(symbolDiv, "zoom-in-out-effect");
+                    //console.log("symbolDiv", symbolDiv);
+                    //applies the same rotation to the animation so that symbol does not rotate to 0 deg before animating
+                    let rotation = dojo.getAttr(symbolDiv, "data-rotation");
+                    document.documentElement.style.setProperty('--animatedSymbolRotation' + i, 'rotate(' + rotation + 'deg)');
+                    dojo.addClass(symbolDiv, "zoom-in-out-effect"+i);
                 }
+                i++;
             }
 
             //waits for the animation to be seen before removing cards
@@ -793,7 +798,7 @@ define([
                             var cardDivParentId = cardDiv.parentElement.parentElement.id;
                             var clone = dojo.clone(cardDiv);
                             dojo.setAttr(clone, "id", cardDiv.id + "clone");
-                            this.slideTemporaryObject(clone,cardDivParentId, cardDiv.id, 'overall_player_board_'+to ).play();
+                            this.slideTemporaryObject(clone, cardDivParentId, cardDiv.id, 'overall_player_board_' + to).play();
                             this.patternPile.replaceWithEmpty(cardDiv);
                         }
                     }
@@ -817,11 +822,17 @@ define([
         notifSpotFailed: function (notif) {
             this.playSound("matchFailure", false);
             //adds shake effect
-            var cards = this.selectedCardDivs;
-            console.log("selectedCardDivs", cards);
-            if (cards) {
-                for (const card of cards) {
-                    dojo.addClass(card, "shake");
+            var symbols = this.selectedCardDivs;
+            console.log("selectedCardDivs", symbols);
+            if (symbols) {
+                let i = 1;
+                for (const symb of symbols) {
+                    //applies the same rotation to the animation so that symbol does not rotate to 0 deg before animating
+                    let rotation = dojo.getAttr(symb, "data-rotation");
+                    document.documentElement.style.setProperty('--animatedSymbolRotation' + i, 'rotate(' + rotation + 'deg)');
+                    dojo.addClass(symb, "shake" + i);
+                    console.log("shake" + i);
+                    i++;
                 }
             }
         },

@@ -52,6 +52,10 @@
   --mobile-minigame3-4-card-width: 32vmin;
   --minigame3-card-width: 22vmin;
   --readOnly-card-width: 15vh;
+
+  --animatedSymbolRotation1: rotate(0deg); 
+  --animatedSymbolRotation2: rotate(0deg); 
+  --animatedSymbolRotation3: rotate(0deg); 
 }
 
 .dbl_whiteblock {
@@ -1196,45 +1200,129 @@ html {
   background-position: 77.77% 100%;
 }
 
-@keyframes shake-slow {
+@keyframes shake-slow1 {
   20% {
-    transform: translate(-30px);
+    transform: var(--animatedSymbolRotation1) translate(-30px);
   }
   40% {
-    transform: translate(15px);
+    transform: var(--animatedSymbolRotation1) translate(15px);
   }
   60% {
-    transform: translate(-15px);
+    transform: var(--animatedSymbolRotation1) translate(-15px);
   }
   80% {
-    transform: translate(8px);
+    transform: var(--animatedSymbolRotation1) translate(8px);
   }
   100% {
-    origin-transform: translate(0px);
+    origin-transform: var(--animatedSymbolRotation1) translate(0px);
+  }
+}
+
+@keyframes shake-slow2 {
+  20% {
+    transform: var(--animatedSymbolRotation2) translate(-30px);
+  }
+  40% {
+    transform: var(--animatedSymbolRotation2) translate(15px);
+  }
+  60% {
+    transform: var(--animatedSymbolRotation2) translate(-15px);
+  }
+  80% {
+    transform: var(--animatedSymbolRotation2) translate(8px);
+  }
+  100% {
+    origin-transform: var(--animatedSymbolRotation2) translate(0px);
+  }
+}
+
+@keyframes shake-slow3{
+  20% {
+    transform: var(--animatedSymbolRotation3) translate(-30px);
+  }
+  40% {
+    transform: var(--animatedSymbolRotation3) translate(15px);
+  }
+  60% {
+    transform: var(--animatedSymbolRotation3) translate(-15px);
+  }
+  80% {
+    transform: var(--animatedSymbolRotation3) translate(8px);
+  }
+  100% {
+    origin-transform: var(--animatedSymbolRotation3) translate(0px);
   }
 }
 
 .shake {
   display: inherit;
   transform-origin: center center;
-  animation-name: shake-slow;
+  animation-name: shake-slow1;
   animation-duration: 0.4s;
   animation-timing-function: ease-in-out;
   animation-iteration-count: 1;
 }
 
-@keyframes zoom-in-zoom-out {
+.shake2 {
+  display: inherit;
+  transform-origin: center center;
+  animation-name: shake-slow2;
+  animation-duration: 0.4s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: 1;
+}
+
+.shake3 {
+  display: inherit;
+  transform-origin: center center;
+  animation-name: shake-slow3;
+  animation-duration: 0.4s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: 1;
+}
+
+@keyframes zoom-in-zoom-out1 {
   0% {
-    transform: scale(1, 1);
+    transform: var(--animatedSymbolRotation1) scale(1, 1);
   }
   50% {
-    transform: scale(1.5, 1.5);
+    transform: var(--animatedSymbolRotation1) scale(1.5, 1.5);
   }
   100% {
-    transform: scale(1, 1);
+    transform: var(--animatedSymbolRotation1) scale(1, 1);
   }
 }
 
-.zoom-in-out-effect {
-  animation: zoom-in-zoom-out 0.3s ease 2;
+@keyframes zoom-in-zoom-out2 {
+  0% {
+    transform: var(--animatedSymbolRotation2) scale(1, 1);
+  }
+  50% {
+    transform: var(--animatedSymbolRotation2) scale(1.5, 1.5);
+  }
+  100% {
+    transform: var(--animatedSymbolRotation2) scale(1, 1);
+  }
+}
+
+@keyframes zoom-in-zoom-out3 {
+  0% {
+    transform: var(--animatedSymbolRotation3) scale(1, 1);
+  }
+  50% {
+    transform: var(--animatedSymbolRotation3) scale(1.5, 1.5);
+  }
+  100% {
+    transform: var(--animatedSymbolRotation3) scale(1, 1);
+  }
+}
+
+.zoom-in-out-effect1 {
+  animation: zoom-in-zoom-out1 0.3s ease 2;
+}
+.zoom-in-out-effect2 {
+  animation: zoom-in-zoom-out2 0.3s ease 2;
+}
+.zoom-in-out-effect3 {
+  animation: zoom-in-zoom-out3 0.3s ease 2;
 }
