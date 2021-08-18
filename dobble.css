@@ -1200,7 +1200,7 @@ html {
   background-position: 77.77% 100%;
 }
 
-@keyframes shake-slow1 {
+@keyframes shake-slow {
   20% {
     transform: var(--animatedSymbolRotation1) translate(-30px);
   }
@@ -1218,64 +1218,10 @@ html {
   }
 }
 
-@keyframes shake-slow2 {
-  20% {
-    transform: var(--animatedSymbolRotation2) translate(-30px);
-  }
-  40% {
-    transform: var(--animatedSymbolRotation2) translate(15px);
-  }
-  60% {
-    transform: var(--animatedSymbolRotation2) translate(-15px);
-  }
-  80% {
-    transform: var(--animatedSymbolRotation2) translate(8px);
-  }
-  100% {
-    origin-transform: var(--animatedSymbolRotation2) translate(0px);
-  }
-}
-
-@keyframes shake-slow3{
-  20% {
-    transform: var(--animatedSymbolRotation3) translate(-30px);
-  }
-  40% {
-    transform: var(--animatedSymbolRotation3) translate(15px);
-  }
-  60% {
-    transform: var(--animatedSymbolRotation3) translate(-15px);
-  }
-  80% {
-    transform: var(--animatedSymbolRotation3) translate(8px);
-  }
-  100% {
-    origin-transform: var(--animatedSymbolRotation3) translate(0px);
-  }
-}
-
 .shake {
   display: inherit;
   transform-origin: center center;
-  animation-name: shake-slow1;
-  animation-duration: 0.4s;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: 1;
-}
-
-.shake2 {
-  display: inherit;
-  transform-origin: center center;
-  animation-name: shake-slow2;
-  animation-duration: 0.4s;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: 1;
-}
-
-.shake3 {
-  display: inherit;
-  transform-origin: center center;
-  animation-name: shake-slow3;
+  animation-name: shake-slow;
   animation-duration: 0.4s;
   animation-timing-function: ease-in-out;
   animation-iteration-count: 1;

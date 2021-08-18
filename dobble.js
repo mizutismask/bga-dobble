@@ -825,14 +825,8 @@ define([
             var symbols = this.selectedCardDivs;
             console.log("selectedCardDivs", symbols);
             if (symbols) {
-                let i = 1;
                 for (const symb of symbols) {
-                    //applies the same rotation to the animation so that symbol does not rotate to 0 deg before animating
-                    let rotation = dojo.getAttr(symb, "data-rotation");
-                    document.documentElement.style.setProperty('--animatedSymbolRotation' + i, 'rotate(' + rotation + 'deg)');
-                    dojo.addClass(symb, "shake" + i);
-                    console.log("shake" + i);
-                    i++;
+                    dojo.addClass(symb, "shake");
                 }
             }
         },
