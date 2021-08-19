@@ -24,8 +24,9 @@
     
     Please REMOVE this comment before publishing your game on BGA
 -->
+<div id="dbl_area">
 
-<div id="piles">
+<div id="piles" class="dbl_content">
     <!-- BEGIN pattern -->
     <div id="pattern_pile_wrap" class="dbl_whiteblock whiteblock dbl_hand_wrap">
         <div id="pattern_pile">
@@ -90,8 +91,8 @@
         <!-- END player -->
     </div>
 
-   
-   
+</div>
+
 </div>
 
 <!-- BEGIN roPiles -->
@@ -107,10 +108,6 @@
 
 // Javascript HTML templates
 
-
-// Example:
-//var jstpl_some_game_item='<div class="my_game_item" id="my_game_item_${MY_ITEM_ID}"></div>';
-
 var jstpl_card='<div id="${cardId}" class="card"></div>'
 var jstpl_empty_card='<div data-card-id="-1" data-card-type="empty" class="card dbl_card_size dbl_empty_card"></div>'
 var jstpl_card_zone='<div id="${zoneId}" class="symbol ${symbolClass}" style="top:${top}%; left:${left}%; transform:rotate(${rotation}deg); width:${size}%; height:${size}%;" ></div>'
@@ -120,7 +117,8 @@ var jstpl_cards_icon = '<div id= "cards_panel_${id}"> \
     <div id="cards_icon_${id}" class="dbl_cards_icon"></div><span id="player_board_cards_count_${id}" class="cards_count"></span></div>';
 var jstpl_sleepy_icon = '<span id="sleepy_panel_${id}"></span>';
 var jstpl_dbl_player_panel = '<div id="dbl_player_panel_${id}" class="dbl_player_panel"></div>';
-//
+var jstpl_countdown = '<div id="dbl_cover_div" class="dbl_cover"><div id="dbl_fly-in"><div>3</div><div>2</div><div>1</div></div></div>';
+
 </script>  
 
 {OVERALL_GAME_FOOTER}

@@ -40,6 +40,7 @@ if (!defined('DECK_LOC_DECK')) {
 
     // constants for game states
     define("GS_CURRENT_ROUND", "currentRound");
+    define("GS_SHOW_COUNTDOWN", "showCountdown");
     define("TRANSITION_PLAYER_TURN", "playerTurn");
 }
 
@@ -65,6 +66,7 @@ class Dobble extends Table
             "triplet" => TRIPLET,
 
             GS_CURRENT_ROUND => 10,
+            GS_SHOW_COUNTDOWN => 11,
         ));
 
         $this->deck = self::getNew("module.common.deck");
@@ -92,6 +94,7 @@ class Dobble extends Table
 
         // Init global values with their initial values
         self::setGameStateInitialValue(GS_CURRENT_ROUND, 1);
+        self::setGameStateInitialValue(GS_SHOW_COUNTDOWN, 1);
 
         // Init game statistics
         // (note: statistics used in this file must be defined in your stats.inc.php file)
@@ -784,6 +787,8 @@ class Dobble extends Table
                 $args['pattern'] = $this->getPatternCards();
         }
         $args['counters'] = $this->argCardsCounters();
+        $args['showCountdown'] = self::getGameStateValue(GS_SHOW_COUNTDOWN);
+        self::setGameStateValue(GS_SHOW_COUNTDOWN, 0);
         return $args;
     }
 

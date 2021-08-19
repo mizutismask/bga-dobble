@@ -53,9 +53,9 @@
   --minigame3-card-width: 22vmin;
   --readOnly-card-width: 15vh;
 
-  --animatedSymbolRotation1: rotate(0deg); 
-  --animatedSymbolRotation2: rotate(0deg); 
-  --animatedSymbolRotation3: rotate(0deg); 
+  --animatedSymbolRotation1: rotate(0deg);
+  --animatedSymbolRotation2: rotate(0deg);
+  --animatedSymbolRotation3: rotate(0deg);
 }
 
 .dbl_whiteblock {
@@ -283,7 +283,7 @@ html {
 }
 
 .dbl_player_board_winner {
-  border:  solid 4px greenyellow !important;
+  border: solid 4px greenyellow !important;
 }
 
 .dbl_winner .dbl_empty_card {
@@ -322,6 +322,14 @@ html {
   top: -50px !important;
 }
 
+.dbl_winner {
+  box-shadow: 2px 12px 26px 13px greenyellow;
+  border-radius: 50%;
+}
+
+.dbl_player_board_winner {
+  border: solid 4px greenyellow !important;
+}
 
 .dbl_player_panel {
   display: flex;
@@ -344,7 +352,7 @@ html {
   background: url("img/sleep.png") no-repeat;
   margin-left: 5px;
   margin-right: 5px;
-  align-self:flex-end;
+  align-self: flex-end;
 }
 
 .dbl_cards_icon {
@@ -381,6 +389,98 @@ html {
     min-height: calc(var(--minigame3-card-width) + 0.5em);
   }
 }
+
+/* Countdown*/
+.dbl_invisible {
+  display: none;
+  /* transition: all 1s ease-out;*/
+}
+
+.dbl_cover {
+  background: #b8e067;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: white;
+  text-shadow: 5px 5px 6px #449715;
+  text-align: center;
+
+  font-weight: 700;
+  overflow: hidden;
+  font-family: "Montserrat", sans-serif;
+
+  width: 100%;
+  height: 95vh;
+  opacity: 0;
+
+  animation: dbl_fade-out 5s /*infinite*/;
+}
+
+.dbl_content {
+  width: 100%;
+}
+
+#dbl_fly-in {
+  font-size: 20em;
+  margin: 8vh auto;
+  height: 20vh;
+}
+
+#dbl_fly-in div {
+  position: fixed;
+  margin: 2vh 0;
+  opacity: 0;
+  width: 80%;
+  animation: dbl_switch 3s linear;
+}
+
+#dbl_fly-in div:nth-child(1) {
+  animation-delay: 1s;
+}
+#dbl_fly-in div:nth-child(2) {
+  animation-delay: 2s;
+}
+#dbl_fly-in div:nth-child(3) {
+  animation-delay: 3s;
+}
+
+@keyframes dbl_fade-out {
+  0%,
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes dbl_switch {
+  0% {
+    opacity: 0;
+    filter: blur(20px);
+    transform: scale(12);
+  }
+  8% {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1);
+  }
+  30% {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1);
+  }
+  40% {
+    opacity: 0;
+    transform: scale(0);
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Cards */
 
 .symbol {
   position: absolute;

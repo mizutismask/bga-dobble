@@ -147,6 +147,7 @@ define([
 
             this.highlightWinners(gamedatas.scores);
             //console.log("Ending game setup");
+
         },
 
         ///////////////////////////////////////////////////
@@ -158,9 +159,22 @@ define([
         onEnteringState: function (stateName, args) {
             console.log("Entering state: " + stateName, args);
             this.currentState = stateName;
+
             //handle pattern
             switch (stateName) {
                 case "playerTurn":
+                    if (Boolean( parseInt(args.args.showCountdown))) {
+                        dojo.addClass("piles", "dbl_invisible");
+                        dojo.query("#read_only_piles").addClass("dbl_invisible");
+                        dojo.place(this.format_block('jstpl_countdown', {}), 'dbl_area', 'first');
+                        window.setTimeout(() => {
+                            dojo.destroy("dbl_cover_div");
+                            dojo.removeClass("piles", "dbl_invisible");
+                            dojo.query("#read_only_piles").removeClass("read_only_piles", "dbl_invisible");
+                        }, 5000);
+        
+                        return;
+                    }
                     this.updateCountersIfPossible(args.args.counters);
                     let patterns = args.args.pattern;
                     switch (this.minigame) {
