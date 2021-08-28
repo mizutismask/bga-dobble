@@ -13,7 +13,7 @@
 $gameinfos = array(
 
     // Name of the game in English (will serve as the basis for translation) 
-    'game_name' => "Spot it",
+    'game_name' => "Spot it!",
 
     // Game designer (or game designers, separated by commas)
     'designer' => 'Denis Blanchot', 'Jacques Cottereau', 'Guillaume Gille-Naves', 'Igor Polouchine',
