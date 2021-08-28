@@ -173,7 +173,6 @@ define([
                             dojo.query("#read_only_piles").removeClass("read_only_piles", "dbl_invisible");
                         }, 5000);
 
-                        return;
                     }
                     this.updateCountersIfPossible(args.args.counters);
                     let patterns = args.args.pattern;
