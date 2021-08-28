@@ -163,7 +163,7 @@ define([
             //handle pattern
             switch (stateName) {
                 case "playerTurn":
-                    if (Boolean( parseInt(args.args.showCountdown))) {
+                    if (Boolean(parseInt(args.args.showCountdown))) {
                         dojo.addClass("piles", "dbl_invisible");
                         dojo.query("#read_only_piles").addClass("dbl_invisible");
                         dojo.place(this.format_block('jstpl_countdown', {}), 'dbl_area', 'first');
@@ -172,7 +172,7 @@ define([
                             dojo.removeClass("piles", "dbl_invisible");
                             dojo.query("#read_only_piles").removeClass("read_only_piles", "dbl_invisible");
                         }, 5000);
-        
+
                         return;
                     }
                     this.updateCountersIfPossible(args.args.counters);
@@ -277,6 +277,10 @@ define([
         //
         onUpdateActionButtons: function (stateName, args) {
             //console.log("onUpdateActionButtons: " + stateName, args);
+
+            if (stateName == "getReady") {
+                this.updateGetReadyActionPhrase();
+            }
 
             if (stateName == "playerTurn") {
                 this.updateActionPhrase();
@@ -421,7 +425,6 @@ define([
 
         updateActionPhrase: function () {
             if (this.isCurrentPlayerActive()) {
-
                 var phraseDiv = "pagemaintitletext";
                 var phrase;
                 switch (this.minigame) {
@@ -443,6 +446,34 @@ define([
 
                 }
                 dojo.byId(phraseDiv).innerHTML = phrase;
+            }
+        },
+
+        updateGetReadyActionPhrase: function () {
+            if (!document.getElementById("minigameName")) {
+                var phraseDiv = "pagemaintitletext";
+                var minigameName;
+                switch (this.minigame) {
+                    case this.TOWERING_INFERNO:
+                        minigameName = _('Towering inferno');
+                        break;
+                    case this.WELL:
+                        minigameName = _('Well');
+                        break;
+                    case this.POISONED_GIFT:
+                        minigameName = _('Poisoned gift');
+                        break;
+                    case this.HOT_POTATO:
+                        minigameName = _('Hot potato');
+                        break;
+                    case this.TRIPLET:
+                        minigameName = _('Triplet');
+                        break;
+
+                }
+
+                var divMinigame = this.format_block("jstpl_minigameName", { minigameNameParam: minigameName });
+                dojo.place(divMinigame, phraseDiv, "before");
             }
         },
 

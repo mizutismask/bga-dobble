@@ -118,6 +118,7 @@ var jstpl_cards_icon = '<div id= "cards_panel_${id}"> \
 var jstpl_sleepy_icon = '<span id="sleepy_panel_${id}"></span>';
 var jstpl_dbl_player_panel = '<div id="dbl_player_panel_${id}" class="dbl_player_panel"></div>';
 var jstpl_countdown = '<div id="dbl_cover_div" class="dbl_cover"><div id="dbl_fly-in"><div>3</div><div>2</div><div>1</div></div></div>';
+var jstpl_minigameName= '<span id="minigameName">${minigameNameParam} : </span>';
 
 </script>  
 
