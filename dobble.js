@@ -31,8 +31,9 @@ define([
             this.TRIPLET = 5;
 
             this.DIV_PATTERN = "pattern_pile";
-
             this.SUCCESS_SOUND = "matchSuccess";
+
+            dojo.connect(window, "onresize", this, dojo.hitch(this, "redoCircularLayout"));
         },
 
         /*
@@ -178,7 +179,8 @@ define([
                         window.setTimeout(() => {
                             dojo.destroy("dbl_cover_div");
                             dojo.removeClass("piles", "dbl_invisible");
-                            dojo.query("#read_only_piles").removeClass("read_only_piles", "dbl_invisible");
+                            dojo.query("#read_only_piles").removeClass("dbl_invisible");
+                            this.redoCircularLayout();
                         }, 5000);
 
                     }
@@ -541,7 +543,7 @@ define([
         },
 
         layoutHandsInCircle: function (playerCount) {
-            if ((this.minigame == this.POISONED_GIFT || this.minigame == this.HOT_POTATO) && playerCount > 2 && $("piles").offsetWidth > 990) {
+            if (this.isCircularLayoutPossible(playerCount)) {
                 dojo.addClass("players_wrap", "circularLayout");
                 var pilesToRound;
                 if (this.minigame == this.POISONED_GIFT) {
@@ -557,6 +559,32 @@ define([
                     dojo.style(node, "transform", "rotate(" + rotateAngle + "deg) translate(0, -" + translation + "px) rotate(-" + rotateAngle + "deg)")
                 });
             }
+        },
+
+        redoCircularLayout: function () {
+            var playerCount=dojo.query('.playerHand').length + 1;//+1 for myHand in hot potato or +1 for the pile in poison gift
+            console.log(playerCount, " players", "round layout possible :",this.isCircularLayoutPossible(playerCount));
+            if (this.isCircularLayoutPossible(playerCount)) {
+                this.layoutHandsInCircle(playerCount);
+            }
+            else {
+                dojo.removeClass("players_wrap", "circularLayout");
+                var pilesToRound;
+                if (this.minigame == this.POISONED_GIFT) {
+                    dojo.removeClass("pattern_pile_wrap", "circularPattern");
+                    pilesToRound = ".dbl_hand_wrap:not(#pattern_pile_wrap)";
+                } else {//hot potato
+                    pilesToRound = ".dbl_hand_wrap:not(#myhand_wrap)";
+                }
+                dojo.query(pilesToRound).forEach(function (node, i, listItems) {
+                   dojo.style(node, "transform", "none")
+                });
+            }
+
+        },
+
+        isCircularLayoutPossible: function (playerCount) {
+            return (this.minigame == this.POISONED_GIFT || this.minigame == this.HOT_POTATO) && playerCount > 2 && $("piles").offsetWidth > 990;
         },
 
         /*
