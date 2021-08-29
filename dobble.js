@@ -54,6 +54,9 @@ define([
             this.cardsDescription = gamedatas.cardsDescription;
             this.minigame = parseInt(gamedatas.minigame);
             dojo.addClass("piles", "minigame" + this.minigame);
+            if (Object.keys(gamedatas.players).length == 2) {
+                dojo.addClass("piles", "twoPlayers");
+            }
             this.players = gamedatas.players;
             // Setting up player boards
 

@@ -222,6 +222,12 @@ html {
   padding-top: var(--mobile-minigame3-4-card-width);
 }
 
+.minigame4.twoPlayers .dbl_card_size,
+.minigame3.twoPlayers .dbl_card_size {
+  width: var(--classic-card-width);
+  padding-top: var(--classic-card-width);
+}
+
 .card {
   border: 2px solid rgb(85, 85, 85);
   border-radius: 50%;
@@ -383,6 +389,14 @@ html {
     width: var(--minigame3-card-width);
     padding-top: var(--minigame3-card-width);
   }
+
+
+  .minigame4.twoPlayers .dbl_card_size,
+  .minigame3.twoPlayers .dbl_card_size {
+    width: var(--classic-card-width);
+    padding-top: var(--classic-card-width);
+  }
+
 
   .minigame4 #pattern_pile {
     min-width: var(--minigame3-card-width);
