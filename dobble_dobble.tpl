@@ -113,11 +113,13 @@ var jstpl_empty_card='<div data-card-id="-1" data-card-type="empty" class="card 
 var jstpl_card_zone='<div id="${zoneId}" class="symbol ${symbolClass}" style="top:${top}%; left:${left}%; transform:rotate(${rotation}deg); width:${size}%; height:${size}%;" ></div>'
 var jstpl_round='<div class="dbl_roundNb player-board">${roundText} <span id="roundNb">${roundNb}</span></div>'
 
+var jstpl_dbl_player_panel = '<div id="dbl_player_panel_${id}" class="dbl_player_panel"></div>';
 var jstpl_cards_icon = '<div id= "cards_panel_${id}"> \
     <div id="cards_icon_${id}" class="dbl_cards_icon"></div><span id="player_board_cards_count_${id}" class="cards_count"></span></div>';
 var jstpl_sleepy_icon = '<span id="sleepy_panel_${id}"></span>';
 var jstpl_winner_desc = '<span id="winner_panel_${id}" class="dbl_winner_panel dbl_hidden">${winner}</span>';
-var jstpl_dbl_player_panel = '<div id="dbl_player_panel_${id}" class="dbl_player_panel"></div>';
+var jstpl_card_size_slider = '<div style="width:100%"><span>${size}</span> <input id="sizeSlider" type="range" min="1" max="200" value="100"></div>';
+
 var jstpl_countdown = '<div id="dbl_cover_div" class="dbl_cover"><div id="dbl_fly-in"><div>3</div><div>2</div><div>1</div></div></div>';
 var jstpl_minigameName= '<span id="minigameName">${minigameNameParam}</span>';
 

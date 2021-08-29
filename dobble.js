@@ -59,6 +59,7 @@ define([
                 dojo.addClass("piles", "twoPlayers");
             }
             this.players = gamedatas.players;
+
             // Setting up player boards
 
             // TODO: Set up your game interface here, according to "gamedatas"
@@ -149,6 +150,15 @@ define([
                     id: player_id,
                 }), dbl_player_board_div);
             }
+
+            //card size slider
+            dojo.place(this.format_block('jstpl_card_size_slider', {
+                size: _("Size"),
+            }), "dbl_player_panel_" + this.player_id);
+            $(sizeSlider).addEventListener("input", function (e) {
+                //change coef applied to card size
+                document.documentElement.style.setProperty('--sizeCoef', e.target.value / 100);
+            })
 
             this.updateCountersIfPossible(gamedatas.counters);
             // Setup game notifications to handle (see "setupNotifications" method below)
@@ -562,8 +572,8 @@ define([
         },
 
         redoCircularLayout: function () {
-            var playerCount=dojo.query('.playerHand').length + 1;//+1 for myHand in hot potato or +1 for the pile in poison gift
-            console.log(playerCount, " players", "round layout possible :",this.isCircularLayoutPossible(playerCount));
+            var playerCount = dojo.query('.playerHand').length + 1;//+1 for myHand in hot potato or +1 for the pile in poison gift
+            //console.log(playerCount, " players", "round layout possible :", this.isCircularLayoutPossible(playerCount));
             if (this.isCircularLayoutPossible(playerCount)) {
                 this.layoutHandsInCircle(playerCount);
             }
@@ -577,7 +587,7 @@ define([
                     pilesToRound = ".dbl_hand_wrap:not(#myhand_wrap)";
                 }
                 dojo.query(pilesToRound).forEach(function (node, i, listItems) {
-                   dojo.style(node, "transform", "none")
+                    dojo.style(node, "transform", "none");
                 });
             }
 

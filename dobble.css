@@ -47,10 +47,11 @@
 /********* You can start writing your CSS below this line: **********/
 
 :root {
-  --classic-card-width: min(100vmin, 33vh);
-  --minigame5-card-width: 23vmin;
-  --mobile-minigame3-4-card-width: 32vmin;
-  --minigame3-card-width: 22vmin;
+  --sizeCoef:1;
+  --classic-card-width: calc(33vh * var(--sizeCoef));
+  --minigame5-card-width: calc(23vmin * var(--sizeCoef));
+  --mobile-minigame3-4-card-width: calc(32vmin * var(--sizeCoef));
+  --minigame3-card-width: calc(22vmin * var(--sizeCoef));
   --readOnly-card-width: 15vh;
 
   --animatedSymbolRotation1: rotate(0deg);
@@ -104,7 +105,7 @@ html {
   display: block !important;
 }
 
-.playerHand {
+.playerHand, #myhand {
   align-self: center;
 }
 
@@ -280,6 +281,7 @@ html {
 
 .player-board {
   background-color: rgba(184, 224, 103, 0.9);
+  color: #25520b;
 }
 
 .dbl_winner {
@@ -296,8 +298,8 @@ html {
   background: inherit;
 }
 
-.dbl_winner_panel{
-  color:greenyellow;
+.dbl_winner_panel {
+  color: greenyellow;
   font-weight: bolder;
   background-color: #449715;
   border-radius: 5px;
@@ -398,13 +400,11 @@ html {
     padding-top: var(--minigame3-card-width);
   }
 
-
   .minigame4.twoPlayers .dbl_card_size,
   .minigame3.twoPlayers .dbl_card_size {
     width: var(--classic-card-width);
     padding-top: var(--classic-card-width);
   }
-
 
   .minigame4 #pattern_pile {
     min-width: var(--minigame3-card-width);
@@ -412,7 +412,7 @@ html {
   }
 }
 
-#minigameName{
+#minigameName {
   color: #449715;
   padding-right: 15px;
 }
@@ -511,6 +511,98 @@ html {
 
   100% {
     opacity: 0;
+  }
+}
+
+/* Slider http://danielstern.ca/range.css/?ref=css-tricks#/ */
+input[type=range] {
+  width: 78%;
+  margin: -0.15px 0;
+  background-color: transparent;
+  -webkit-appearance: none;
+}
+input[type=range]:focus {
+  outline: none;
+}
+input[type=range]::-webkit-slider-runnable-track {
+  background: #449715;
+  border: 0;
+  border-radius: 8px;
+  width: 100%;
+  height: 9.3px;
+  cursor: pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  margin-top: 0.15px;
+  width: 16px;
+  height: 9px;
+  background: #adff2f;
+  border: 0;
+  border-radius: 13px;
+  cursor: pointer;
+  -webkit-appearance: none;
+}
+input[type=range]:focus::-webkit-slider-runnable-track {
+  background: #4ead18;
+}
+input[type=range]::-moz-range-track {
+  background: #449715;
+  border: 0;
+  border-radius: 8px;
+  width: 100%;
+  height: 9.3px;
+  cursor: pointer;
+}
+input[type=range]::-moz-range-thumb {
+  width: 16px;
+  height: 9px;
+  background: #adff2f;
+  border: 0;
+  border-radius: 13px;
+  cursor: pointer;
+}
+input[type=range]::-ms-track {
+  background: transparent;
+  border-color: transparent;
+  border-width: 1.75px 0;
+  color: transparent;
+  width: 100%;
+  height: 9.3px;
+  cursor: pointer;
+}
+input[type=range]::-ms-fill-lower {
+  background: #3a8112;
+  border: 0;
+  border-radius: 16px;
+}
+input[type=range]::-ms-fill-upper {
+  background: #449715;
+  border: 0;
+  border-radius: 16px;
+}
+input[type=range]::-ms-thumb {
+  width: 16px;
+  height: 9px;
+  background: #adff2f;
+  border: 0;
+  border-radius: 13px;
+  cursor: pointer;
+  margin-top: 0px;
+  /*Needed to keep the Edge thumb centred*/
+}
+input[type=range]:focus::-ms-fill-lower {
+  background: #449715;
+}
+input[type=range]:focus::-ms-fill-upper {
+  background: #4ead18;
+}
+/*TODO: Use one of the selectors from https://stackoverflow.com/a/20541859/7077589 and figure out
+how to remove the virtical space around the range input in IE*/
+@supports (-ms-ime-align:auto) {
+  /* Pre-Chromium Edge only styles, selector taken from hhttps://stackoverflow.com/a/32202953/7077589 */
+  input[type=range] {
+    margin: 0;
+    /*Edge starts the margin from the thumb, not the track as other browsers do*/
   }
 }
 
