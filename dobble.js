@@ -142,6 +142,11 @@ define([
                 var el = 'player_' + player_id + "_sleepy";
                 this.addTooltipHtml(el, sleepyTooltip);
 
+                //winner text
+                dojo.place(this.format_block('jstpl_winner_desc', {
+                    winner: _("Leader"),
+                    id: player_id,
+                }), dbl_player_board_div);
             }
 
             this.updateCountersIfPossible(gamedatas.counters);
@@ -591,11 +596,13 @@ define([
             }
             dojo.query(".dbl_winner").removeClass("dbl_winner");
             dojo.query(".dbl_player_board_winner").removeClass("dbl_player_board_winner");
+            dojo.query(".dbl_winner_panel").addClass("dbl_hidden");
 
             for (const player of winners) {
                 //dojo.query("#player_hand_" + player +" h3").addClass("dbl_winner");//on names
                 dojo.query("#player_hand_stock_" + player).addClass("dbl_winner");//on piles
                 dojo.query("#overall_player_board_" + player).addClass("dbl_player_board_winner");
+                dojo.query("#winner_panel_" + player).removeClass("dbl_hidden");
                 if (player == this.player_id) {
                     dojo.query("#myhand").addClass("dbl_winner");
                 }

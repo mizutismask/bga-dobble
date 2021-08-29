@@ -296,6 +296,14 @@ html {
   background: inherit;
 }
 
+.dbl_winner_panel{
+  color:greenyellow;
+  font-weight: bolder;
+  background-color: #449715;
+  border-radius: 5px;
+  padding: 1px 5px;
+}
+
 .dbl_roundNb {
   color: #449715;
   text-align: center;
@@ -404,9 +412,19 @@ html {
   }
 }
 
+#minigameName{
+  color: #449715;
+  padding-right: 15px;
+}
+
 /* Countdown*/
 .dbl_invisible {
   display: none;
+  /*transition: all 1s ease-out;*/
+}
+
+.dbl_hidden {
+  visibility: hidden;
   /*transition: all 1s ease-out;*/
 }
 
