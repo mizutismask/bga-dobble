@@ -100,10 +100,10 @@ define([
 
                 this.layoutHandsInCircle(Object.keys(gamedatas.players).length);
             }
-
+            this.addMinigameName();
             if (this.minigame == this.HOT_POTATO) {
                 var divRound = this.format_block("jstpl_round", { roundText: _("Round"), roundNb: gamedatas.roundNumber });
-                dojo.place(divRound, "right-side-second-part", "before");
+                dojo.place(divRound, "gameDesc");
             }
 
             if (this.minigame == this.WELL || this.minigame == this.TOWERING_INFERNO) {
@@ -297,10 +297,6 @@ define([
         onUpdateActionButtons: function (stateName, args) {
             //console.log("onUpdateActionButtons: " + stateName, args);
 
-            if (stateName == "getReady") {
-                this.updateGetReadyActionPhrase();
-            }
-
             if (stateName == "playerTurn") {
                 this.updateActionPhrase();
             }
@@ -446,21 +442,22 @@ define([
             if (this.isCurrentPlayerActive()) {
                 var phraseDiv = "pagemaintitletext";
                 var phrase;
+                var short = dojo.byId("maintitlebar_content").clientWidth < 500;
                 switch (this.minigame) {
                     case this.TOWERING_INFERNO:
-                        phrase = _("Find the common symbol to get more cards than you opponents");
+                        phrase = short ? _("Get more cards than you opponents"): _("Find the common symbol to get more cards than you opponents");
                         break;
                     case this.WELL:
-                        phrase = _("Find the common symbol to be the first to get rid of all yours cards");
+                        phrase = short ? _("Get rid of all yours cards"): _("Find the common symbol to be the first to get rid of all yours cards");
                         break;
                     case this.POISONED_GIFT:
-                        phrase = _("Find the common symbol with the opponent of your choice and the central pile");
+                        phrase = short ? _("Give the common pile to an opponent"): _("Find the common symbol with the opponent of your choice and the central pile");
                         break;
                     case this.HOT_POTATO:
-                        phrase = _("Find the common symbol with the opponent of your choice");
+                        phrase = short ? _("Give your pile to an opponent"): _("Find the common symbol with the opponent of your choice");
                         break;
                     case this.TRIPLET:
-                        phrase = _("Find the common symbol on 3 cards until it's not possible anymore");
+                        phrase = short ? _("Find the common symbol on 3 cards"): _("Find the common symbol on 3 cards until it's not possible anymore");
                         break;
 
                 }
@@ -468,32 +465,31 @@ define([
             }
         },
 
-        updateGetReadyActionPhrase: function () {
-            if (!document.getElementById("minigameName")) {
-                var phraseDiv = "pagemaintitletext";
-                var minigameName;
-                switch (this.minigame) {
-                    case this.TOWERING_INFERNO:
-                        minigameName = _('Towering inferno');
-                        break;
-                    case this.WELL:
-                        minigameName = _('Well');
-                        break;
-                    case this.POISONED_GIFT:
-                        minigameName = _('Poisoned gift');
-                        break;
-                    case this.HOT_POTATO:
-                        minigameName = _('Hot potato');
-                        break;
-                    case this.TRIPLET:
-                        minigameName = _('Triplet');
-                        break;
+        addMinigameName: function () {
+            var container = this.format_block("jstpl_gameDescription", {});
+            dojo.place(container, "right-side-second-part", "before");
 
-                }
+            var minigameName;
+            switch (this.minigame) {
+                case this.TOWERING_INFERNO:
+                    minigameName = _('Towering inferno');
+                    break;
+                case this.WELL:
+                    minigameName = _('Well');
+                    break;
+                case this.POISONED_GIFT:
+                    minigameName = _('Poisoned gift');
+                    break;
+                case this.HOT_POTATO:
+                    minigameName = _('Hot potato');
+                    break;
+                case this.TRIPLET:
+                    minigameName = _('Triplet');
+                    break;
 
-                var divMinigame = this.format_block("jstpl_minigameName", { minigameNameParam: minigameName });
-                dojo.place(divMinigame, phraseDiv, "before");
             }
+            var divMinigame = this.format_block("jstpl_minigameName", { minigameNameParam: minigameName });
+            dojo.place(divMinigame, "gameDesc");
         },
 
         setSelectionModeOnHandStocks: function (selectionMode) {

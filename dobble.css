@@ -306,7 +306,7 @@ html {
   padding: 1px 5px;
 }
 
-.dbl_roundNb {
+.dbl_gameDesc {
   color: #449715;
   text-align: center;
   font-weight: bolder;
@@ -384,6 +384,10 @@ html {
 @media only screen and (hover: none) and (pointer: coarse) {
   #dbl_dobble_hand {
     display: none;
+  }
+
+  #page-title{
+    font-size: 90%;/*makes titles smaller so that it fits in one line on mobiles*/
   }
 }
 
