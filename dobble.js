@@ -189,6 +189,15 @@ define([
                 this.toggleScoresAndCountersVisibility(true);
             }
 
+            if (stateName === "getReady" && this.minigame == this.TRIPLET) {
+                this.patternPile.removeAll();
+                fakes = [];
+                for (let i = 0; i < 9; i++) {
+                    fakes[i] = null;
+                }
+                this.patternPile.addCards(fakes);
+            }
+
             //handle pattern
             switch (stateName) {
                 case "playerTurn":

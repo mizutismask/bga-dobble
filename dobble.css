@@ -261,10 +261,6 @@ html {
   display: none;
 }
 
-.gamestate_getReady #piles,
-.gamestate_getReady #read_only_piles {
-  display: none;
-}
 
 .minigame5 .card_selected {
   transform: scale(0.9);
