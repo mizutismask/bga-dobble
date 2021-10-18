@@ -56,4 +56,16 @@ $game_options = array(
             ],
         ],
     ),
+
+    HIDE_SCORES=> array(
+        'name' => totranslate('Hide scores'),
+        'values' => array(
+            ACTIVATED => array(
+                'name' => totranslate('Yes'), 'tmdisplay' => totranslate('Hide scores'),
+                'description' => totranslate('Scores and card numbers are hidden')
+            ),
+            DEACTIVATED => array('name' => totranslate('No')),
+        ),
+        'default' => DEACTIVATED,
+    ),
 );

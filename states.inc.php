@@ -55,10 +55,12 @@ if (!defined('STATE_PLAYER_TURN')) { // ensure this block is only invoked once, 
     define("STATE_PLAYER_TURN", 3);
     define("STATE_NEXT_TURN", 4);
     define("STATE_NEXT_ROUND", 5);
+    define("STATE_BEFORE_END", 6);
 
     define("TRANSITION_COUNTDOWN", "countdown");
     define("TRANSITION_NEXT_TURN", "nextTurn");
     define("TRANSITION_NEXT_ROUND", "nextRound");
+    define("TRANSITION_BEFORE_END", "beforeEnd");
     define("TRANSITION_END_GAME", "endGame");
 }
 
@@ -106,7 +108,7 @@ $machinestates = array(
         "type" => "game",
         "action" => "stNextTurn",
         "updateGameProgression" => true,
-        "transitions" => array(TRANSITION_PLAYER_TURN => STATE_PLAYER_TURN, TRANSITION_NEXT_ROUND => STATE_PLAYER_TURN, TRANSITION_END_GAME => 99)
+        "transitions" => array(TRANSITION_PLAYER_TURN => STATE_PLAYER_TURN, TRANSITION_NEXT_ROUND => STATE_PLAYER_TURN, TRANSITION_BEFORE_END => STATE_BEFORE_END)
     ),
 
     STATE_NEXT_ROUND => array(
@@ -115,8 +117,19 @@ $machinestates = array(
         "type" => "game",
         "action" => "stNextRound",
         "updateGameProgression" => true,
-        "transitions" => array(TRANSITION_NEXT_TURN => STATE_NEXT_TURN, TRANSITION_END_GAME => 99)
+        "transitions" => array(TRANSITION_NEXT_TURN => STATE_NEXT_TURN, TRANSITION_BEFORE_END => STATE_BEFORE_END)
     ),
+
+    STATE_BEFORE_END => array(
+        "name" => "beforeEnd",
+        "description" => '',
+        "type" => "game",
+        "action" => "stBeforeEnd",
+        "updateGameProgression" => true,
+        "args" => "argRevealScores",
+        "transitions" => array(TRANSITION_END_GAME => 99)
+    ),
+
 
     // Final state.
     // Please do not modify (and do not overload action/args methods).

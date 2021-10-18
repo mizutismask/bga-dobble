@@ -64,6 +64,7 @@ class Dobble extends Table
             "hot_potato" => HOT_POTATO,
             "poisoned_gift" => POISONED_GIFT,
             "triplet" => TRIPLET,
+            "hide_scores" => HIDE_SCORES,
 
             GS_CURRENT_ROUND => 10,
             GS_SHOW_COUNTDOWN => 11,
@@ -137,6 +138,7 @@ class Dobble extends Table
         $result['players'] = self::getCollectionFromDb($sql);
         $result['pattern'] = $this->getPatternCards();
         $result['minigame'] = $this->getMiniGame();
+        $result['hideScores'] = $this->isScoreHidden();
         $result['counters'] = $this->argCardsCounters();
         $result['cardsDescription'] = $this->cards_description;
         $result['scores'] = $this->getScoresByPlayer();
@@ -291,6 +293,11 @@ class Dobble extends Table
     function getRoundsNumber()
     {
         return self::getGameStateValue('rounds_number');
+    }
+
+    function isScoreHidden()
+    {
+        return self::getGameStateValue('hide_scores') == ACTIVATED;
     }
 
     /** Add a "symbols" property, which is an array of all symbols in the card. */
@@ -580,23 +587,27 @@ class Dobble extends Table
         return count($triplets) > 0;
     }
 
-    function argCardsCounters()
+    function argCardsCounters($forceEvenIfHidden=false)
     {
         $players = self::getObjectListFromDB("SELECT player_id id FROM player", true);
         $counters = array();
-        for ($i = 0; $i < ($this->getPlayersNumber()); $i++) {
-            $counters['cards_count_' . $players[$i]] = array('counter_name' => 'cards_count_' . $players[$i], 'counter_value' => 0);
-            $counters['player_board_cards_count_' . $players[$i]] = array('counter_name' => 'player_board_cards_count_' . $players[$i], 'counter_value' => 0);
-        }
-        $cards_in_hand = $this->deck->countCardsByLocationArgs(DECK_LOC_HAND);
-        $cards_won = $this->deck->countCardsByLocationArgs(DECK_LOC_WON);
-        foreach ($cards_in_hand as $player_id => $cards_nbr) {
-            $counters['cards_count_' . $player_id]['counter_value'] = $cards_nbr;
-            $counters['player_board_cards_count_' . $player_id]['counter_value'] = $cards_nbr;
-        }
-        foreach ($cards_won as $player_id => $cards_won_nb) {
-            $counters['cards_count_' . $player_id]['counter_value'] += $cards_won_nb;
-            $counters['player_board_cards_count_' . $player_id]['counter_value'] += $cards_won_nb;
+
+        if(!$this->isScoreHidden()||$forceEvenIfHidden){
+
+            for ($i = 0; $i < ($this->getPlayersNumber()); $i++) {
+                $counters['cards_count_' . $players[$i]] = array('counter_name' => 'cards_count_' . $players[$i], 'counter_value' => 0);
+                $counters['player_board_cards_count_' . $players[$i]] = array('counter_name' => 'player_board_cards_count_' . $players[$i], 'counter_value' => 0);
+            }
+            $cards_in_hand = $this->deck->countCardsByLocationArgs(DECK_LOC_HAND);
+            $cards_won = $this->deck->countCardsByLocationArgs(DECK_LOC_WON);
+            foreach ($cards_in_hand as $player_id => $cards_nbr) {
+                $counters['cards_count_' . $player_id]['counter_value'] = $cards_nbr;
+                $counters['player_board_cards_count_' . $player_id]['counter_value'] = $cards_nbr;
+            }
+            foreach ($cards_won as $player_id => $cards_won_nb) {
+                $counters['cards_count_' . $player_id]['counter_value'] += $cards_won_nb;
+                $counters['player_board_cards_count_' . $player_id]['counter_value'] += $cards_won_nb;
+            }
         }
 
         if ($this->getMiniGame() != HOT_POTATO) {
@@ -798,6 +809,12 @@ class Dobble extends Table
         return  self::getCollectionFromDb($sql, true);
     }
 
+    public function argRevealScores(){
+        $args = [];
+        $args['counters'] = $this->argCardsCounters(true);
+        $args['scores'] = $this->getScoresByPlayer();
+        return $args;
+    }
 
     //////////////////////////////////////////////////////////////////////////////
     //////////// Game state actions
@@ -817,14 +834,14 @@ class Dobble extends Table
 
             case TRIPLET:
                 if ($this->deck->countCardInLocation(DECK_LOC_DECK) <= 9 && !$this->isTripletPossible()) {
-                    $this->gamestate->nextState(TRANSITION_END_GAME); //not enough cards to go on
+                    $this->gamestate->nextState(TRANSITION_BEFORE_END); //not enough cards to go on
                 } else {
                     $this->gamestate->nextState(TRANSITION_PLAYER_TURN);
                 }
                 break;
             case WELL:
                 if ($this->isAnyPlayerWithoutHand()) {
-                    $this->gamestate->nextState(TRANSITION_END_GAME); //only one player with cards in hand
+                    $this->gamestate->nextState(TRANSITION_BEFORE_END); //only one player with cards in hand
                 } else {
                     $this->gamestate->nextState(TRANSITION_PLAYER_TURN);
                 }
@@ -835,7 +852,7 @@ class Dobble extends Table
             case POISONED_GIFT:
             case TOWERING_INFERNO:
                 if ($this->deck->countCardInLocation(DECK_LOC_DECK) == 0) {
-                    $this->gamestate->nextState(TRANSITION_END_GAME); //no more cards in the pile
+                    $this->gamestate->nextState(TRANSITION_BEFORE_END); //no more cards in the pile
                 } else {
                     $this->gamestate->nextState(TRANSITION_PLAYER_TURN);
                 }
@@ -854,7 +871,7 @@ class Dobble extends Table
 
                 //checks if it's the end of the game
                 if ($currentRound == $this->getRoundsNumber()) {
-                    $this->gamestate->nextState(TRANSITION_END_GAME);
+                    $this->gamestate->nextState(TRANSITION_BEFORE_END);
                 } else {
                     //prepare next round (we reshuffle because we need enough cards to make all the rounds)
                     $this->deck->moveAllCardsInLocation(null, DECK_LOC_DECK);
@@ -888,6 +905,10 @@ class Dobble extends Table
     function st_multiPlayerAllActive()
     {
         $this->gamestate->setAllPlayersMultiactive();
+    }
+
+    function stBeforeEnd(){
+        $this->gamestate->nextState(TRANSITION_END_GAME);
     }
 
     //////////////////////////////////////////////////////////////////////////////

@@ -54,6 +54,7 @@ define([
             console.log("gamedatas ", gamedatas);
             this.cardsDescription = gamedatas.cardsDescription;
             this.minigame = parseInt(gamedatas.minigame);
+            this.hideScores = Boolean(gamedatas.hideScores);
             dojo.addClass("piles", "minigame" + this.minigame);
             if (Object.keys(gamedatas.players).length == 2) {
                 dojo.addClass("piles", "twoPlayers");
@@ -61,8 +62,6 @@ define([
             this.players = gamedatas.players;
 
             // Setting up player boards
-
-            // TODO: Set up your game interface here, according to "gamedatas"
             if (
                 this.minigame == this.WELL ||
                 this.minigame == this.TOWERING_INFERNO ||
@@ -160,7 +159,13 @@ define([
                 document.documentElement.style.setProperty('--sizeCoef', e.target.value / 100);
             })
 
-            this.updateCountersIfPossible(gamedatas.counters);
+            console.log("game setup this.hideScores", this.hideScores);
+            this.toggleScoresAndCountersVisibility(!this.hideScores);
+            if (!this.hideScores) {
+                this.updateCountersIfPossible(gamedatas.counters);
+            } else {
+                //todo add tooltip to class fa-star
+            }
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
 
@@ -178,6 +183,13 @@ define([
         onEnteringState: function (stateName, args) {
             console.log("Entering state: " + stateName, args);
             this.currentState = stateName;
+
+            if (stateName === "beforeEnd") {
+                this.updateScores(args.args.scores, true);
+                console.log("beforeEnd counters ", args.args.counters);
+                this.updateCountersIfPossible(args.args.counters);
+                this.toggleScoresAndCountersVisibility(true);
+            }
 
             //handle pattern
             switch (stateName) {
@@ -281,6 +293,7 @@ define([
                         default:
                             break;
                     }
+                    break;
             }
         },
 
@@ -431,6 +444,7 @@ define([
             var existingCounters = this.filterObject(counters, (item, key) => {
                 return dojo.byId(item.counter_name) != undefined;
             });
+            console.log("existingCounters ", existingCounters);
             this.updateCounters(existingCounters);
         },
 
@@ -445,19 +459,19 @@ define([
                 var short = dojo.byId("maintitlebar_content").clientWidth < 500;
                 switch (this.minigame) {
                     case this.TOWERING_INFERNO:
-                        phrase = short ? _("Get more cards than you opponents"): _("Find the common symbol to get more cards than you opponents");
+                        phrase = short ? _("Get more cards than you opponents") : _("Find the common symbol to get more cards than you opponents");
                         break;
                     case this.WELL:
-                        phrase = short ? _("Get rid of all yours cards"): _("Find the common symbol to be the first to get rid of all yours cards");
+                        phrase = short ? _("Get rid of all yours cards") : _("Find the common symbol to be the first to get rid of all yours cards");
                         break;
                     case this.POISONED_GIFT:
-                        phrase = short ? _("Give the common pile to an opponent"): _("Find the common symbol with the opponent of your choice and the central pile");
+                        phrase = short ? _("Give the common pile to an opponent") : _("Find the common symbol with the opponent of your choice and the central pile");
                         break;
                     case this.HOT_POTATO:
-                        phrase = short ? _("Give your pile to an opponent"): _("Find the common symbol with the opponent of your choice");
+                        phrase = short ? _("Give your pile to an opponent") : _("Find the common symbol with the opponent of your choice");
                         break;
                     case this.TRIPLET:
-                        phrase = short ? _("Find the common symbol on 3 cards"): _("Find the common symbol on 3 cards until it's not possible anymore");
+                        phrase = short ? _("Find the common symbol on 3 cards") : _("Find the common symbol on 3 cards until it's not possible anymore");
                         break;
 
                 }
@@ -601,9 +615,12 @@ define([
             playNextMoveSound && this.disableNextMoveSound();
         },
 
-        updateScores(scores) {
-            for (const [id, score] of Object.entries(scores)) {
-                this.scoreCtrl[id].setValue(score);
+        updateScores(scores, forceEvenIfHidden = false) {
+            console.log("show ", !this.hideScores || forceEvenIfHidden);
+            if (!this.hideScores || forceEvenIfHidden) {
+                for (const [id, score] of Object.entries(scores)) {
+                    this.scoreCtrl[id].setValue(score);
+                }
             }
             this.highlightWinners(scores);
         },
@@ -640,6 +657,19 @@ define([
                 if (player == this.player_id) {
                     dojo.query("#myhand").addClass("dbl_winner");
                 }
+            }
+        },
+
+        toggleScoresAndCountersVisibility(visible) {
+            if (visible) {
+                dojo.query(".player_score_value").removeClass("dbl_hidden");
+                dojo.query(".dbl_cards_count_wrapper").removeClass("dbl_hidden");
+                dojo.query(".dbl_cards_icon").removeClass("dbl_hidden");
+                
+            } else {
+                dojo.query(".player_score_value").addClass("dbl_hidden");
+                dojo.query(".dbl_cards_count_wrapper").addClass("dbl_hidden");
+                dojo.query(".dbl_cards_icon").addClass("dbl_hidden");
             }
         },
 
