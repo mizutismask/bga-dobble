@@ -587,27 +587,24 @@ class Dobble extends Table
         return count($triplets) > 0;
     }
 
-    function argCardsCounters($forceEvenIfHidden=false)
+    function argCardsCounters()
     {
         $players = self::getObjectListFromDB("SELECT player_id id FROM player", true);
         $counters = array();
 
-        if(!$this->isScoreHidden()||$forceEvenIfHidden){
-
-            for ($i = 0; $i < ($this->getPlayersNumber()); $i++) {
-                $counters['cards_count_' . $players[$i]] = array('counter_name' => 'cards_count_' . $players[$i], 'counter_value' => 0);
-                $counters['player_board_cards_count_' . $players[$i]] = array('counter_name' => 'player_board_cards_count_' . $players[$i], 'counter_value' => 0);
-            }
-            $cards_in_hand = $this->deck->countCardsByLocationArgs(DECK_LOC_HAND);
-            $cards_won = $this->deck->countCardsByLocationArgs(DECK_LOC_WON);
-            foreach ($cards_in_hand as $player_id => $cards_nbr) {
-                $counters['cards_count_' . $player_id]['counter_value'] = $cards_nbr;
-                $counters['player_board_cards_count_' . $player_id]['counter_value'] = $cards_nbr;
-            }
-            foreach ($cards_won as $player_id => $cards_won_nb) {
-                $counters['cards_count_' . $player_id]['counter_value'] += $cards_won_nb;
-                $counters['player_board_cards_count_' . $player_id]['counter_value'] += $cards_won_nb;
-            }
+        for ($i = 0; $i < ($this->getPlayersNumber()); $i++) {
+            $counters['cards_count_' . $players[$i]] = array('counter_name' => 'cards_count_' . $players[$i], 'counter_value' => 0);
+            $counters['player_board_cards_count_' . $players[$i]] = array('counter_name' => 'player_board_cards_count_' . $players[$i], 'counter_value' => 0);
+        }
+        $cards_in_hand = $this->deck->countCardsByLocationArgs(DECK_LOC_HAND);
+        $cards_won = $this->deck->countCardsByLocationArgs(DECK_LOC_WON);
+        foreach ($cards_in_hand as $player_id => $cards_nbr) {
+            $counters['cards_count_' . $player_id]['counter_value'] = $cards_nbr;
+            $counters['player_board_cards_count_' . $player_id]['counter_value'] = $cards_nbr;
+        }
+        foreach ($cards_won as $player_id => $cards_won_nb) {
+            $counters['cards_count_' . $player_id]['counter_value'] += $cards_won_nb;
+            $counters['player_board_cards_count_' . $player_id]['counter_value'] += $cards_won_nb;
         }
 
         if ($this->getMiniGame() != HOT_POTATO) {
@@ -809,9 +806,10 @@ class Dobble extends Table
         return  self::getCollectionFromDb($sql, true);
     }
 
-    public function argRevealScores(){
+    public function argRevealScores()
+    {
         $args = [];
-        $args['counters'] = $this->argCardsCounters(true);
+        $args['counters'] = $this->argCardsCounters();
         $args['scores'] = $this->getScoresByPlayer();
         return $args;
     }
@@ -907,7 +905,8 @@ class Dobble extends Table
         $this->gamestate->setAllPlayersMultiactive();
     }
 
-    function stBeforeEnd(){
+    function stBeforeEnd()
+    {
         $this->gamestate->nextState(TRANSITION_END_GAME);
     }
 

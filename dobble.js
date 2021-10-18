@@ -159,12 +159,11 @@ define([
                 document.documentElement.style.setProperty('--sizeCoef', e.target.value / 100);
             })
 
-            console.log("game setup this.hideScores", this.hideScores);
             this.toggleScoresAndCountersVisibility(!this.hideScores);
-            if (!this.hideScores) {
-                this.updateCountersIfPossible(gamedatas.counters);
-            } else {
-                //todo add tooltip to class fa-star
+            this.updateCountersIfPossible(gamedatas.counters);
+
+            if (this.hideScores) {
+                this.addTooltipToClass('fa-star', _("You chose to hide scores in the table setup"), "");
             }
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
@@ -185,8 +184,7 @@ define([
             this.currentState = stateName;
 
             if (stateName === "beforeEnd") {
-                this.updateScores(args.args.scores, true);
-                console.log("beforeEnd counters ", args.args.counters);
+                this.updateScores(args.args.scores);
                 this.updateCountersIfPossible(args.args.counters);
                 this.toggleScoresAndCountersVisibility(true);
             }
@@ -615,12 +613,9 @@ define([
             playNextMoveSound && this.disableNextMoveSound();
         },
 
-        updateScores(scores, forceEvenIfHidden = false) {
-            console.log("show ", !this.hideScores || forceEvenIfHidden);
-            if (!this.hideScores || forceEvenIfHidden) {
-                for (const [id, score] of Object.entries(scores)) {
-                    this.scoreCtrl[id].setValue(score);
-                }
+        updateScores(scores) {
+            for (const [id, score] of Object.entries(scores)) {
+                this.scoreCtrl[id].setValue(score);
             }
             this.highlightWinners(scores);
         },
@@ -665,11 +660,14 @@ define([
                 dojo.query(".player_score_value").removeClass("dbl_hidden");
                 dojo.query(".dbl_cards_count_wrapper").removeClass("dbl_hidden");
                 dojo.query(".dbl_cards_icon").removeClass("dbl_hidden");
-                
+                dojo.query(".cards_count").removeClass("dbl_hidden");
+
+
             } else {
                 dojo.query(".player_score_value").addClass("dbl_hidden");
                 dojo.query(".dbl_cards_count_wrapper").addClass("dbl_hidden");
                 dojo.query(".dbl_cards_icon").addClass("dbl_hidden");
+                dojo.query(".cards_count").addClass("dbl_hidden");
             }
         },
 
