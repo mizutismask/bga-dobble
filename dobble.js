@@ -667,14 +667,14 @@ define([
         toggleScoresAndCountersVisibility(visible) {
             if (visible) {
                 dojo.query(".player_score_value").removeClass("dbl_hidden");
-                dojo.query(".dbl_cards_count_wrapper").removeClass("dbl_hidden");
+                dojo.query(".dbl_cards_count_wrapper:not(#pattern_cards_count_wrapper)").removeClass("dbl_hidden");
                 dojo.query(".dbl_cards_icon").removeClass("dbl_hidden");
                 dojo.query(".cards_count").removeClass("dbl_hidden");
 
 
             } else {
                 dojo.query(".player_score_value").addClass("dbl_hidden");
-                dojo.query(".dbl_cards_count_wrapper").addClass("dbl_hidden");
+                dojo.query(".dbl_cards_count_wrapper:not(#pattern_cards_count_wrapper)").addClass("dbl_hidden");
                 dojo.query(".dbl_cards_icon").addClass("dbl_hidden");
                 dojo.query(".cards_count").addClass("dbl_hidden");
             }
