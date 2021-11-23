@@ -67,6 +67,7 @@
 
 #pattern_pile {
   min-width: var(--classic-card-width);
+  min-height: var(--classic-card-width);
 }
 
 .minigame4 #pattern_pile {
