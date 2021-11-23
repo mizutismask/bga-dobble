@@ -50,8 +50,8 @@ define([
         */
 
         setup: function (gamedatas) {
-            console.log("minigame ", this.minigame);
-            console.log("gamedatas ", gamedatas);
+            //console.log("minigame ", this.minigame);
+            //console.log("gamedatas ", gamedatas);
             this.cardsDescription = gamedatas.cardsDescription;
             this.minigame = parseInt(gamedatas.minigame);
             this.hideScores = Boolean(gamedatas.hideScores);
@@ -182,7 +182,7 @@ define([
         //                  You can use this method to perform some user interface changes at this moment.
         //
         onEnteringState: function (stateName, args) {
-            console.log("Entering state: " + stateName, args);
+            //console.log("Entering state: " + stateName, args);
             this.currentState = stateName;
 
             if (stateName === "beforeEnd") {
@@ -433,7 +433,7 @@ define([
             if (card) {
                 fromDiv = "card-" + card.id;
             }
-            console.log("fromDiv ", fromDiv);
+            //console.log("fromDiv ", fromDiv);
             return fromDiv;
         },
 
@@ -453,7 +453,7 @@ define([
             var existingCounters = this.filterObject(counters, (item, key) => {
                 return dojo.byId(item.counter_name) != undefined;
             });
-            console.log("existingCounters ", existingCounters);
+            //console.log("existingCounters ", existingCounters);
             this.updateCounters(existingCounters);
         },
 
@@ -697,8 +697,8 @@ define([
         */
         onChooseSymbol: function (evt, selected = false, divId, cardId) {
             var symbol = dojo.getAttr(evt.currentTarget.id, "data-symbol");
-            console.log("evt.currentTarget.id", evt.currentTarget.id);
-            console.log("onChooseSymbol ", symbol);
+            //console.log("evt.currentTarget.id", evt.currentTarget.id);
+            //console.log("onChooseSymbol ", symbol);
 
             //store selected divs to shake in case of error
             this.selectedCardDivs = dojo.query(".card > .stockitem_selected").map((div) => div.id);
@@ -827,7 +827,7 @@ define([
         // TODO: from this point and below, you can write your game notifications handling methods
 
         notifCardsMove: function (notif) {
-            console.log("notifCardsMove", notif);
+            //console.log("notifCardsMove", notif);
             var fromPlayerId = notif.args.fromPlayerId;
             var cards = notif.args.cards;
             var from = notif.args.from;
@@ -950,7 +950,7 @@ define([
             this.playSound("matchFailure", false);
             //adds shake effect
             var symbols = this.selectedCardDivs;
-            console.log("selectedCardDivs", symbols);
+            //console.log("selectedCardDivs", symbols);
             if (symbols) {
                 for (const symb of symbols) {
                     dojo.addClass(symb, "shake");
@@ -959,7 +959,7 @@ define([
         },
 
         notifDBLGameStateMultipleActiveUpdate: function (notif) {
-            console.log("notifDBLGameStateMultipleActiveUpdate", notif);
+            //console.log("notifDBLGameStateMultipleActiveUpdate", notif);
             if (this.currentState == "playerTurn") {
                 for (var playerId of Object.keys(this.players)) {
                     var divId = "#player_" + playerId + "_sleepy";
