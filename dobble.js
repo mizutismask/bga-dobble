@@ -151,13 +151,15 @@ define([
             }
 
             //card size slider
-            dojo.place(this.format_block('jstpl_card_size_slider', {
-                size: _("Size"),
-            }), "dbl_player_panel_" + this.player_id);
-            $(sizeSlider).addEventListener("input", function (e) {
-                //change coef applied to card size
-                document.documentElement.style.setProperty('--sizeCoef', e.target.value / 100);
-            })
+            if (dojo.byId("dbl_player_panel_" + this.player_id)) {//not in spectator mode
+                dojo.place(this.format_block('jstpl_card_size_slider', {
+                    size: _("Size"),
+                }), "dbl_player_panel_" + this.player_id);
+                $(sizeSlider).addEventListener("input", function (e) {
+                    //change coef applied to card size
+                    document.documentElement.style.setProperty('--sizeCoef', e.target.value / 100);
+                })
+            }
 
             this.toggleScoresAndCountersVisibility(!this.hideScores);
             this.updateCountersIfPossible(gamedatas.counters);
