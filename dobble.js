@@ -964,14 +964,39 @@ define([
                 for (var playerId of Object.keys(this.players)) {
                     var divId = "#player_" + playerId + "_sleepy";
                     var playerPanelSleepy = "#sleepy_panel_" + playerId;
+
+                    var cardId = "#" + this.getStockDiv(playerId) + " .card";
                     if ((this.minigame != this.HOT_POTATO && !notif.args.includes(playerId))
                         || this.minigame == this.HOT_POTATO && !notif.args.includes(playerId) && dojo.byId("cards_count_" + playerId).innerHTML != 0) {
+                        var phraseDiv = "pagemaintitletext";
+                        dojo.byId(phraseDiv).innerHTML = _("Wait until next card");
                         dojo.query(divId).addClass("dbl_sleep");
                         dojo.query(playerPanelSleepy).addClass("dbl_sleepy_panel");
+                        if (this.minigame == this.TRIPLET) {
+                            if (playerId == this.player_id) {
+                                dojo.query("#pattern_pile .card").addClass("dbl_sleepy_card");
+                            }
+                        }
+                        else {
+                            if (playerId == this.player_id) {
+                                dojo.query(cardId).addClass("dbl_sleepy_card");
+                            }
+                        }
+
                     }
                     else {
+                        this.updateActionPhrase();
                         dojo.query(divId).removeClass("dbl_sleep");
                         dojo.query(playerPanelSleepy).removeClass("dbl_sleepy_panel");
+                        if (this.minigame == this.TRIPLET) {
+                            if (playerId == this.player_id) {
+                                dojo.query("#pattern_pile .card").removeClass("dbl_sleepy_card");
+                            }
+                        } else {
+                            if (playerId == this.player_id) {
+                                dojo.query(cardId).removeClass("dbl_sleepy_card");
+                            }
+                        }
                     }
                 }
             }
