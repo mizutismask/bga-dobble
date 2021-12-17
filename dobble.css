@@ -41,7 +41,7 @@
      Note: on the production platform, this file will be compressed and comments will be removed.
            Consequently, don't hesitate to put as many comments as necessary.
 */
-
+/*yellow 251 225 34 */
 /* Note: you must not use any @import directive */
 
 /********* You can start writing your CSS below this line: **********/
@@ -57,12 +57,21 @@
   --animatedSymbolRotation1: rotate(0deg);
   --animatedSymbolRotation2: rotate(0deg);
   --animatedSymbolRotation3: rotate(0deg);
+
+  --yellowMain: rgba(251, 225, 34, 1);
+  --yellowTransp: rgba(251, 225, 34, 0.9);
+  --purpleMain: rgba(167, 123, 202, 1);
+  --purpleTransp: rgba(167, 123, 202, 0.9);
+  --purpleLight: rgba(167, 123, 202, 0.5);
+  --purpleLightExa: #a77bca;
+  --winnerColor: #7014bb;
+
 }
 
 .dbl_whiteblock {
   margin-top: 0px !important;
   border-radius: 8px;
-  background: rgba(184, 224, 103, 0.9);
+  background: var(--yellowTransp);
 }
 
 #pattern_pile {
@@ -76,12 +85,7 @@
 }
 
 html {
-  /*background: url("img/background2.png");*/
   background: url("img/background.png");
-}
-
-#dbl_area {
-  /* background: no-repeat url("img/background.png");*/
 }
 
 #piles {
@@ -179,7 +183,7 @@ html {
 }
 
 .dbl_cards_count_wrapper {
-  color: #449715;
+  color: var(--purpleMain);
   font-size: x-large;
   font-weight: bold;
   display: inline;
@@ -256,7 +260,7 @@ html {
 .minigame4 #pattern_pile .card {
   border-style: solid;
   border-width: 2px;
-  border-color: #886a95 !important;
+  border-color: var(--purpleTransp) !important;
   -moz-box-shadow: 5px 5px 5px 0px rgba(136, 106, 149, 1);
   -webkit-box-shadow: 5px 5px 5px 0px rgba(136, 106, 149, 1);
   -o-box-shadow: 5px 5px 5px 0px rgba(136, 106, 149, 1);
@@ -276,28 +280,32 @@ html {
   transform: scale(0.9);
 }
 
+h3 .to_translate {
+  color: var(--purpleMain);
+}
+
 /*yellow f7d639 and violet 876998*/
 .dbl_empty_card {
-  background-color: rgba(184, 224, 103, 0.9);
+  background-color: var(--yellowTransp);
   border-style: dashed !important;
   border-width: 2px;
-  border-color: seagreen;
+  border-color: var(--purpleTransp);
   box-shadow: none !important;
 }
 
 .player-board {
-  background-color: rgba(184, 224, 103, 0.9);
-  color: #25520b;
+  background-color: var(--purpleMain);
+  color: var(--yellowMain);
 }
 
 .dbl_winner {
-  box-shadow: 2px 12px 26px 13px greenyellow;
+  box-shadow: 2px 12px 26px 13px var(--winnerColor);
   border-radius: 50%;
-  background-color: greenyellow;
+  background-color: var(--winnerColor);
 }
 
 .dbl_player_board_winner {
-  border: solid 4px greenyellow !important;
+  border: solid 4px var(--winnerColor) !important;
 }
 
 .dbl_winner .dbl_empty_card {
@@ -305,15 +313,15 @@ html {
 }
 
 .dbl_winner_panel {
-  color: greenyellow;
+  color: var(--yellowTransp);
   font-weight: bolder;
-  background-color: #449715;
+  background-color: var(--winnerColor);
   border-radius: 5px;
   padding: 1px 5px;
 }
 
 .dbl_gameDesc {
-  color: #449715;
+  color: var(--yellowTransp);
   text-align: center;
   font-weight: bolder;
   margin-top: 1em;
@@ -345,12 +353,12 @@ html {
 }
 
 .dbl_winner {
-  box-shadow: 2px 12px 26px 13px greenyellow;
+  box-shadow: 2px 7px 26px 4px var(--winnerColor);
   border-radius: 50%;
 }
 
 .dbl_player_board_winner {
-  border: solid 4px greenyellow !important;
+  border: solid 4px var(--purpleTransp) !important;
 }
 
 .dbl_player_panel {
@@ -423,7 +431,7 @@ html {
 }
 
 #minigameName {
-  color: #449715;
+  color: var(--yellowTransp);
   padding-right: 15px;
 }
 
@@ -439,12 +447,12 @@ html {
 }
 
 .dbl_cover {
-  background: #b8e067;
+  background: var(--yellowTransp);
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: fixed;
   color: white;
-  text-shadow: 5px 5px 6px #449715;
+  text-shadow: 5px 5px 6px var(--purpleTransp);
   text-align: center;
 
   font-weight: 700;
@@ -535,7 +543,7 @@ input[type="range"]:focus {
   outline: none;
 }
 input[type="range"]::-webkit-slider-runnable-track {
-  background: #449715;
+  background: var(--yellowTransp);
   border: 0;
   border-radius: 8px;
   width: 100%;
@@ -546,17 +554,17 @@ input[type="range"]::-webkit-slider-thumb {
   margin-top: 0.15px;
   width: 16px;
   height: 9px;
-  background: #adff2f;
+  background: var(--winnerColor);
   border: 0;
   border-radius: 13px;
   cursor: pointer;
   -webkit-appearance: none;
 }
 input[type="range"]:focus::-webkit-slider-runnable-track {
-  background: #4ead18;
+  background: var(--yellowMain);
 }
 input[type="range"]::-moz-range-track {
-  background: #449715;
+  background: var(--yellowTransp);
   border: 0;
   border-radius: 8px;
   width: 100%;
@@ -566,7 +574,7 @@ input[type="range"]::-moz-range-track {
 input[type="range"]::-moz-range-thumb {
   width: 16px;
   height: 9px;
-  background: #adff2f;
+  background: var(--winnerColor);
   border: 0;
   border-radius: 13px;
   cursor: pointer;
@@ -581,19 +589,19 @@ input[type="range"]::-ms-track {
   cursor: pointer;
 }
 input[type="range"]::-ms-fill-lower {
-  background: #3a8112;
+  background: var(--yellowTransp);
   border: 0;
   border-radius: 16px;
 }
 input[type="range"]::-ms-fill-upper {
-  background: #449715;
+  background: var(--yellowTransp);
   border: 0;
   border-radius: 16px;
 }
 input[type="range"]::-ms-thumb {
   width: 16px;
   height: 9px;
-  background: #adff2f;
+  background: var(--winnerColor);
   border: 0;
   border-radius: 13px;
   cursor: pointer;
@@ -601,10 +609,10 @@ input[type="range"]::-ms-thumb {
   /*Needed to keep the Edge thumb centred*/
 }
 input[type="range"]:focus::-ms-fill-lower {
-  background: #449715;
+  background: var(--yellowTransp);
 }
 input[type="range"]:focus::-ms-fill-upper {
-  background: #4ead18;
+  background: var(--yellowMain);
 }
 /*TODO: Use one of the selectors from https://stackoverflow.com/a/20541859/7077589 and figure out
 how to remove the virtical space around the range input in IE*/
