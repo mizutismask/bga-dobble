@@ -208,6 +208,10 @@ html {
   padding-top: var(--readOnly-card-width);
 }
 
+.dbl_read_only .dbl_winner {
+  box-shadow: 2px 7px 15px 2px var(--winnerColor); /* smaller shadow */ 
+}
+
 .minigame5 #pattern_pile {
   display: grid;
   grid-gap: 5px;
@@ -284,9 +288,8 @@ h3 .to_translate {
   color: var(--purpleMain);
 }
 
-/*yellow f7d639 and violet 876998*/
 .dbl_empty_card {
-  background-color: var(--yellowTransp);
+  background-color: white;
   border-style: dashed !important;
   border-width: 2px;
   border-color: var(--purpleTransp);
@@ -301,15 +304,11 @@ h3 .to_translate {
 .dbl_winner {
   box-shadow: 2px 12px 26px 13px var(--winnerColor);
   border-radius: 50%;
-  background-color: var(--winnerColor);
+  background-color: white;
 }
 
 .dbl_player_board_winner {
   border: solid 4px var(--winnerColor) !important;
-}
-
-.dbl_winner .dbl_empty_card {
-  background: inherit;
 }
 
 .dbl_winner_panel {
