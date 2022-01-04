@@ -633,6 +633,7 @@ how to remove the virtical space around the range input in IE*/
   position: absolute;
   background-image: url("./img/cards/symbols.png");
   background-size: 1000%;
+  background-repeat: no-repeat;
   cursor: pointer;
 }
 
