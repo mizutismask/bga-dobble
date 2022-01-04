@@ -280,6 +280,10 @@ html {
   display: none;
 }
 
+.userPrefHideHand #dbl_dobble_hand{
+  display: none !important;
+}
+
 .minigame5 .card_selected {
   transform: scale(0.9);
 }

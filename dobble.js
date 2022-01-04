@@ -160,6 +160,15 @@ define([
                     document.documentElement.style.setProperty('--sizeCoef', e.target.value / 100);
                 })
             }
+            //hide hand
+            if (this.isDobbleHandPossibleOnCurrentMinigame()) {
+                dojo.place(this.format_block('jstpl_user_pref_hide_hand', {
+                    hideHand: _("Hide hand"),
+                }), "dbl_player_panel_" + this.player_id);
+                $(userPrefHideHand).addEventListener("click", function (e) {
+                    dojo.toggleClass("dbl_area", "userPrefHideHand");
+                })
+            }
 
             this.toggleScoresAndCountersVisibility(!this.hideScores);
             this.updateCountersIfPossible(gamedatas.counters);
@@ -548,7 +557,7 @@ define([
         },
 
         setupDobbleHand: function () {
-            if (this.minigame == this.WELL || this.minigame == this.TOWERING_INFERNO) {
+            if (this.isDobbleHandPossibleOnCurrentMinigame()) {
                 let eye = document.querySelector(".dbl_hand_eye");
                 let eyeBoundingRect = eye.getBoundingClientRect();
                 let eyeCenter = {
@@ -561,6 +570,10 @@ define([
                     eye.style.transform = `rotate(${angle}deg)`;
                 })
             }
+        },
+
+        isDobbleHandPossibleOnCurrentMinigame: function () {
+            return this.minigame == this.WELL || this.minigame == this.TOWERING_INFERNO;
         },
 
         animateDobbleHand: function () {
