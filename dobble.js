@@ -169,6 +169,13 @@ define([
                     dojo.toggleClass("dbl_area", "userPrefHideHand");
                 })
             }
+            //undo circular layout
+            if (this.isCircularLayoutPossible(Object.keys(gamedatas.players).length)) {
+                dojo.place(this.format_block('jstpl_user_pref_disable_round_layout', {
+                    noRoundLayout: _("Round layout if possible"),
+                }), "dbl_player_panel_" + this.player_id);
+                $(userPrefDisableRoundLayout).addEventListener("click", this.redoCircularLayout.bind(this));
+            }
 
             this.toggleScoresAndCountersVisibility(!this.hideScores);
             this.updateCountersIfPossible(gamedatas.counters);
@@ -606,7 +613,7 @@ define([
         redoCircularLayout: function () {
             var playerCount = dojo.query('.playerHand').length + 1;//+1 for myHand in hot potato or +1 for the pile in poison gift
             //console.log(playerCount, " players", "round layout possible :", this.isCircularLayoutPossible(playerCount));
-            if (this.isCircularLayoutPossible(playerCount)) {
+            if (this.isCircularLayoutPossible(playerCount) && $(userPrefDisableRoundLayout).checked) {
                 this.layoutHandsInCircle(playerCount);
             }
             else {

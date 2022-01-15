@@ -120,7 +120,7 @@ var jstpl_sleepy_icon = '<span id="sleepy_panel_${id}"></span>';
 var jstpl_winner_desc = '<span id="winner_panel_${id}" class="dbl_winner_panel dbl_hidden">${winner}</span>';
 var jstpl_card_size_slider = '<div style="width:100%"><span>${size}</span> <input id="sizeSlider" type="range" min="1" max="200" value="100"></div>';
 var jstpl_user_pref_hide_hand = '<input type="checkbox" id="userPrefHideHand" name="userPrefHand" ><label for="userPrefHand">${hideHand}</label>';
-
+var jstpl_user_pref_disable_round_layout = '<input type="checkbox" id="userPrefDisableRoundLayout" name="userPrefNoRoundLayout" checked><label for="userPrefNoRoundLayout">${noRoundLayout}</label>';
 
 var jstpl_countdown = '<div id="dbl_cover_div" class="dbl_cover"><div id="dbl_fly-in"><div>3</div><div>2</div><div>1</div></div></div>';
 var jstpl_gameDescription= '<div id="gameDesc" class="dbl_gameDesc player-board"></div>';
