@@ -170,11 +170,13 @@ define([
                 })
             }
             //undo circular layout
-            if (this.isCircularLayoutPossible(Object.keys(gamedatas.players).length)) {
-                dojo.place(this.format_block('jstpl_user_pref_disable_round_layout', {
-                    noRoundLayout: _("Round layout if possible"),
-                }), "dbl_player_panel_" + this.player_id);
-                $(userPrefDisableRoundLayout).addEventListener("click", this.redoCircularLayout.bind(this));
+            if (dojo.byId("dbl_player_panel_" + this.player_id)) {//not in spectator mode
+                if (this.isCircularLayoutPossible(Object.keys(gamedatas.players).length)) {
+                    dojo.place(this.format_block('jstpl_user_pref_disable_round_layout', {
+                        noRoundLayout: _("Round layout if possible"),
+                    }), "dbl_player_panel_" + this.player_id);
+                    $(userPrefDisableRoundLayout).addEventListener("click", this.redoCircularLayout.bind(this));
+                }
             }
 
             this.toggleScoresAndCountersVisibility(!this.hideScores);
@@ -613,7 +615,8 @@ define([
         redoCircularLayout: function () {
             var playerCount = dojo.query('.playerHand').length + 1;//+1 for myHand in hot potato or +1 for the pile in poison gift
             //console.log(playerCount, " players", "round layout possible :", this.isCircularLayoutPossible(playerCount));
-            if (this.isCircularLayoutPossible(playerCount) && $(userPrefDisableRoundLayout).checked) {
+            var isCircularLayout = dojo.byId("userPrefDisableRoundLayout") && $(userPrefDisableRoundLayout).checked || !dojo.byId("userPrefDisableRoundLayout");
+            if (this.isCircularLayoutPossible(playerCount) && isCircularLayout) {
                 this.layoutHandsInCircle(playerCount);
             }
             else {
@@ -706,14 +709,14 @@ define([
         //// Player's action
 
         /*
-        
+         
             Here, you are defining methods to handle player's action (ex: results of mouse click on 
             game objects).
             
             Most of the time, these methods:
             _ check the action is possible at this game state.
             _ make a call to the game server
-        
+         
         */
         onChooseSymbol: function (evt, selected = false, divId, cardId) {
             var symbol = dojo.getAttr(evt.currentTarget.id, "data-symbol");
@@ -815,7 +818,7 @@ define([
             
             Note: game notification names correspond to "notifyAllPlayers" and "notifyPlayer" calls in
                   your dobble.game.php file.
-        
+         
         */
         setupNotifications: function () {
             //console.log("notifications subscriptions setup");
